@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 11px; font-weight: 700; fill: #111; }
+      .subtitle { font-size: 8px; fill: #666; }
+      .label { font-size: 8.5px; fill: #333; }
+      .pct-label { font-size: 7.5px; fill: #888; }
+      .callout { font-size: 8px; font-weight: 700; fill: #0d9488; }
+      .marker-label { font-size: 8px; fill: #333; font-weight: 600; }
+    </style>
+    <marker id="arr-teal" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+      <path d="M0,0 L0,5 L5,2.5 z" fill="#0d9488"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+      <path d="M0,0 L0,5 L5,2.5 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <rect width="400" height="250" fill="#ffffff" rx="4"/>
+
+  <!-- Title -->
+  <text x="200" y="18" text-anchor="middle" class="title">Selection Overhead vs. Real ML Kernel Duration</text>
+  <text x="200" y="30" text-anchor="middle" class="subtitle">Proportional comparison — selection is invisible at every scale</text>
+
+  <!-- Chart: horizontal stacked bars showing kernel duration vs overhead -->
+  <!-- Each kernel shown as a colored bar, with the selection overhead as an invisible sliver -->
+  <!-- Bar width = 300px total (x=50 to x=350), height=28px, gap=10px -->
+  <!-- Colors: GEMM=#f59e0b, Attention=#3b82f6, Norm=#10b981, Micro=#8b5cf6 -->
+
+  <!-- Top y for bars: 50px -->
+  <!-- Row 1: Large GEMM 100ms. Bar = 300px. Overhead = 0.000006% * 300 = 0.000018px → sub-pixel, draw as 1px hairline. -->
+  <rect x="50" y="48" width="300" height="26" fill="#f59e0b" opacity="0.85" rx="2"/>
+  <!-- hairline for overhead at far left — render as a 1px colored line -->
+  <rect x="50" y="48" width="1" height="26" fill="#0d9488" rx="0"/>
+  <text x="46" y="65" text-anchor="end" class="marker-label" fill="#b45309">Large GEMM</text>
+  <text x="46" y="74" text-anchor="end" class="pct-label">100 ms</text>
+  <text x="354" y="65" class="pct-label">overhead: 6×10⁻⁶%</text>
+
+  <!-- Row 2: Medium attention 10ms. Bar = 300px. -->
+  <rect x="50" y="86" width="300" height="26" fill="#3b82f6" opacity="0.75" rx="2"/>
+  <rect x="50" y="86" width="1" height="26" fill="#0d9488" rx="0"/>
+  <text x="46" y="103" text-anchor="end" class="marker-label" fill="#1d4ed8">Attention</text>
+  <text x="46" y="112" text-anchor="end" class="pct-label">10 ms</text>
+  <text x="354" y="103" class="pct-label">overhead: 6×10⁻⁵%</text>
+
+  <!-- Row 3: Small norm kernel 1ms. Bar = 300px. -->
+  <rect x="50" y="124" width="300" height="26" fill="#10b981" opacity="0.75" rx="2"/>
+  <rect x="50" y="124" width="1" height="26" fill="#0d9488" rx="0"/>
+  <text x="46" y="141" text-anchor="end" class="marker-label" fill="#065f46">Norm kernel</text>
+  <text x="46" y="150" text-anchor="end" class="pct-label">1 ms</text>
+  <text x="354" y="141" class="pct-label">overhead: 6×10⁻⁴%</text>
+
+  <!-- Row 4: Micro-kernel 100µs. Bar = 300px. Overhead = 0.006% * 300 = 0.018px → still sub-pixel, but here we render 1px -->
+  <rect x="50" y="162" width="300" height="26" fill="#8b5cf6" opacity="0.75" rx="2"/>
+  <rect x="50" y="162" width="1" height="26" fill="#0d9488" rx="0"/>
+  <text x="46" y="179" text-anchor="end" class="marker-label" fill="#5b21b6">Micro-kernel</text>
+  <text x="46" y="188" text-anchor="end" class="pct-label">100 µs</text>
+  <text x="354" y="179" class="pct-label">overhead: 6×10⁻³%</text>
+
+  <!-- Callout pointing to the 1px teal slivers -->
+  <!-- Arrow from label down-left to x=51, y=137 (center between rows 2-3) -->
+  <line x1="110" y1="205" x2="53" y2="175" stroke="#0d9488" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#arr-teal)"/>
+  <text x="113" y="203" class="callout">&#8592; Selection (all four rows)</text>
+  <text x="113" y="214" font-size="7.5" fill="#0d9488">Faster than a single L2 cache access</text>
+  <text x="113" y="224" font-size="7.5" fill="#0d9488">(~5 ns vs ~40 ns L2 hit)</text>
+
+  <!-- Visual legend note at top-left -->
+  <rect x="52" y="37" width="8" height="8" fill="#0d9488" rx="1"/>
+  <text x="63" y="45" font-size="7.5" fill="#0d9488" font-weight="700">Selection overhead (1px = too wide to scale)</text>
+
+  <!-- Bottom note -->
+  <text x="200" y="242" text-anchor="middle" font-size="7.5" fill="#9ca3af">Each bar represents 100% of kernel duration. Overhead slice is sub-pixel at every scale.</text>
+</svg>

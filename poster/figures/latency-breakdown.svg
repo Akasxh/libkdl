@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="650" height="350" viewBox="0 0 650 350" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 13px; font-weight: 700; fill: #111; }
+      .subtitle { font-size: 9.5px; fill: #555; }
+      .axis-label { font-size: 9px; fill: #444; }
+      .tick-label { font-size: 8.5px; fill: #555; }
+      .bar-label { font-size: 9px; font-weight: 600; fill: #111; }
+      .annotation { font-size: 8px; fill: #555; }
+      .callout-label { font-size: 8px; font-weight: 700; fill: #0d9488; }
+      .bracket-label { font-size: 8px; fill: #dc2626; font-weight: 600; }
+    </style>
+    <!-- Log gridline pattern -->
+    <marker id="arrow-teal" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#0d9488"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="650" height="350" fill="#ffffff" rx="4"/>
+
+  <!-- Title block -->
+  <text x="325" y="22" text-anchor="middle" class="title">Cold-Path Dispatch Latency Decomposition</text>
+  <text x="325" y="36" text-anchor="middle" class="subtitle">GTX 1650 (sm_75), CUDA 13.1, null kernel CUBIN</text>
+
+  <!-- Chart area: left=130, right=530, top=52, bottom=252 -->
+  <!-- Log scale: 0.001 µs → 100 µs maps to x=130→530 (400px) -->
+  <!-- log10(0.001)=-3, log10(100)=2, range=5 decades, 400px/5=80px per decade -->
+
+  <!-- Gridlines + tick marks -->
+  <!-- x = 130 + (log10(val)+3) * 80 -->
+  <!-- 0.001: x=130, 0.01: x=210, 0.1: x=290, 1: x=370, 10: x=450, 100: x=530 -->
+
+  <line x1="130" y1="52" x2="130" y2="252" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="210" y1="52" x2="210" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="290" y1="52" x2="290" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="370" y1="52" x2="370" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="450" y1="52" x2="450" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="530" y1="52" x2="530" y2="252" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Baseline -->
+  <line x1="130" y1="252" x2="530" y2="252" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!-- X-axis tick labels -->
+  <text x="130" y="266" text-anchor="middle" class="tick-label">0.001</text>
+  <text x="210" y="266" text-anchor="middle" class="tick-label">0.01</text>
+  <text x="290" y="266" text-anchor="middle" class="tick-label">0.1</text>
+  <text x="370" y="266" text-anchor="middle" class="tick-label">1</text>
+  <text x="450" y="266" text-anchor="middle" class="tick-label">10</text>
+  <text x="530" y="266" text-anchor="middle" class="tick-label">100</text>
+  <text x="330" y="282" text-anchor="middle" class="axis-label">Latency (µs) — log scale</text>
+
+  <!-- Bar rows: y positions (top of each bar), bar height = 28px, gap = 10px -->
+  <!-- Row 1: cuModuleLoadData (cold) = 36.0 µs → log10(36)=1.556 → x=130+(1.556+3)*80=130+364.5=494.5 -->
+  <!-- Row 2: cuStreamSynchronize = 2.45 µs → log10(2.45)=0.389 → x=130+(0.389+3)*80=130+271.1=401.1 -->
+  <!-- Row 3: cuLaunchKernel = 1.65 µs → log10(1.65)=0.217 → x=130+(0.217+3)*80=130+257.4=387.4 -->
+  <!-- Row 4: cuModuleGetFunction = 0.063 µs → log10(0.063)=-1.201 → x=130+(-1.201+3)*80=130+143.9=273.9 -->
+  <!-- Row 5: Selection = 0.005 µs → log10(0.005)=-2.301 → x=130+(-2.301+3)*80=130+55.9=185.9 -->
+
+  <!-- Row 1: cuModuleLoadData -->
+  <rect x="130" y="60" width="364" height="28" fill="#dc2626" rx="2"/>
+  <!-- "90% of cold path" bracket -->
+  <line x1="494" y1="56" x2="494" y2="61" stroke="#dc2626" stroke-width="1.5"/>
+  <line x1="130" y1="56" x2="494" y2="56" stroke="#dc2626" stroke-width="1.5"/>
+  <line x1="130" y1="56" x2="130" y2="61" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="312" y="53" text-anchor="middle" class="bracket-label">90% of total cold path</text>
+  <!-- value label -->
+  <text x="499" y="79" class="bar-label" fill="#dc2626">36.0 µs</text>
+
+  <!-- Row 2: cuStreamSynchronize -->
+  <rect x="130" y="98" width="271" height="28" fill="#2d7fc1" rx="2"/>
+  <text x="406" y="117" class="bar-label" fill="#2d7fc1">2.45 µs</text>
+
+  <!-- Row 3: cuLaunchKernel -->
+  <rect x="130" y="136" width="257" height="28" fill="#7c3aed" rx="2"/>
+  <text x="392" y="155" class="bar-label" fill="#7c3aed">1.65 µs</text>
+
+  <!-- Row 4: cuModuleGetFunction -->
+  <rect x="130" y="174" width="144" height="28" fill="#6b7280" rx="2"/>
+  <text x="279" y="193" class="bar-label" fill="#6b7280">0.063 µs</text>
+
+  <!-- Row 5: Selection overhead — only 56px wide from baseline, nearly invisible -->
+  <!-- Selection = ~0.005 µs → barely 1.5px; render as 3px wide for visibility, then callout -->
+  <rect x="130" y="212" width="3" height="28" fill="#0d9488" rx="1"/>
+
+  <!-- Zoom inset callout for Selection -->
+  <!-- Inset box at bottom right -->
+  <rect x="380" y="200" width="130" height="58" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5" rx="4"/>
+  <text x="445" y="213" text-anchor="middle" font-size="8" font-weight="700" fill="#0d9488">ZOOMED: Selection</text>
+  <!-- Mini log bar inside inset -->
+  <rect x="390" y="218" width="110" height="12" fill="#e5e7eb" rx="1"/>
+  <!-- 0.004-0.006 µs range shown as a thick tick -->
+  <!-- Map 0.001=0, 0.01=22px within the 110px inset (just the first decade) -->
+  <!-- 0.005 in [0.001,0.01]: fraction = (log10(0.005)-log10(0.001))/(log10(0.01)-log10(0.001)) = (-2.301+3)/1 = 0.699 → x = 390+0.699*110 = 390+76.9 = 467 -->
+  <rect x="462" y="218" width="6" height="12" fill="#0d9488" rx="1"/>
+  <text x="390" y="243" font-size="7" fill="#555">0.001 µs</text>
+  <text x="500" y="243" font-size="7" fill="#555">0.01 µs</text>
+  <text x="445" y="255" text-anchor="middle" class="callout-label">3–6 ns</text>
+
+  <!-- Arrow from Selection bar to inset -->
+  <line x1="132" y1="226" x2="376" y2="226" stroke="#0d9488" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow-teal)"/>
+
+  <!-- Y-axis row labels -->
+  <text x="126" y="79" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuModuleLoadData</text>
+  <text x="126" y="90" text-anchor="end" font-size="7.5" fill="#666">(cold)</text>
+  <text x="126" y="117" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuStreamSynchronize</text>
+  <text x="126" y="155" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuLaunchKernel</text>
+  <text x="126" y="193" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuModuleGetFunction</text>
+  <text x="126" y="226" text-anchor="end" font-size="9" fill="#222" font-weight="600">Selection overhead</text>
+
+  <!-- Bottom annotation -->
+  <text x="325" y="304" text-anchor="middle" font-size="9" fill="#0d9488" font-weight="700">Selection overhead: &lt; 0.01% of total cold-path latency</text>
+
+  <!-- Legend -->
+  <rect x="136" y="316" width="10" height="10" fill="#dc2626" rx="1"/>
+  <text x="150" y="325" font-size="8" fill="#444">Module load (cold)</text>
+  <rect x="248" y="316" width="10" height="10" fill="#2d7fc1" rx="1"/>
+  <text x="262" y="325" font-size="8" fill="#444">Stream sync</text>
+  <rect x="338" y="316" width="10" height="10" fill="#7c3aed" rx="1"/>
+  <text x="352" y="325" font-size="8" fill="#444">Kernel launch</text>
+  <rect x="420" y="316" width="10" height="10" fill="#6b7280" rx="1"/>
+  <text x="434" y="325" font-size="8" fill="#444">Get function</text>
+  <rect x="502" y="316" width="10" height="10" fill="#0d9488" rx="1"/>
+  <text x="516" y="325" font-size="8" fill="#444">Selection</text>
+
+</svg>

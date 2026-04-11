@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="208" viewBox="0 0 700 208"
+     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#0d9488"/>
+    </marker>
+  </defs>
+
+  <!-- White background -->
+  <rect width="700" height="208" fill="#ffffff"/>
+
+  <!-- Section heading -->
+  <text x="350" y="14" text-anchor="middle" font-size="9.5" font-weight="700"
+        fill="#4b5563" letter-spacing="1.2"
+        font-variant="all-small-caps">Runtime Dispatch Already Exists Everywhere Except MLIR</text>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- CARD TEMPLATE: x positions for 5 cards, each 124px wide, gap 5px -->
+  <!-- Card 1: x=6,  Card 2: x=135, Card 3: x=264, Card 4: x=393, Card 5: x=522 -->
+  <!-- Each card: width=123, height=118, top=22 -->
+  <!-- ─────────────────────────────────────────────────────── -->
+
+  <!-- ── Card 1: cuBLAS ── -->
+  <rect x="6" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <!-- check badge -->
+  <circle cx="117" cy="34" r="8" fill="#16a34a"/>
+  <path d="M112,34 L115,37 L122,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Matrix icon -->
+  <g transform="translate(40,32)">
+    <rect x="0"  y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
+    <rect x="9"  y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
+    <rect x="18" y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.25"/>
+    <rect x="0"  y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
+    <rect x="9"  y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
+    <rect x="18" y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
+    <rect x="0"  y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.25"/>
+    <rect x="9"  y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
+    <rect x="18" y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
+  </g>
+  <text x="67" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">cuBLAS</text>
+  <text x="67" y="98"  text-anchor="middle" font-size="8" fill="#374151">100s of GEMM variants</text>
+  <text x="67" y="109" text-anchor="middle" font-size="8" fill="#374151">selected at runtime</text>
+  <text x="67" y="120" text-anchor="middle" font-size="8" fill="#374151">by tile heuristic</text>
+
+  <!-- ── Card 2: cuDNN v9 ── -->
+  <rect x="135" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="246" cy="34" r="8" fill="#16a34a"/>
+  <path d="M241,34 L244,37 L251,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Neural net icon -->
+  <g transform="translate(168,30)">
+    <circle cx="4"  cy="8"  r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="4"  cy="20" r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="4"  cy="32" r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+    <circle cx="22" cy="14" r="3.5" fill="#16a34a" opacity="0.7"/>
+    <circle cx="22" cy="26" r="3.5" fill="#16a34a" opacity="0.7"/>
+    <circle cx="40" cy="20" r="3.5" fill="#16a34a" opacity="0.95"/>
+    <line x1="7.5" y1="8"  x2="18.5" y2="14" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+    <line x1="7.5" y1="20" x2="18.5" y2="14" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+    <line x1="7.5" y1="20" x2="18.5" y2="26" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+    <line x1="7.5" y1="32" x2="18.5" y2="26" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+    <line x1="25.5" y1="14" x2="36.5" y2="20" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+    <line x1="25.5" y1="26" x2="36.5" y2="20" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
+  </g>
+  <text x="196" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">cuDNN v9</text>
+  <text x="196" y="98"  text-anchor="middle" font-size="8" fill="#374151">NVRTC JIT fusion</text>
+  <text x="196" y="109" text-anchor="middle" font-size="8" fill="#374151">3 heuristic</text>
+  <text x="196" y="120" text-anchor="middle" font-size="8" fill="#374151">dispatch modes</text>
+
+  <!-- ── Card 3: PyTorch ── -->
+  <rect x="264" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="375" cy="34" r="8" fill="#16a34a"/>
+  <path d="M370,34 L373,37 L380,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Flame / torch icon -->
+  <g transform="translate(308,27)">
+    <path d="M14,34 C5,30 2,22 7,14 C8,19 11,20 12,17 C12,12 17,7 14,0 C21,5 26,14 22,24 C24,21 25,18 24,15 C29,20 28,28 24,34 C21,37 17,38 14,34Z"
+          fill="#ea580c" opacity="0.85"/>
+    <ellipse cx="14" cy="32" rx="5.5" ry="3.5" fill="#fed7aa" opacity="0.55"/>
+  </g>
+  <text x="325" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">PyTorch</text>
+  <text x="325" y="98"  text-anchor="middle" font-size="8" fill="#374151">DispatchKeySet on</text>
+  <text x="325" y="109" text-anchor="middle" font-size="8" fill="#374151">every op call from</text>
+  <text x="325" y="120" text-anchor="middle" font-size="8" fill="#374151">live tensor metadata</text>
+
+  <!-- ── Card 4: torch.compile ── -->
+  <rect x="393" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="504" cy="34" r="8" fill="#16a34a"/>
+  <path d="M499,34 L502,37 L509,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Gear icon -->
+  <g transform="translate(431,28)">
+    <circle cx="15" cy="14" r="5.5" fill="none" stroke="#16a34a" stroke-width="2"/>
+    <circle cx="15" cy="14" r="2.5" fill="#16a34a"/>
+    <!-- teeth -->
+    <rect x="13.2" y="3"  width="3.6" height="4" rx="1" fill="#16a34a"/>
+    <rect x="13.2" y="21" width="3.6" height="4" rx="1" fill="#16a34a"/>
+    <rect x="3"   y="12.2" width="4" height="3.6" rx="1" fill="#16a34a"/>
+    <rect x="21"  y="12.2" width="4" height="3.6" rx="1" fill="#16a34a"/>
+    <rect x="6.5" y="5.5" width="3.6" height="4" rx="1" transform="rotate(-45 8.3 7.5)" fill="#16a34a"/>
+    <rect x="21"  y="5.5" width="3.6" height="4" rx="1" transform="rotate(45 23 7.5)"  fill="#16a34a"/>
+    <rect x="6.5" y="18.5" width="3.6" height="4" rx="1" transform="rotate(45 8.3 20.5)"  fill="#16a34a"/>
+    <rect x="21"  y="18.5" width="3.6" height="4" rx="1" transform="rotate(-45 23 20.5)" fill="#16a34a"/>
+  </g>
+  <text x="454" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">torch.compile</text>
+  <text x="454" y="98"  text-anchor="middle" font-size="8" fill="#374151">Shape guards →</text>
+  <text x="454" y="109" text-anchor="middle" font-size="8" fill="#374151">recompile per</text>
+  <text x="454" y="120" text-anchor="middle" font-size="8" fill="#374151">backend at runtime</text>
+
+  <!-- ── Card 5: MLIR gpu.binary — THE GAP ── -->
+  <rect x="522" y="22" width="171" height="118" rx="5" fill="#fff1f2" stroke="#dc2626" stroke-width="2"/>
+  <!-- Red X badge -->
+  <circle cx="681" cy="34" r="9" fill="#dc2626"/>
+  <line x1="676" y1="29" x2="686" y2="39" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="686" y1="29" x2="676" y2="39" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <!-- MLIR / IR diamond icon with X slash -->
+  <g transform="translate(571,27)">
+    <polygon points="18,2 34,16 18,30 2,16" fill="none" stroke="#dc2626" stroke-width="1.5" opacity="0.5"/>
+    <polygon points="18,8 26,16 18,24 10,16"  fill="#dc2626" opacity="0.12"/>
+    <circle cx="18" cy="16" r="3" fill="#dc2626" opacity="0.35"/>
+    <line x1="5"  y1="5"  x2="31" y2="29" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+    <line x1="31" y1="5"  x2="5"  y2="29" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+  </g>
+  <text x="607" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">MLIR  gpu.binary</text>
+  <text x="607" y="98"  text-anchor="middle" font-size="8" fill="#991b1b">select_object resolves</text>
+  <text x="607" y="109" text-anchor="middle" font-size="8" fill="#991b1b">at COMPILE TIME</text>
+  <text x="607" y="120" text-anchor="middle" font-size="8" fill="#991b1b">— no runtime path</text>
+  <!-- Gap label tab -->
+  <rect x="522" y="137" width="171" height="15" rx="3" fill="#dc2626"/>
+  <text x="607" y="148" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" letter-spacing="0.8">THE GAP WE FILL</text>
+
+  <!-- "Green" label for first 4 -->
+  <rect x="6" y="137" width="509" height="15" rx="3" fill="#dcfce7"/>
+  <text x="259" y="148" text-anchor="middle" font-size="8.5" font-weight="600" fill="#15803d" letter-spacing="0.5">RUNTIME DISPATCH SUPPORTED ✓</text>
+
+  <!-- Arrow: down from midpoint between gap box and solution -->
+  <line x1="607" y1="153" x2="607" y2="163" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="3,2"/>
+  <line x1="607" y1="163" x2="350" y2="163" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="3,2"/>
+  <line x1="350" y1="163" x2="350" y2="173" stroke="#0d9488" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Solution pill -->
+  <rect x="100" y="177" width="500" height="26" rx="6" fill="#0d9488"/>
+  <text x="350" y="194" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">
+    <tspan font-weight="400" fill="#ccfbf1">This Work: </tspan>#gpu.runtime_select — Runtime Binary Dispatch for MLIR
+  </text>
+</svg>

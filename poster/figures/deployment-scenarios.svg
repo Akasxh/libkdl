@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="195" viewBox="0 0 700 195"
+     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr-b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="#2d7fc1"/>
+    </marker>
+    <marker id="arr-t" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="#0d9488"/>
+    </marker>
+    <marker id="arr-o" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="#ea580c"/>
+    </marker>
+  </defs>
+
+  <!-- White background -->
+  <rect width="700" height="195" fill="#ffffff"/>
+
+  <!-- Panel dividers (light) -->
+  <line x1="235" y1="8" x2="235" y2="170" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="465" y1="8" x2="465" y2="170" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- PANEL 1: HPC Cluster (x: 0–234) -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <!-- Panel header -->
+  <rect x="8" y="8" width="219" height="20" rx="3" fill="#2d7fc1"/>
+  <text x="117" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">① HPC Cluster</text>
+
+  <!-- ONE BINARY label at top center -->
+  <rect x="58" y="36" width="118" height="16" rx="3" fill="#dbeafe" stroke="#2d7fc1" stroke-width="1"/>
+  <text x="117" y="47" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">one .mlir binary</text>
+
+  <!-- Arrows down from binary -->
+  <line x1="80"  y1="52" x2="50"  y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b)"/>
+  <line x1="117" y1="52" x2="117" y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b)"/>
+  <line x1="154" y1="52" x2="184" y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b)"/>
+
+  <!-- GPU node boxes -->
+  <!-- A100 -->
+  <rect x="14" y="70" width="70" height="46" rx="4" fill="#eff6ff" stroke="#2d7fc1" stroke-width="1.2"/>
+  <!-- chip icon -->
+  <rect x="27" y="78" width="22" height="22" rx="2" fill="#2d7fc1" opacity="0.15" stroke="#2d7fc1" stroke-width="1"/>
+  <rect x="31" y="82" width="14" height="14" rx="1" fill="#2d7fc1" opacity="0.5"/>
+  <!-- chip pins -->
+  <line x1="27" y1="83" x2="23" y2="83" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="27" y1="87" x2="23" y2="87" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="27" y1="91" x2="23" y2="91" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="49" y1="83" x2="53" y2="83" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="49" y1="87" x2="53" y2="87" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="49" y1="91" x2="53" y2="91" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="33" y1="78" x2="33" y2="74" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="38" y1="78" x2="38" y2="74" stroke="#2d7fc1" stroke-width="1"/>
+  <line x1="43" y1="78" x2="43" y2="74" stroke="#2d7fc1" stroke-width="1"/>
+  <text x="65" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">A100</text>
+  <text x="65" y="96" text-anchor="middle" font-size="7" fill="#374151">NVIDIA</text>
+  <text x="49" y="110" text-anchor="middle" font-size="7" fill="#374151">CUDA</text>
+
+  <!-- MI250X -->
+  <rect x="82" y="70" width="70" height="46" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.2"/>
+  <rect x="95" y="78" width="22" height="22" rx="2" fill="#16a34a" opacity="0.15" stroke="#16a34a" stroke-width="1"/>
+  <rect x="99" y="82" width="14" height="14" rx="1" fill="#16a34a" opacity="0.5"/>
+  <line x1="95"  y1="83" x2="91"  y2="83" stroke="#16a34a" stroke-width="1"/>
+  <line x1="95"  y1="87" x2="91"  y2="87" stroke="#16a34a" stroke-width="1"/>
+  <line x1="95"  y1="91" x2="91"  y2="91" stroke="#16a34a" stroke-width="1"/>
+  <line x1="117" y1="83" x2="121" y2="83" stroke="#16a34a" stroke-width="1"/>
+  <line x1="117" y1="87" x2="121" y2="87" stroke="#16a34a" stroke-width="1"/>
+  <line x1="117" y1="91" x2="121" y2="91" stroke="#16a34a" stroke-width="1"/>
+  <text x="133" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#15803d">MI250X</text>
+  <text x="133" y="96" text-anchor="middle" font-size="7" fill="#374151">AMD</text>
+  <text x="117" y="110" text-anchor="middle" font-size="7" fill="#374151">ROCm</text>
+
+  <!-- CPU fallback -->
+  <rect x="150" y="70" width="70" height="46" rx="4" fill="#fafafa" stroke="#9ca3af" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <rect x="163" y="78" width="22" height="22" rx="2" fill="#9ca3af" opacity="0.15" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="167" y="82" width="14" height="14" rx="1" fill="#9ca3af" opacity="0.4"/>
+  <text x="185" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#6b7280">CPU</text>
+  <text x="185" y="96" text-anchor="middle" font-size="7" fill="#6b7280">Fallback</text>
+  <text x="185" y="110" text-anchor="middle" font-size="7" fill="#6b7280">OpenMP</text>
+
+  <!-- Tagline -->
+  <text x="117" y="135" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">one binary · three backends</text>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- PANEL 2: Cloud Container (x: 235–464) -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <rect x="243" y="8" width="214" height="20" rx="3" fill="#0d9488"/>
+  <text x="350" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">② Cloud Container</text>
+
+  <!-- Docker container box -->
+  <rect x="258" y="34" width="184" height="50" rx="5" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
+  <!-- Docker whale icon (simplified) -->
+  <rect x="266" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.4"/>
+  <rect x="278" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.7"/>
+  <rect x="290" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.4"/>
+  <rect x="266" y="50" width="44" height="8" rx="2" fill="#0d9488" opacity="0.7"/>
+  <!-- Spout -->
+  <rect x="310" y="46" width="8" height="4" rx="1" fill="#0d9488" opacity="0.5"/>
+  <!-- label -->
+  <text x="340" y="48" text-anchor="start" font-size="10" font-weight="700" fill="#0f766e">container image</text>
+  <text x="340" y="61" text-anchor="start" font-size="8" fill="#374151">GPU unknown at</text>
+  <text x="340" y="71" text-anchor="start" font-size="8" fill="#374151">build time</text>
+
+  <!-- Question mark bubble -->
+  <circle cx="420" cy="59" r="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
+  <text x="420" y="63" text-anchor="middle" font-size="13" font-weight="900" fill="#d97706">?</text>
+
+  <!-- Deploy arrow fork -->
+  <line x1="350" y1="87" x2="350" y2="100" stroke="#0d9488" stroke-width="1.5"/>
+  <line x1="290" y1="100" x2="410" y2="100" stroke="#0d9488" stroke-width="1.5"/>
+  <line x1="290" y1="100" x2="290" y2="112" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t)"/>
+  <line x1="410" y1="100" x2="410" y2="112" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t)"/>
+
+  <!-- AWS target -->
+  <rect x="255" y="113" width="70" height="32" rx="4" fill="#eff6ff" stroke="#2d7fc1" stroke-width="1.2"/>
+  <text x="290" y="126" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">AWS p4d</text>
+  <text x="290" y="137" text-anchor="middle" font-size="7" fill="#374151">A100 · CUDA</text>
+
+  <!-- Azure target -->
+  <rect x="374" y="113" width="70" height="32" rx="4" fill="#fdf4ff" stroke="#9333ea" stroke-width="1.2"/>
+  <text x="409" y="126" text-anchor="middle" font-size="7.5" font-weight="700" fill="#7e22ce">Azure ND</text>
+  <text x="409" y="137" text-anchor="middle" font-size="7" fill="#374151">MI300X · ROCm</text>
+
+  <!-- Tagline -->
+  <text x="350" y="160" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">GPU resolved at container launch</text>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- PANEL 3: ML Framework (x: 465–700) -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <rect x="473" y="8" width="219" height="20" rx="3" fill="#ea580c"/>
+  <text x="582" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">③ ML Framework</text>
+
+  <!-- Framework boxes -->
+  <rect x="480" y="34" width="85" height="30" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.2"/>
+  <text x="522" y="50" text-anchor="middle" font-size="9" font-weight="700" fill="#c2410c">torch-mlir</text>
+
+  <rect x="617" y="34" width="75" height="30" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.2"/>
+  <text x="654" y="50" text-anchor="middle" font-size="9" font-weight="700" fill="#c2410c">ONNX-RT</text>
+
+  <!-- Converging arrows -->
+  <line x1="522" y1="64" x2="522" y2="77" stroke="#ea580c" stroke-width="1.3" marker-end="url(#arr-o)"/>
+  <line x1="654" y1="64" x2="654" y2="72" stroke="#ea580c" stroke-width="1.3"/>
+  <line x1="654" y1="72" x2="590" y2="72" stroke="#ea580c" stroke-width="1.3"/>
+  <line x1="590" y1="72" x2="590" y2="77" stroke="#ea580c" stroke-width="1.3" marker-end="url(#arr-o)"/>
+
+  <!-- gpu.binary node -->
+  <rect x="487" y="79" width="110" height="26" rx="4" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.3"/>
+  <text x="542" y="90" text-anchor="middle" font-size="8.5" font-weight="700" fill="#92400e">gpu.binary</text>
+  <text x="542" y="100" text-anchor="middle" font-size="7.5" fill="#78350f">both emit same IR</text>
+
+  <!-- Arrow to dispatch layer -->
+  <line x1="542" y1="105" x2="542" y2="115" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t)"/>
+
+  <!-- Single dispatch layer — the contribution -->
+  <rect x="480" y="117" width="195" height="28" rx="4" fill="#0d9488"/>
+  <text x="577" y="129" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">#gpu.runtime_select</text>
+  <text x="577" y="140" text-anchor="middle" font-size="7.5" fill="#ccfbf1">single dispatch layer</text>
+
+  <!-- Tagline -->
+  <text x="582" y="162" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">no per-framework reimplementation</text>
+
+  <!-- ───────────────────────────────────────── -->
+  <!-- Bottom caption -->
+  <!-- ───────────────────────────────────────── -->
+  <rect x="0" y="175" width="700" height="20" rx="0" fill="#f9fafb"/>
+  <line x1="0" y1="175" x2="700" y2="175" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="350" y="188" text-anchor="middle" font-size="8" fill="#6b7280">
+    Runtime binary selection eliminates per-target build matrices and per-framework dispatch reimplementation
+  </text>
+</svg>

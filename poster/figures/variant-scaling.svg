@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 11px; font-weight: 700; fill: #111; }
+      .subtitle { font-size: 8px; fill: #666; }
+      .axis-label { font-size: 8.5px; fill: #444; }
+      .tick-label { font-size: 8px; fill: #555; }
+      .ref-label { font-size: 8px; fill: #555; font-style: italic; }
+      .data-label { font-size: 8px; fill: #0d9488; font-weight: 600; }
+      .annot { font-size: 7.5px; fill: #374151; }
+    </style>
+    <marker id="pt-dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+      <circle cx="3" cy="3" r="2.5" fill="#0d9488"/>
+    </marker>
+  </defs>
+
+  <rect width="400" height="300" fill="#ffffff" rx="4"/>
+
+  <!-- Title -->
+  <text x="200" y="18" text-anchor="middle" class="title">Selection Time vs. Number of Kernel Variants</text>
+  <text x="200" y="30" text-anchor="middle" class="subtitle">Linear O(n) scan — stays negligible even at 100 variants</text>
+
+  <!-- Chart area: x=60 to x=360 (300px), y=45 to y=220 (175px) -->
+  <!-- X-axis: 1 to 100 variants, linear. 1→x=60, 100→x=360. px per unit = 300/99 ≈ 3.03 -->
+  <!-- Y-axis: 0 to 70,000 ns (log scale to show all three levels) -->
+  <!-- log scale: 1 ns → y=220, 100,000 ns → y=45 -->
+  <!-- log10(1)=0, log10(100000)=5 → 175px / 5 = 35px per decade -->
+  <!-- y = 220 - (log10(val)) * 35 -->
+  <!-- But data goes from 2ns to 62.5ns, with ref lines at 1650ns and 36000ns -->
+  <!-- Use Y range: 1 ns to 100,000 ns (5 decades) -->
+
+  <!-- Gridlines (log Y) -->
+  <!-- y for 1ns: 220, 10ns: 185, 100ns: 150, 1000ns: 115, 10000ns: 80, 100000ns: 45 -->
+  <line x1="60" y1="220" x2="360" y2="220" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="60" y1="185" x2="360" y2="185" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="60" y1="150" x2="360" y2="150" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="60" y1="115" x2="360" y2="115" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="60" y1="80" x2="360" y2="80" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="60" y1="45" x2="360" y2="45" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="60" y1="45" x2="60" y2="220" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!-- Y-axis tick labels -->
+  <text x="56" y="223" text-anchor="end" class="tick-label">1</text>
+  <text x="56" y="188" text-anchor="end" class="tick-label">10</text>
+  <text x="56" y="153" text-anchor="end" class="tick-label">100</text>
+  <text x="56" y="118" text-anchor="end" class="tick-label">1k</text>
+  <text x="56" y="83" text-anchor="end" class="tick-label">10k</text>
+  <text x="56" y="48" text-anchor="end" class="tick-label">100k</text>
+  <text x="14" y="140" text-anchor="middle" class="axis-label" transform="rotate(-90, 14, 140)">Selection time (ns)</text>
+
+  <!-- X-axis ticks: 1, 10, 30, 50, 100 -->
+  <!-- x = 60 + (n-1)/99 * 300 -->
+  <!-- n=1: x=60, n=10: x=87.3, n=30: x=151.5, n=50: x=211.8, n=100: x=360 -->
+  <text x="60" y="233" text-anchor="middle" class="tick-label">1</text>
+  <text x="87" y="233" text-anchor="middle" class="tick-label">10</text>
+  <text x="151" y="233" text-anchor="middle" class="tick-label">30</text>
+  <text x="212" y="233" text-anchor="middle" class="tick-label">50</text>
+  <text x="360" y="233" text-anchor="middle" class="tick-label">100</text>
+  <text x="210" y="246" text-anchor="middle" class="axis-label">Number of kernel variants</text>
+
+  <!-- Reference line: cuLaunchKernel = 1650 ns -->
+  <!-- y = 220 - log10(1650)*35 = 220 - 3.217*35 = 220 - 112.6 = 107.4 -->
+  <line x1="60" y1="107" x2="360" y2="107" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="362" y="110" class="ref-label" fill="#7c3aed">cuLaunchKernel</text>
+  <text x="362" y="119" class="ref-label" fill="#7c3aed">1,650 ns</text>
+
+  <!-- Reference line: cuModuleLoadData = 36,000 ns -->
+  <!-- y = 220 - log10(36000)*35 = 220 - 4.556*35 = 220 - 159.5 = 60.5 -->
+  <!-- Need to fit label; crop line at x=340 and put label left -->
+  <line x1="60" y1="61" x2="360" y2="61" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="362" y="58" class="ref-label" fill="#dc2626">cuModuleLoadData</text>
+  <text x="362" y="67" class="ref-label" fill="#dc2626">36,000 ns</text>
+
+  <!-- Data points: (n, ns) and their (x, y) coords -->
+  <!-- n=1, 2ns:   x=60,   y=220-log10(2)*35   = 220-10.5=209.5 -->
+  <!-- n=3, 5ns:   x=66.1, y=220-log10(5)*35   = 220-24.5=195.5 -->
+  <!-- n=10, 15ns: x=87.3, y=220-log10(15)*35  = 220-40.9=179.1 -->
+  <!-- n=30, 40ns: x=151.5,y=220-log10(40)*35  = 220-55.1=164.9 -->
+  <!-- n=100,62.5: x=360,  y=220-log10(62.5)*35= 220-62.7=157.3 -->
+
+  <!-- Line path: teal -->
+  <polyline
+    points="60,210 66,196 87,179 148,164 360,157"
+    fill="none"
+    stroke="#0d9488"
+    stroke-width="2.2"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- Data point circles -->
+  <circle cx="60"  cy="210" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="66"  cy="196" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="87"  cy="179" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="148" cy="164" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="360" cy="157" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+
+  <!-- Value labels for data points -->
+  <text x="55"  y="208" text-anchor="end"  class="data-label">2 ns</text>
+  <text x="61"  y="193" text-anchor="end"  class="data-label">5 ns</text>
+  <text x="91"  y="176" text-anchor="start" class="data-label">15 ns</text>
+  <text x="152" y="161" text-anchor="start" class="data-label">40 ns</text>
+  <text x="355" y="153" text-anchor="end"   class="data-label">62.5 ns</text>
+
+  <!-- Key annotation: 26,000x gap -->
+  <!-- Arrow from the selection line at x=360,y=157 up to cuModuleLoadData at x=360,y=61 -->
+  <!-- Put a brace or text in the right margin -->
+  <!-- Double-headed arrow or bracket on right at x=378 -->
+  <line x1="378" y1="61" x2="378" y2="157" stroke="#374151" stroke-width="1" marker-end="url(#pt-dot)"/>
+  <line x1="373" y1="61" x2="383" y2="61" stroke="#374151" stroke-width="1"/>
+  <line x1="373" y1="157" x2="383" y2="157" stroke="#374151" stroke-width="1"/>
+  <text x="381" y="113" class="annot" transform="rotate(90, 381, 113)" text-anchor="middle">26,000× cheaper than module load</text>
+
+  <!-- Legend -->
+  <line x1="65" y1="265" x2="90" y2="265" stroke="#0d9488" stroke-width="2.2"/>
+  <circle cx="77" cy="265" r="3.5" fill="#0d9488" stroke="#fff" stroke-width="1"/>
+  <text x="94" y="268" font-size="8" fill="#333">Selection time (O(n) scan)</text>
+
+  <line x1="65" y1="278" x2="90" y2="278" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="94" y="281" font-size="8" fill="#333">cuLaunchKernel baseline</text>
+
+  <line x1="65" y1="291" x2="90" y2="291" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="94" y="294" font-size="8" fill="#333">cuModuleLoadData baseline</text>
+</svg>

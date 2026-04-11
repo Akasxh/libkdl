@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="260" viewBox="0 0 500 260"
+     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+
+  <!-- White background -->
+  <rect width="500" height="260" fill="#ffffff"/>
+
+  <!-- ─── Layout constants ─── -->
+  <!-- Row height: 24px; header row y=46; data rows from y=70 -->
+  <!-- Column layout: label col 0–134, then 5 feature cols 73px each at x=135 -->
+  <!-- Col x positions (center): 135+36=171, 208+36=244, 281+36=317, 354+36=390, 427+36=463... -->
+  <!-- Actually: 5 cols * 73 = 365; total = 135 + 365 = 500 ✓ -->
+  <!-- Col centers: 135+36=171, 135+73+36=244, 135+146+36=317, 135+219+36=390, 135+292+36=463 -->
+
+  <!-- Title -->
+  <text x="250" y="16" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1e3a5f" letter-spacing="0.3">Related Work Comparison</text>
+  <line x1="30" y1="21" x2="470" y2="21" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- ─── Column header row ─── -->
+  <rect x="0" y="27" width="500" height="22" fill="#1e3a5f"/>
+
+  <!-- System label header -->
+  <text x="67" y="41" text-anchor="middle" font-size="8.5" font-weight="700" fill="#ffffff">System</text>
+
+  <!-- Feature headers -->
+  <text x="171" y="38" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Runtime</text>
+  <text x="171" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Select</text>
+
+  <text x="244" y="38" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Cross-</text>
+  <text x="244" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Vendor</text>
+
+  <text x="317" y="38" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">MLIR-</text>
+  <text x="317" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Native</text>
+
+  <text x="390" y="38" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Ranked</text>
+  <text x="390" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Selection</text>
+
+  <text x="463" y="38" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">Lightweight</text>
+  <text x="463" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="#d1fae5">&lt;1K LOC</text>
+
+  <!-- Column separators in header -->
+  <line x1="135" y1="27" x2="135" y2="49" stroke="#2d5a8a" stroke-width="0.5"/>
+  <line x1="208" y1="27" x2="208" y2="49" stroke="#2d5a8a" stroke-width="0.5"/>
+  <line x1="281" y1="27" x2="281" y2="49" stroke="#2d5a8a" stroke-width="0.5"/>
+  <line x1="354" y1="27" x2="354" y2="49" stroke="#2d5a8a" stroke-width="0.5"/>
+  <line x1="427" y1="27" x2="427" y2="49" stroke="#2d5a8a" stroke-width="0.5"/>
+
+  <!-- ─── Data rows ─── -->
+  <!-- Row template: alternating #f8fafc and #ffffff, 24px tall -->
+  <!-- Systems: IREE HAL, chipStar, Proteus, HetGPU, liboffload, CPU FMV, This Work -->
+  <!-- y positions: 49, 73, 97, 121, 145, 169, 193 -->
+
+  <!-- Helper: dot symbols -->
+  <!-- ● green=#16a34a  ◐ yellow=#ca8a04  ○ gray=#9ca3af -->
+
+  <!-- ── Row 1: IREE HAL ── y=49 -->
+  <rect x="0" y="49" width="500" height="24" fill="#f8fafc"/>
+  <line x1="0" y1="73" x2="500" y2="73" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="64" font-size="9" font-weight="600" fill="#374151">IREE HAL</text>
+  <!-- Runtime Select: ● -->
+  <circle cx="171" cy="61" r="6.5" fill="#16a34a"/>
+  <text x="171" cy="61" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#fff" dy="61">●</text>
+  <!-- Cross-Vendor: ● -->
+  <circle cx="244" cy="61" r="6.5" fill="#16a34a"/>
+  <!-- MLIR-Native: ◐ (partial) -->
+  <circle cx="317" cy="61" r="6.5" fill="#9ca3af"/>
+  <path d="M317,54.5 A6.5,6.5 0 0,1 317,67.5 Z" fill="#ca8a04"/>
+  <!-- Ranked Selection: ○ -->
+  <circle cx="390" cy="61" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Lightweight: ○ + LOC -->
+  <circle cx="448" cy="61" r="6.5" fill="none" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="463" y="65" text-anchor="start" font-size="7" fill="#dc2626">100K+</text>
+
+  <!-- ── Row 2: chipStar ── y=73 -->
+  <rect x="0" y="73" width="500" height="24" fill="#ffffff"/>
+  <line x1="0" y1="97" x2="500" y2="97" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="88" font-size="9" font-weight="600" fill="#374151">chipStar</text>
+  <!-- Runtime Select: ◐ -->
+  <circle cx="171" cy="85" r="6.5" fill="#9ca3af"/>
+  <path d="M171,78.5 A6.5,6.5 0 0,1 171,91.5 Z" fill="#ca8a04"/>
+  <!-- Cross-Vendor: ● -->
+  <circle cx="244" cy="85" r="6.5" fill="#16a34a"/>
+  <!-- MLIR-Native: ○ -->
+  <circle cx="317" cy="85" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Ranked Selection: ○ -->
+  <circle cx="390" cy="85" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Lightweight: ○ -->
+  <circle cx="448" cy="85" r="6.5" fill="none" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="463" y="89" text-anchor="start" font-size="7" fill="#dc2626">50K+</text>
+
+  <!-- ── Row 3: Proteus ── y=97 -->
+  <rect x="0" y="97" width="500" height="24" fill="#f8fafc"/>
+  <line x1="0" y1="121" x2="500" y2="121" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="112" font-size="9" font-weight="600" fill="#374151">Proteus</text>
+  <!-- Runtime Select: ● -->
+  <circle cx="171" cy="109" r="6.5" fill="#16a34a"/>
+  <!-- Cross-Vendor: ○ -->
+  <circle cx="244" cy="109" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- MLIR-Native: ○ -->
+  <circle cx="317" cy="109" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Ranked Selection: ● -->
+  <circle cx="390" cy="109" r="6.5" fill="#16a34a"/>
+  <!-- Lightweight: ◐ -->
+  <circle cx="448" cy="109" r="6.5" fill="#9ca3af"/>
+  <path d="M448,102.5 A6.5,6.5 0 0,1 448,115.5 Z" fill="#ca8a04"/>
+  <text x="463" y="113" text-anchor="start" font-size="7" fill="#92400e">~5K</text>
+
+  <!-- ── Row 4: HetGPU ── y=121 -->
+  <rect x="0" y="121" width="500" height="24" fill="#ffffff"/>
+  <line x1="0" y1="145" x2="500" y2="145" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="136" font-size="9" font-weight="600" fill="#374151">HetGPU</text>
+  <!-- Runtime Select: ● -->
+  <circle cx="171" cy="133" r="6.5" fill="#16a34a"/>
+  <!-- Cross-Vendor: ● -->
+  <circle cx="244" cy="133" r="6.5" fill="#16a34a"/>
+  <!-- MLIR-Native: ○ -->
+  <circle cx="317" cy="133" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Ranked Selection: ○ -->
+  <circle cx="390" cy="133" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Lightweight: ◐ -->
+  <circle cx="448" cy="133" r="6.5" fill="#9ca3af"/>
+  <path d="M448,126.5 A6.5,6.5 0 0,1 448,139.5 Z" fill="#ca8a04"/>
+  <text x="463" y="137" text-anchor="start" font-size="7" fill="#92400e">~8K</text>
+
+  <!-- ── Row 5: liboffload ── y=145 -->
+  <rect x="0" y="145" width="500" height="24" fill="#f8fafc"/>
+  <line x1="0" y1="169" x2="500" y2="169" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="160" font-size="9" font-weight="600" fill="#374151">liboffload</text>
+  <!-- Runtime Select: ◐ -->
+  <circle cx="171" cy="157" r="6.5" fill="#9ca3af"/>
+  <path d="M171,150.5 A6.5,6.5 0 0,1 171,163.5 Z" fill="#ca8a04"/>
+  <!-- Cross-Vendor: ● -->
+  <circle cx="244" cy="157" r="6.5" fill="#16a34a"/>
+  <!-- MLIR-Native: ○ -->
+  <circle cx="317" cy="157" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Ranked Selection: ○ -->
+  <circle cx="390" cy="157" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Lightweight: ● -->
+  <circle cx="448" cy="157" r="6.5" fill="#16a34a"/>
+  <text x="463" y="161" text-anchor="start" font-size="7" fill="#15803d">~2K</text>
+
+  <!-- ── Row 6: CPU FMV ── y=169 -->
+  <rect x="0" y="169" width="500" height="24" fill="#ffffff"/>
+  <line x1="0" y1="193" x2="500" y2="193" stroke="#e5e7eb" stroke-width="0.5"/>
+  <text x="10" y="184" font-size="9" font-weight="600" fill="#374151">CPU FMV</text>
+  <!-- Runtime Select: ● -->
+  <circle cx="171" cy="181" r="6.5" fill="#16a34a"/>
+  <!-- Cross-Vendor: ○ -->
+  <circle cx="244" cy="181" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- MLIR-Native: ○ -->
+  <circle cx="317" cy="181" r="6.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Ranked Selection: ● -->
+  <circle cx="390" cy="181" r="6.5" fill="#16a34a"/>
+  <!-- Lightweight: ● -->
+  <circle cx="448" cy="181" r="6.5" fill="#16a34a"/>
+  <text x="463" y="185" text-anchor="start" font-size="7" fill="#15803d">&lt;500</text>
+
+  <!-- ── Row 7: THIS WORK — highlighted ── y=193 -->
+  <rect x="0" y="193" width="500" height="32" rx="0" fill="#ccfbf1"/>
+  <rect x="0" y="193" width="4"   height="32" fill="#0d9488"/>
+  <line x1="0" y1="193" x2="500" y2="193" stroke="#0d9488" stroke-width="1.5"/>
+  <line x1="0" y1="225" x2="500" y2="225" stroke="#0d9488" stroke-width="1.5"/>
+  <text x="10" y="205" font-size="8.5" font-weight="700" fill="#0f766e">This Work</text>
+  <text x="10" y="217" font-size="7.5" font-weight="600" fill="#0f766e">#gpu.runtime_select</text>
+
+  <!-- All green dots for This Work -->
+  <circle cx="171" cy="209" r="7" fill="#0d9488"/>
+  <path d="M165,209 L169.5,213.5 L177,205" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="244" cy="209" r="7" fill="#0d9488"/>
+  <path d="M238,209 L242.5,213.5 L250,205" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="317" cy="209" r="7" fill="#0d9488"/>
+  <path d="M311,209 L315.5,213.5 L323,205" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="390" cy="209" r="7" fill="#0d9488"/>
+  <path d="M384,209 L388.5,213.5 L396,205" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Lightweight: green + LOC -->
+  <circle cx="448" cy="209" r="7" fill="#0d9488"/>
+  <path d="M442,209 L446.5,213.5 L454,205" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="463" y="213" text-anchor="start" font-size="7.5" font-weight="700" fill="#0f766e">~800</text>
+
+  <!-- Column separators (full height, light) -->
+  <line x1="135" y1="49" x2="135" y2="225" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="208" y1="49" x2="208" y2="225" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="281" y1="49" x2="281" y2="225" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="354" y1="49" x2="354" y2="225" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="427" y1="49" x2="427" y2="225" stroke="#e5e7eb" stroke-width="0.5"/>
+
+  <!-- ─── Legend ─── -->
+  <rect x="0" y="228" width="500" height="32" fill="#f9fafb"/>
+  <line x1="0" y1="228" x2="500" y2="228" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Legend title -->
+  <text x="18" y="247" font-size="8.5" font-weight="600" fill="#374151">Legend:</text>
+
+  <!-- ● Yes -->
+  <circle cx="72" cy="244" r="5.5" fill="#16a34a"/>
+  <text x="81" y="247" font-size="8" fill="#374151">Yes</text>
+
+  <!-- ◐ Partial -->
+  <circle cx="113" cy="244" r="5.5" fill="#9ca3af"/>
+  <path d="M113,238.5 A5.5,5.5 0 0,1 113,249.5 Z" fill="#ca8a04"/>
+  <text x="122" y="247" font-size="8" fill="#374151">Partial</text>
+
+  <!-- ○ No -->
+  <circle cx="163" cy="244" r="5.5" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="172" y="247" font-size="8" fill="#374151">No</text>
+
+  <!-- LOC note -->
+  <text x="210" y="242" font-size="7.5" fill="#6b7280">LOC = lines of code for dispatch mechanism only</text>
+  <text x="210" y="253" font-size="7.5" fill="#6b7280">(IREE total codebase; This Work: new code added to LLVM)</text>
+</svg>
