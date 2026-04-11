@@ -9,18 +9,17 @@
 html, body { margin: 0 !important; padding: 0 !important; }
 
 :root {
-  --blue:    #1a56a0;
-  --teal:    #0d7a6e;
-  --orange:  #c04f0c;
+  --blue:    #2d7fc1;
+  --teal:    #0d9488;
+  --orange:  #ea580c;
   --navy:    #1a2e44;
   --bg:      #ffffff;
-  --card:    #ffffff;
-  --border:  #e2e8f0;
   --text:    #1e293b;
   --mid:     #52647a;
   --dim:     #94a3b8;
-  --gap:     6mm;
-  --pad:     9mm;
+  --border:  #e2e8f0;
+  --gap:     7mm;
+  --pad:     14mm;
 }
 
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -40,34 +39,28 @@ body {
 /* ── HEADER ─────────────────────────────────────────────────── */
 .header {
   background: #ffffff;
-  border-bottom: 1px solid var(--border);
-  padding: 7mm var(--pad) 6mm;
+  border-bottom: 1.5px solid var(--border);
+  padding: 12mm var(--pad) 10mm;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 8mm;
-  align-items: flex-start;
+  gap: 12mm;
+  align-items: center;
   flex-shrink: 0;
 }
 
-.header-text { }
-
 .poster-title {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 36pt;
+  font-size: 42pt;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.08;
   color: var(--navy);
-  letter-spacing: -0.2pt;
-  margin-bottom: 3mm;
+  letter-spacing: -0.3pt;
+  margin-bottom: 4mm;
 }
 
-.poster-title .accent { color: var(--navy); }
-
 .poster-subtitle {
-  font-family: Georgia, serif;
-  font-size: 12pt;
+  font-size: 15pt;
   color: var(--mid);
-  margin-bottom: 2.5mm;
+  margin-bottom: 3mm;
   line-height: 1.4;
 }
 
@@ -75,32 +68,24 @@ body {
   font-family: 'Fira Code', 'Courier New', monospace;
   background: #f4f7fb;
   border: 1px solid #d1dce8;
-  padding: 1pt 4pt;
+  padding: 1pt 5pt;
   border-radius: 2pt;
   color: var(--blue);
   font-size: 0.88em;
 }
 
 .poster-authors {
-  font-family: Georgia, serif;
-  font-size: 12.5pt;
+  font-size: 15pt;
   color: var(--mid);
-  font-weight: 400;
-  margin-bottom: 1.5mm;
+  margin-bottom: 2mm;
 }
-
 .poster-authors strong { color: var(--navy); font-weight: 700; }
-
-.poster-authors .sep {
-  color: var(--dim);
-  margin: 0 2mm;
-}
+.poster-authors .sep { color: var(--dim); margin: 0 3mm; }
 
 .poster-github {
-  font-family: Georgia, serif;
-  font-size: 11.5pt;
+  font-size: 14pt;
   color: var(--blue);
-  margin-top: 1mm;
+  margin-top: 1.5mm;
 }
 
 /* Header right: key stats + badge */
@@ -108,65 +93,56 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4mm;
+  gap: 5mm;
 }
 
 .key-stats {
   display: flex;
   gap: 0;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   overflow: hidden;
-  background: #fff;
 }
 
 .kstat {
   text-align: center;
-  padding: 4mm 6mm;
-  border-right: 1px solid var(--border);
+  padding: 5mm 8mm;
+  border-right: 1.5px solid var(--border);
 }
 .kstat:last-child { border-right: none; }
 
 .kstat-val {
   font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 22pt;
+  font-size: 28pt;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.5pt;
   color: var(--navy);
 }
-.kstat.teal  .kstat-val { color: var(--teal); }
+.kstat.teal .kstat-val { color: var(--teal); }
 
 .kstat-lbl {
-  font-family: Georgia, serif;
-  font-size: 8.5pt;
+  font-size: 10pt;
   color: var(--mid);
-  margin-top: 1mm;
-  font-weight: 400;
+  margin-top: 1.5mm;
   line-height: 1.3;
 }
 
 .venue-badge {
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   color: var(--navy);
-  padding: 3.5mm 6mm;
+  padding: 4mm 8mm;
   text-align: center;
-  font-family: Georgia, serif;
-  font-size: 10.5pt;
+  font-size: 12pt;
   font-weight: 700;
   line-height: 1.5;
 }
 .venue-badge em {
   font-style: normal;
   color: var(--mid);
-  font-size: 9pt;
+  font-size: 10pt;
   display: block;
   font-weight: 400;
   margin-top: 0.5mm;
-}
-
-/* ── THESIS STRIP — now hidden, content moved to col1 ─────── */
-.thesis-strip {
-  display: none;
 }
 
 /* ── BODY: 3 columns ─────────────────────────────────────────── */
@@ -174,11 +150,11 @@ body {
   display: flex;
   flex-direction: row;
   gap: var(--gap);
-  padding: 5mm var(--pad);
+  padding: 6mm var(--pad);
   flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .col {
@@ -186,96 +162,77 @@ body {
   flex-direction: column;
   gap: var(--gap);
   flex: 1;
+  min-height: 0;
 }
+.col:nth-child(2) { flex: 1.08; }
 
-.col:nth-child(2) { flex: 1.05; }
-
-/* ── CARDS — no borders, no shadows, separated by whitespace ─ */
+/* ── SECTION CARDS ────────────────────────────────────────── */
 .card {
   background: #ffffff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  padding-bottom: 4mm;
+  flex-grow: 0;
+  padding-bottom: 5mm;
   border-bottom: 1px solid var(--border);
 }
 .card:last-child { border-bottom: none; }
+.card.grow { flex-grow: 1; }
 
-/* grow cards — let content determine height, column fills with whitespace naturally */
-.card.grow {
-  flex-shrink: 0;
-}
+/* All columns: last card absorbs remaining space */
+.col > .card:last-child { flex-grow: 1; }
 
 .card-head {
-  padding: 0 0 2.5mm 0;
+  padding: 0 0 3mm 0;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 3mm;
+  margin-bottom: 4mm;
 }
 
-.card-body { padding: 0; flex: 1; }
-.card-body.tight { padding: 0; }
-
-/* Column color accent: subtle 2px left border on section titles */
-.blue-card  .card-head { border-left: 3px solid var(--blue); padding-left: 4mm; }
-.teal-card  .card-head { border-left: 3px solid var(--teal); padding-left: 4mm; }
-.orange-card .card-head { border-left: 3px solid var(--orange); padding-left: 4mm; }
+/* Column accent */
+.blue-card  .card-head { border-left: 3.5px solid var(--blue); padding-left: 5mm; }
+.teal-card  .card-head { border-left: 3.5px solid var(--teal); padding-left: 5mm; }
+.orange-card .card-head { border-left: 3.5px solid var(--orange); padding-left: 5mm; }
 
 .card-head h2 {
-  font-family: Georgia, serif;
-  font-size: 12pt;
+  font-size: 14pt;
   font-weight: 700;
   color: var(--navy);
   line-height: 1.2;
-  display: flex;
-  align-items: center;
-  gap: 2mm;
 }
 
-/* Remove numbered circles — just plain text now */
-.sec-num { display: none; }
-
-/* Column label strips — plain section heading, FA3-style */
+/* Column label strips */
 .col-label {
-  font-family: Georgia, serif;
-  font-size: 10pt;
+  font-size: 12pt;
   font-weight: 700;
   font-style: italic;
   color: var(--mid);
-  text-transform: none;
-  letter-spacing: 0;
   padding-bottom: 3mm;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: none;
-}
-.col-label.blue, .col-label.teal, .col-label.orange {
-  background: none;
-  color: var(--mid);
 }
 
 /* Card body typography */
+.card-body { padding: 0; flex: 1; }
+
 .card-body p {
-  font-family: Georgia, serif;
-  font-size: 10.5pt;
+  font-size: 12pt;
   line-height: 1.5;
   color: var(--text);
-  margin-bottom: 2.5mm;
+  margin-bottom: 3mm;
 }
 .card-body p:last-child { margin-bottom: 0; }
 
 .card-body ul {
-  padding-left: 5mm;
-  margin-bottom: 2.5mm;
+  padding-left: 6mm;
+  margin-bottom: 3mm;
 }
 .card-body li {
-  font-family: Georgia, serif;
-  font-size: 10.5pt;
+  font-size: 12pt;
   line-height: 1.48;
   color: var(--text);
-  margin-bottom: 1.2mm;
+  margin-bottom: 1.5mm;
 }
-
 li::marker { color: var(--navy); font-weight: 700; }
 
 .card-body strong { color: var(--navy); font-weight: 700; }
@@ -291,157 +248,45 @@ code {
 }
 
 .h3 {
-  font-family: Georgia, serif;
-  font-size: 10.5pt;
+  font-size: 12pt;
   font-weight: 700;
   color: var(--navy);
-  margin: 2.5mm 0 1.5mm;
+  margin: 3mm 0 2mm;
   font-style: italic;
 }
 
-/* ── UPSTREAM STEPS (col1) ───────────────────────────────────── */
-.upstream-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3mm;
-  margin: 2mm 0;
-}
-
-.up-step {
-  display: flex;
-  gap: 3mm;
-  align-items: flex-start;
-}
-
-.up-num {
-  width: 6mm;
-  height: 6mm;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 8.5pt;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 0.8mm;
-  font-family: Georgia, serif;
-  border: 1.5px solid var(--navy);
-  color: var(--navy);
-  background: transparent;
-}
-
-.up-num.done { border-color: var(--teal); color: var(--teal); }
-.up-num.wip  { border-color: var(--orange); color: var(--orange); }
-.up-num.next { border-color: var(--blue); color: var(--blue); }
-
-.up-body { flex: 1; }
-
-.up-title {
-  font-size: 11pt;
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1.3;
-  font-family: Georgia, serif;
-}
-
-.up-desc {
-  font-family: Georgia, serif;
-  font-size: 9.5pt;
-  color: var(--mid);
-  line-height: 1.42;
-  margin-top: 0.3mm;
-}
-
-/* ── BEFORE / AFTER GRID ─────────────────────────────────────── */
-.ba-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3mm;
-  margin: 2mm 0;
-}
-
-.ba-col {
-  border-radius: 1mm;
-  padding: 3mm 4mm;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5mm;
-}
-
-.ba-before {
-  background: #fdf6f6;
-  border: 1px solid #e8d0d0;
-}
-
-.ba-after {
-  background: #f5faf8;
-  border: 1px solid #c8ddd7;
-}
-
-.ba-lbl {
-  font-size: 8.5pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4pt;
-  margin-bottom: 1mm;
-  font-family: Georgia, serif;
-  font-style: italic;
-}
-
-.ba-before .ba-lbl { color: #9b2c2c; }
-.ba-after  .ba-lbl { color: var(--teal); }
-
-.ba-item {
-  font-family: Georgia, serif;
-  font-size: 9.5pt;
-  line-height: 1.42;
-  color: var(--text);
-  padding-left: 4mm;
-  position: relative;
-}
-
-.ba-item::before {
-  position: absolute;
-  left: 0;
-  font-weight: 700;
-  font-family: Georgia, serif;
-}
-
-.ba-before .ba-item::before { content: "✗"; color: #9b2c2c; }
-.ba-after  .ba-item::before { content: "✓"; color: var(--teal); }
-
-/* ── SVG FIGURE CONTAINERS ───────────────────────────────────── */
+/* ── FIGURE CONTAINERS ─────────────────────────────────────── */
 .fig-wrap {
   width: 100%;
   overflow: hidden;
+  margin: 3mm 0;
 }
-.fig-wrap svg {
+.fig-wrap img {
   width: 100%;
   height: auto;
   display: block;
 }
+
 .fig-caption {
-  font-family: Georgia, serif;
-  font-size: 8.5pt;
+  font-size: 9.5pt;
   color: var(--mid);
   line-height: 1.4;
   margin-top: 2mm;
   font-style: italic;
 }
 
-/* ── PR BADGES ───────────────────────────────────────────────── */
+/* ── PR BADGES ──────────────────────────────────────────────── */
 .pr-row {
   display: flex;
   align-items: baseline;
-  gap: 2.5mm;
-  margin-bottom: 2mm;
+  gap: 3mm;
+  margin-bottom: 2.5mm;
 }
 .badge {
   font-family: 'Fira Code', monospace;
-  font-size: 8pt;
+  font-size: 9pt;
   font-weight: 700;
-  padding: 0.5mm 2.5mm;
+  padding: 0.8mm 3mm;
   border-radius: 1mm;
   flex-shrink: 0;
   line-height: 1.2;
@@ -453,71 +298,64 @@ code {
 .badge.rfc    { background: #f0f9ff; border-color: #7dd3fc; color: #0369a1; }
 
 .pr-text {
-  font-family: Georgia, serif;
-  font-size: 9.5pt;
+  font-size: 11pt;
   color: var(--text);
   line-height: 1.42;
 }
 
-/* ── WHY BULLETS ─────────────────────────────────────────────── */
+/* ── WHY BULLETS ───────────────────────────────────────────── */
 .why-item {
   display: flex;
-  gap: 2.5mm;
+  gap: 3mm;
   align-items: baseline;
-  margin-bottom: 2mm;
+  margin-bottom: 3mm;
 }
 .why-tag {
-  font-family: Georgia, serif;
-  font-size: 9pt;
+  font-size: 10pt;
   font-weight: 700;
   font-style: italic;
   color: var(--navy);
   flex-shrink: 0;
   white-space: nowrap;
-  min-width: 10mm;
+  min-width: 12mm;
 }
-/* Strip colored backgrounds from why-tag variants */
-.why-tag.teal, .why-tag.orange { background: none; color: var(--navy); padding: 0; border-radius: 0; }
 
 .why-text {
-  font-family: Georgia, serif;
-  font-size: 10pt;
+  font-size: 11.5pt;
   line-height: 1.48;
   color: var(--text);
 }
 
-/* ── METADATA TABLE ──────────────────────────────────────────── */
+/* ── TABLES ─────────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 10pt;
+  font-size: 11pt;
   margin: 3mm 0;
 }
 
 thead th {
   background: #f8f9fa;
   color: var(--navy);
-  font-family: Georgia, serif;
-  font-size: 9pt;
+  font-size: 10pt;
   font-weight: 700;
-  padding: 2.5mm 3mm;
+  padding: 3mm 3.5mm;
   text-align: left;
   border-bottom: 2px solid var(--border);
   font-style: italic;
 }
 
 tbody td {
-  padding: 2mm 3mm;
+  padding: 2.5mm 3.5mm;
   border-bottom: 1px solid var(--border);
-  font-family: Georgia, serif;
-  font-size: 10pt;
+  font-size: 11pt;
   vertical-align: top;
   color: var(--text);
   line-height: 1.42;
 }
 
 tbody tr:nth-child(even) { background: #f9fafb; }
-.td-mono { font-family: 'Fira Code', monospace; font-size: 9pt; color: var(--blue); }
+.td-mono { font-family: 'Fira Code', monospace; font-size: 10pt; color: var(--blue); }
 .td-num { text-align: right; font-family: 'Fira Code', monospace; }
 .td-hl { color: var(--teal); font-weight: 700; }
 
@@ -529,20 +367,19 @@ tbody tr:nth-child(even) { background: #f9fafb; }
   font-weight: 700;
 }
 
-/* ── CODE BLOCK ──────────────────────────────────────────────── */
+/* ── CODE BLOCK ─────────────────────────────────────────────── */
 pre {
   background: #f8f9fa;
   border: 1px solid var(--border);
-  border-radius: 1mm;
+  border-radius: 1.5mm;
   font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 8.5pt;
-  line-height: 1.5;
-  padding: 3mm 4mm;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  padding: 4mm 5mm;
   overflow: hidden;
-  margin: 2.5mm 0;
+  margin: 3mm 0;
   flex-shrink: 0;
 }
-
 pre .kw   { color: #9b2335; font-weight: 700; }
 pre .ty   { color: #1a4fa0; }
 pre .fn   { color: #5a2d82; font-weight: 700; }
@@ -552,25 +389,23 @@ pre .num  { color: #1a4fa0; font-weight: 700; }
 pre .attr { color: #7c3700; font-weight: 700; }
 pre .op   { color: #1a4fa0; }
 
-/* ── STAT BOXES — plain, no gradient, no colored tops ─────── */
+/* ── STAT BOXES ─────────────────────────────────────────────── */
 .stat-row {
   display: flex;
-  gap: 3mm;
-  margin: 3mm 0;
+  gap: 4mm;
+  margin: 4mm 0;
   flex-shrink: 0;
 }
-
 .sbox {
   flex: 1;
   background: #fff;
   border: 1px solid var(--border);
-  padding: 3mm 2.5mm;
+  padding: 4mm 3mm;
   text-align: center;
 }
-
 .sval {
   font-family: 'Fira Code', monospace;
-  font-size: 18pt;
+  font-size: 22pt;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.5pt;
@@ -579,47 +414,78 @@ pre .op   { color: #1a4fa0; }
 .sbox.teal .sval { color: var(--teal); }
 
 .slbl {
-  font-family: Georgia, serif;
-  font-size: 8pt;
+  font-size: 9pt;
   color: var(--mid);
-  font-weight: 400;
-  margin-top: 1mm;
+  margin-top: 1.5mm;
   line-height: 1.3;
 }
 
-/* ── CALLOUT — simple light box ─────────────────────────────── */
-.callout {
-  background: #f0f4f8;
-  padding: 3mm 3.5mm;
-  border-radius: 1mm;
-  margin: 2.5mm 0;
+/* ── FINDINGS ───────────────────────────────────────────────── */
+.finding {
+  display: flex;
+  gap: 3mm;
+  align-items: flex-start;
+  margin-bottom: 3mm;
+  flex-shrink: 0;
 }
-.callout.blue   { background: #f0f4f8; }
-.callout.orange { background: #f0f4f8; }
+.fnum {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--navy);
+  flex-shrink: 0;
+  margin-top: 0.5mm;
+  min-width: 6mm;
+}
+.fbody {
+  font-size: 11pt;
+  line-height: 1.48;
+  color: var(--text);
+  flex: 1;
+}
+.fbody strong { color: var(--navy); font-weight: 700; }
 
-.callout p {
-  font-family: Georgia, serif;
-  font-size: 10pt !important;
-  line-height: 1.45 !important;
-  color: var(--navy) !important;
-  margin: 0 !important;
+/* ── BIG NUMBERS ────────────────────────────────────────────── */
+.big-nums {
+  display: flex;
+  gap: 5mm;
+  margin: 3mm 0;
+}
+.bignum {
+  flex: 1;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 4mm 4mm;
+}
+.bignum-val {
+  font-family: 'Fira Code', monospace;
+  font-size: 26pt;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+  display: block;
+}
+.bignum-lbl {
+  font-size: 9pt;
+  color: var(--mid);
+  margin-top: 2mm;
+  line-height: 1.3;
 }
 
-/* ── ARCH FLOW ───────────────────────────────────────────────── */
+/* ── ARCH FLOW ──────────────────────────────────────────────── */
 .arch-flow {
   display: flex;
   align-items: center;
-  gap: 2mm;
+  gap: 2.5mm;
   margin: 3mm 0;
   flex-wrap: nowrap;
 }
-
 .abox {
   font-family: 'Fira Code', monospace;
-  font-size: 8pt;
+  font-size: 9pt;
   font-weight: 700;
-  padding: 2mm 3mm;
-  border-radius: 1mm;
+  padding: 2.5mm 3.5mm;
+  border-radius: 1.5mm;
   text-align: center;
   line-height: 1.35;
   white-space: nowrap;
@@ -632,118 +498,108 @@ pre .op   { color: #1a4fa0; }
 .abox.teal   { color: var(--teal); border-color: #99e6de; background: #f0fdf9; }
 .abox.orange { color: var(--orange); border-color: #fed7aa; background: #fff7f0; }
 .abox.dark   { color: var(--navy); border-color: #cbd5e1; background: #f4f6f8; }
+.aarrow { color: var(--dim); font-size: 13pt; flex-shrink: 0; }
 
-.aarrow { color: var(--dim); font-size: 11pt; flex-shrink: 0; }
-
-/* ── FINDINGS ────────────────────────────────────────────────── */
-.finding {
-  display: flex;
+/* ── BEFORE / AFTER GRID ─────────────────────────────────────── */
+.ba-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 3mm;
-  align-items: flex-start;
-  margin-bottom: 2mm;
-  flex-shrink: 0;
+  margin: 3mm 0;
 }
-.fnum {
-  font-family: Georgia, serif;
-  font-size: 10pt;
-  font-weight: 700;
-  color: var(--navy);
-  flex-shrink: 0;
-  margin-top: 0.5mm;
-  min-width: 6mm;
-  display: inline-block;
-}
-.fbody {
-  font-family: Georgia, serif;
-  font-size: 10pt;
-  line-height: 1.48;
-  color: var(--text);
-  flex: 1;
-}
-.fbody strong { color: var(--navy); font-weight: 700; }
-
-/* ── DIVIDER ─────────────────────────────────────────────────── */
-.div { border: none; border-top: 1px solid var(--border); margin: 3mm 0; }
-
-/* ── BIG NUMBERS — plain ─────────────────────────────────────── */
-.big-nums {
+.ba-col {
+  border-radius: 1mm;
+  padding: 3.5mm 4mm;
   display: flex;
-  gap: 4mm;
-  margin: 2.5mm 0;
+  flex-direction: column;
+  gap: 1.5mm;
 }
-.bignum {
-  flex: 1;
-  text-align: center;
-  background: #fff;
-  border: 1px solid var(--border);
-  padding: 3mm 3mm;
-}
-.bignum-val {
-  font-family: 'Fira Code', monospace;
-  font-size: 24pt;
+.ba-before { background: #fdf6f6; border: 1px solid #e8d0d0; }
+.ba-after  { background: #f5faf8; border: 1px solid #c8ddd7; }
+.ba-lbl {
+  font-size: 9pt;
   font-weight: 700;
-  color: var(--navy);
-  line-height: 1;
-  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  margin-bottom: 1mm;
+  font-style: italic;
 }
-.bignum-lbl {
-  font-family: Georgia, serif;
-  font-size: 8pt;
-  color: var(--mid);
-  font-weight: 400;
-  margin-top: 1.5mm;
-  line-height: 1.3;
+.ba-before .ba-lbl { color: #9b2c2c; }
+.ba-after  .ba-lbl { color: var(--teal); }
+.ba-item {
+  font-size: 10.5pt;
+  line-height: 1.42;
+  color: var(--text);
+  padding-left: 4.5mm;
+  position: relative;
+}
+.ba-item::before { position: absolute; left: 0; font-weight: 700; }
+.ba-before .ba-item::before { content: "\2717"; color: #9b2c2c; }
+.ba-after  .ba-item::before { content: "\2713"; color: var(--teal); }
+
+/* ── DIVIDERS ───────────────────────────────────────────────── */
+.div { border: none; border-top: 1px solid var(--border); margin: 4mm 0; }
+
+/* ── CALLOUT ────────────────────────────────────────────────── */
+.callout {
+  background: #f0f4f8;
+  padding: 4mm 4mm;
+  border-radius: 1.5mm;
+  margin: 3mm 0;
+}
+.callout p {
+  font-size: 11pt !important;
+  line-height: 1.45 !important;
+  color: var(--navy) !important;
+  margin: 0 !important;
 }
 
-/* ── BOTTOM BAR — light background ──────────────────────────── */
+/* ── BOTTOM BAR ─────────────────────────────────────────────── */
 .bottom-bar {
   background: #f8f9fa;
-  border-top: 1px solid var(--border);
-  padding: 5mm var(--pad);
+  border-top: 1.5px solid var(--border);
+  padding: 8mm var(--pad);
   display: flex;
-  gap: 8mm;
+  gap: 10mm;
   flex-shrink: 0;
   color: var(--text);
   align-items: flex-start;
 }
 
 .bottom-bar h2 {
-  font-family: Georgia, serif;
-  font-size: 11pt;
+  font-size: 13pt;
   font-weight: 700;
   font-style: italic;
   color: var(--navy);
-  margin-bottom: 3mm;
+  margin-bottom: 4mm;
 }
 
-.bottom-left { flex: 2.2; }
-.bottom-mid  { flex: 1; }
+.bottom-left { flex: 2; }
+.bottom-mid  { flex: 1.2; }
 .bottom-right {
   flex: 0 0 auto;
   display: flex;
-  gap: 4mm;
+  gap: 5mm;
   align-items: flex-start;
 }
 
-.bottom-bar table { font-size: 10pt; }
+.bottom-bar table { font-size: 11pt; }
 
 .bottom-bar thead th {
   background: #f0f2f5;
   border-bottom: 1px solid var(--border);
   color: var(--navy);
-  font-family: Georgia, serif;
-  font-size: 9pt;
+  font-size: 10pt;
   font-weight: 700;
   font-style: italic;
-  padding: 2mm 3mm;
+  padding: 2.5mm 3.5mm;
 }
 
 .bottom-bar tbody td {
   color: var(--text);
   border-bottom: 1px solid var(--border);
-  padding: 2mm 3mm;
-  font-family: Georgia, serif;
-  font-size: 10pt;
+  padding: 2.5mm 3.5mm;
+  font-size: 11pt;
   vertical-align: middle;
 }
 .bottom-bar tbody tr:nth-child(even) { background: #f9fafb; }
@@ -767,40 +623,37 @@ pre .op   { color: #1a4fa0; }
 }
 .upstream-steps li {
   counter-increment: step;
-  font-family: Georgia, serif;
-  font-size: 10pt;
+  font-size: 11pt;
   color: var(--text);
-  padding: 1.5mm 0 1.5mm 7mm;
+  padding: 2mm 0 2mm 8mm;
   position: relative;
   line-height: 1.45;
 }
 .upstream-steps li::before {
   content: counter(step);
   position: absolute;
-  left: 0; top: 2mm;
-  width: 4.5mm; height: 4.5mm;
+  left: 0; top: 2.5mm;
+  width: 5mm; height: 5mm;
   border-radius: 50%;
   border: 1.5px solid var(--teal);
   color: var(--teal);
-  font-size: 7.5pt;
+  font-size: 8pt;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Georgia, serif;
 }
 
 .qr-box {
-  width: 36mm;
-  height: 36mm;
+  width: 40mm;
+  height: 40mm;
   border: 1px solid var(--border);
   background: #f8f9fa;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: Georgia, serif;
-  font-size: 8.5pt;
+  font-size: 9pt;
   font-weight: 700;
   color: var(--mid);
   text-align: center;
@@ -829,17 +682,17 @@ pre .op   { color: #1a4fa0; }
 <div class="header">
   <div class="header-text">
     <div class="poster-title">
-      Measuring &amp; Improving <span class="accent">Multi-Target<br>Binary Selection</span> in LLVM's GPU Offload Stack
+      Measuring &amp; Improving Multi-Target<br>Binary Selection in LLVM's GPU Offload Stack
     </div>
     <div class="poster-subtitle">
       Metadata Vocabulary &ensp;+&ensp; Dispatch Flame Graph &ensp;+&ensp; <code>#gpu.runtime_select</code> Design
     </div>
     <div class="poster-authors">
       <strong>S. Akash</strong>
-      <span class="sep">·</span>IIT Patna
-      <span class="sep">·</span>CERN GSoC
-      <span class="sep">·</span>vLLM contributor
-      <span class="sep">·</span>EuroLLVM Dublin 2026
+      <span class="sep">&middot;</span>IIT Patna
+      <span class="sep">&middot;</span>CERN GSoC
+      <span class="sep">&middot;</span>vLLM contributor
+      <span class="sep">&middot;</span>EuroLLVM Dublin 2026
     </div>
     <div class="poster-github">github.com/Akasxh/libkdl</div>
   </div>
@@ -849,11 +702,11 @@ pre .op   { color: #1a4fa0; }
         <div class="kstat-val">3-6 ns</div>
         <div class="kstat-lbl">Selection overhead</div>
       </div>
-      <div class="kstat blue">
+      <div class="kstat">
         <div class="kstat-val">5</div>
         <div class="kstat-lbl">New metadata keys</div>
       </div>
-      <div class="kstat orange">
+      <div class="kstat">
         <div class="kstat-val">0%</div>
         <div class="kstat-lbl">Hot-path penalty</div>
       </div>
@@ -865,11 +718,6 @@ pre .op   { color: #1a4fa0; }
   </div>
 </div>
 
-<!-- ── THESIS STRIP ─────────────────────────────────────────── -->
-<div class="thesis-strip">
-  <p>MLIR compiles one <code>gpu.module</code> to 3 GPU vendors. <code>OffloadBinary</code> carries N device images. But at runtime, the offload stack picks the <strong>first compatible image</strong> — no metadata vocabulary, no published measurement, no "best-compatible" mechanism. We fix all three.</p>
-</div>
-
 <!-- ═════════════════════════════════════════════════════════════
      3-COLUMN BODY
      ═════════════════════════════════════════════════════════════ -->
@@ -877,143 +725,31 @@ pre .op   { color: #1a4fa0; }
 
   <!-- ─── COLUMN 1: THE PROBLEM ────────────────────────────── -->
   <div class="col">
-    <div class="col-label blue">1 — The Problem</div>
+    <div class="col-label">1 — The Problem</div>
 
-    <!-- Summary paragraph (was thesis strip) -->
-    <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.55;color:var(--navy);border-left:3px solid var(--blue);padding-left:4mm;flex-shrink:0;">MLIR compiles one <code>gpu.module</code> to 3 GPU vendors. <code>OffloadBinary</code> carries N device images. But at runtime, the offload stack picks the <strong>first compatible image</strong> — no metadata vocabulary, no published measurement, no "best-compatible" mechanism. We fix all three.</p>
+    <!-- Thesis paragraph -->
+    <p style="font-size:13pt;line-height:1.55;color:var(--navy);border-left:3.5px solid var(--blue);padding-left:5mm;flex-shrink:0;">MLIR compiles one <code>gpu.module</code> to 3 GPU vendors. <code>OffloadBinary</code> carries N device images. But at runtime, the offload stack picks the <strong>first compatible image</strong> — no metadata vocabulary, no published measurement, no "best-compatible" mechanism. We fix all three.</p>
 
-    <!-- Card: Intro + runtime-dispatch-everywhere SVG -->
-    <div class="card blue-card">
+    <!-- The Gap + runtime-dispatch-everywhere figure -->
+    <div class="card blue-card" style="flex-grow:1;">
       <div class="card-head">
-        <h2><span class="sec-num">1</span> The Gap</h2>
+        <h2>The Gap</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <p>Since Aug 2025, MLIR compiles NVIDIA + AMD + Intel GPUs in one pipeline. The <strong>compile-time half is done</strong>. The runtime selection policy is not — <code>#gpu.select_object</code> resolves at compile time only.</p>
-
-        <!-- INLINE SVG: runtime-dispatch-everywhere -->
-        <div class="fig-wrap" style="margin: 3mm 0;">
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="210" viewBox="0 0 700 210"
-     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
-  <defs>
-    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <polygon points="0 0,8 3,0 6" fill="#0d9488"/>
-    </marker>
-  </defs>
-  <rect width="700" height="210" fill="#ffffff"/>
-  <text x="350" y="14" text-anchor="middle" font-size="9.5" font-weight="700"
-        fill="#4b5563" letter-spacing="1.2"
-        font-variant="all-small-caps">Runtime Dispatch Already Exists Everywhere Except MLIR</text>
-  <!-- ── Card 1: cuBLAS ── -->
-  <rect x="6" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-  <circle cx="117" cy="34" r="8" fill="#16a34a"/>
-  <path d="M112,34 L115,37 L122,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <g transform="translate(40,32)">
-    <rect x="0"  y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
-    <rect x="9"  y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
-    <rect x="18" y="0"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.25"/>
-    <rect x="0"  y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
-    <rect x="9"  y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
-    <rect x="18" y="9"  width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
-    <rect x="0"  y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.25"/>
-    <rect x="9"  y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.55"/>
-    <rect x="18" y="18" width="7" height="7" rx="1" fill="#16a34a" opacity="0.9"/>
-  </g>
-  <text x="67" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">cuBLAS</text>
-  <text x="67" y="98"  text-anchor="middle" font-size="8" fill="#374151">100s of GEMM variants</text>
-  <text x="67" y="109" text-anchor="middle" font-size="8" fill="#374151">selected at runtime</text>
-  <text x="67" y="120" text-anchor="middle" font-size="8" fill="#374151">by tile heuristic</text>
-  <!-- ── Card 2: cuDNN v9 ── -->
-  <rect x="135" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-  <circle cx="246" cy="34" r="8" fill="#16a34a"/>
-  <path d="M241,34 L244,37 L251,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <g transform="translate(168,30)">
-    <circle cx="4"  cy="8"  r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-    <circle cx="4"  cy="20" r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-    <circle cx="4"  cy="32" r="3.5" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-    <circle cx="22" cy="14" r="3.5" fill="#16a34a" opacity="0.7"/>
-    <circle cx="22" cy="26" r="3.5" fill="#16a34a" opacity="0.7"/>
-    <circle cx="40" cy="20" r="3.5" fill="#16a34a" opacity="0.95"/>
-    <line x1="7.5" y1="8"  x2="18.5" y2="14" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-    <line x1="7.5" y1="20" x2="18.5" y2="14" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-    <line x1="7.5" y1="20" x2="18.5" y2="26" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-    <line x1="7.5" y1="32" x2="18.5" y2="26" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-    <line x1="25.5" y1="14" x2="36.5" y2="20" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-    <line x1="25.5" y1="26" x2="36.5" y2="20" stroke="#16a34a" stroke-width="0.9" opacity="0.5"/>
-  </g>
-  <text x="196" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">cuDNN v9</text>
-  <text x="196" y="98"  text-anchor="middle" font-size="8" fill="#374151">NVRTC JIT fusion</text>
-  <text x="196" y="109" text-anchor="middle" font-size="8" fill="#374151">3 heuristic</text>
-  <text x="196" y="120" text-anchor="middle" font-size="8" fill="#374151">dispatch modes</text>
-  <!-- ── Card 3: PyTorch ── -->
-  <rect x="264" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-  <circle cx="375" cy="34" r="8" fill="#16a34a"/>
-  <path d="M370,34 L373,37 L380,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <g transform="translate(308,27)">
-    <path d="M14,34 C5,30 2,22 7,14 C8,19 11,20 12,17 C12,12 17,7 14,0 C21,5 26,14 22,24 C24,21 25,18 24,15 C29,20 28,28 24,34 C21,37 17,38 14,34Z"
-          fill="#ea580c" opacity="0.85"/>
-    <ellipse cx="14" cy="32" rx="5.5" ry="3.5" fill="#fed7aa" opacity="0.55"/>
-  </g>
-  <text x="325" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">PyTorch</text>
-  <text x="325" y="98"  text-anchor="middle" font-size="8" fill="#374151">DispatchKeySet on</text>
-  <text x="325" y="109" text-anchor="middle" font-size="8" fill="#374151">every op call from</text>
-  <text x="325" y="120" text-anchor="middle" font-size="8" fill="#374151">live tensor metadata</text>
-  <!-- ── Card 4: torch.compile ── -->
-  <rect x="393" y="22" width="123" height="118" rx="5" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-  <circle cx="504" cy="34" r="8" fill="#16a34a"/>
-  <path d="M499,34 L502,37 L509,30" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <g transform="translate(431,28)">
-    <circle cx="15" cy="14" r="5.5" fill="none" stroke="#16a34a" stroke-width="2"/>
-    <circle cx="15" cy="14" r="2.5" fill="#16a34a"/>
-    <rect x="13.2" y="3"  width="3.6" height="4" rx="1" fill="#16a34a"/>
-    <rect x="13.2" y="21" width="3.6" height="4" rx="1" fill="#16a34a"/>
-    <rect x="3"   y="12.2" width="4" height="3.6" rx="1" fill="#16a34a"/>
-    <rect x="21"  y="12.2" width="4" height="3.6" rx="1" fill="#16a34a"/>
-    <rect x="6.5" y="5.5" width="3.6" height="4" rx="1" transform="rotate(-45 8.3 7.5)" fill="#16a34a"/>
-    <rect x="21"  y="5.5" width="3.6" height="4" rx="1" transform="rotate(45 23 7.5)"  fill="#16a34a"/>
-    <rect x="6.5" y="18.5" width="3.6" height="4" rx="1" transform="rotate(45 8.3 20.5)"  fill="#16a34a"/>
-    <rect x="21"  y="18.5" width="3.6" height="4" rx="1" transform="rotate(-45 23 20.5)" fill="#16a34a"/>
-  </g>
-  <text x="454" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">torch.compile</text>
-  <text x="454" y="98"  text-anchor="middle" font-size="8" fill="#374151">Shape guards →</text>
-  <text x="454" y="109" text-anchor="middle" font-size="8" fill="#374151">recompile per</text>
-  <text x="454" y="120" text-anchor="middle" font-size="8" fill="#374151">backend at runtime</text>
-  <!-- ── Card 5: MLIR gap ── -->
-  <rect x="522" y="22" width="171" height="118" rx="5" fill="#fff1f2" stroke="#dc2626" stroke-width="2"/>
-  <circle cx="681" cy="34" r="9" fill="#dc2626"/>
-  <line x1="676" y1="29" x2="686" y2="39" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-  <line x1="686" y1="29" x2="676" y2="39" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-  <g transform="translate(571,27)">
-    <polygon points="18,2 34,16 18,30 2,16" fill="none" stroke="#dc2626" stroke-width="1.5" opacity="0.5"/>
-    <polygon points="18,8 26,16 18,24 10,16"  fill="#dc2626" opacity="0.12"/>
-    <circle cx="18" cy="16" r="3" fill="#dc2626" opacity="0.35"/>
-    <line x1="5"  y1="5"  x2="31" y2="29" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
-    <line x1="31" y1="5"  x2="5"  y2="29" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
-  </g>
-  <text x="607" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">MLIR  gpu.binary</text>
-  <text x="607" y="98"  text-anchor="middle" font-size="8" fill="#991b1b">select_object resolves</text>
-  <text x="607" y="109" text-anchor="middle" font-size="8" fill="#991b1b">at COMPILE TIME</text>
-  <text x="607" y="120" text-anchor="middle" font-size="8" fill="#991b1b">— no runtime path</text>
-  <rect x="522" y="137" width="171" height="15" rx="3" fill="#dc2626"/>
-  <text x="607" y="148" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" letter-spacing="0.8">THE GAP WE FILL</text>
-  <rect x="6" y="137" width="509" height="15" rx="3" fill="#dcfce7"/>
-  <text x="259" y="148" text-anchor="middle" font-size="8.5" font-weight="600" fill="#15803d" letter-spacing="0.5">RUNTIME DISPATCH SUPPORTED ✓</text>
-  <line x1="607" y1="153" x2="607" y2="163" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="3,2"/>
-  <line x1="607" y1="163" x2="350" y2="163" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="3,2"/>
-  <line x1="350" y1="163" x2="350" y2="173" stroke="#0d9488" stroke-width="1.8" marker-end="url(#arr)"/>
-  <rect x="140" y="177" width="420" height="28" rx="6" fill="#0d9488"/>
-  <text x="350" y="188" text-anchor="middle" font-size="9" font-weight="400" fill="#ccfbf1">This Work:</text>
-  <text x="350" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">#gpu.runtime_select — Runtime Binary Dispatch for MLIR</text>
-</svg>
+        <div class="fig-wrap">
+          <img src="figures/runtime-dispatch-everywhere.svg" alt="Runtime dispatch is already universal except MLIR">
         </div>
+        <p class="fig-caption">cuBLAS, cuDNN, PyTorch, torch.compile all select GPU code at runtime. MLIR gpu.binary is the exception.</p>
       </div>
     </div>
 
-    <!-- Card: Upstream evidence -->
-    <div class="card blue-card">
+    <!-- Upstream evidence -->
+    <div class="card blue-card" style="flex-grow:1;">
       <div class="card-head">
         <h2>Upstream Evidence</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <div class="pr-row">
           <span class="badge merged">PR #148286</span>
           <span class="pr-text">XeVM target upstreamed (Aug 2025) — tri-vendor compilation now possible</span>
@@ -1037,128 +773,23 @@ pre .op   { color: #1a4fa0; }
       </div>
     </div>
 
-    <!-- Card: Why this matters -->
+    <!-- Why this matters -->
     <div class="card blue-card grow">
       <div class="card-head">
         <h2>Why This Matters</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <div class="why-item">
           <span class="why-tag">CERN</span>
           <span class="why-text">~80 build configs for heterogeneous GPU clusters (A100 + MI250X + CPU). A fat binary with runtime selection eliminates combinatorial explosion.</span>
         </div>
         <div class="why-item">
-          <span class="why-tag teal">vLLM</span>
+          <span class="why-tag">vLLM</span>
           <span class="why-text">Separate NVIDIA/AMD codepaths per kernel. Runtime variant selection enables one serving binary for both vendors.</span>
         </div>
         <div class="why-item">
-          <span class="why-tag orange">Cloud</span>
+          <span class="why-tag">Cloud</span>
           <span class="why-text">AWS p4/p5, Azure ND — GPU model unknown at container image build time. Ship one binary, resolve at launch.</span>
-        </div>
-
-        <hr class="div">
-
-        <!-- INLINE SVG: deployment-scenarios -->
-        <div class="fig-wrap" style="margin: 2mm 0 3mm;">
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="195" viewBox="0 0 700 195"
-     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
-  <defs>
-    <marker id="arr-b-ds" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-      <polygon points="0 0,7 2.5,0 5" fill="#2d7fc1"/>
-    </marker>
-    <marker id="arr-t-ds" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-      <polygon points="0 0,7 2.5,0 5" fill="#0d9488"/>
-    </marker>
-    <marker id="arr-o-ds" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-      <polygon points="0 0,7 2.5,0 5" fill="#ea580c"/>
-    </marker>
-  </defs>
-  <rect width="700" height="195" fill="#ffffff"/>
-  <line x1="235" y1="8" x2="235" y2="170" stroke="#e5e7eb" stroke-width="1"/>
-  <line x1="465" y1="8" x2="465" y2="170" stroke="#e5e7eb" stroke-width="1"/>
-  <!-- PANEL 1: HPC Cluster -->
-  <rect x="8" y="8" width="219" height="20" rx="3" fill="#2d7fc1"/>
-  <text x="117" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">① HPC Cluster</text>
-  <rect x="58" y="36" width="118" height="16" rx="3" fill="#dbeafe" stroke="#2d7fc1" stroke-width="1"/>
-  <text x="117" y="47" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">one .mlir binary</text>
-  <line x1="80"  y1="52" x2="50"  y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b-ds)"/>
-  <line x1="117" y1="52" x2="117" y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b-ds)"/>
-  <line x1="154" y1="52" x2="184" y2="68" stroke="#2d7fc1" stroke-width="1.3" marker-end="url(#arr-b-ds)"/>
-  <rect x="14" y="70" width="70" height="46" rx="4" fill="#eff6ff" stroke="#2d7fc1" stroke-width="1.2"/>
-  <rect x="27" y="78" width="22" height="22" rx="2" fill="#2d7fc1" opacity="0.15" stroke="#2d7fc1" stroke-width="1"/>
-  <rect x="31" y="82" width="14" height="14" rx="1" fill="#2d7fc1" opacity="0.5"/>
-  <line x1="27" y1="83" x2="23" y2="83" stroke="#2d7fc1" stroke-width="1"/>
-  <line x1="27" y1="87" x2="23" y2="87" stroke="#2d7fc1" stroke-width="1"/>
-  <line x1="27" y1="91" x2="23" y2="91" stroke="#2d7fc1" stroke-width="1"/>
-  <line x1="49" y1="83" x2="53" y2="83" stroke="#2d7fc1" stroke-width="1"/>
-  <line x1="49" y1="87" x2="53" y2="87" stroke="#2d7fc1" stroke-width="1"/>
-  <line x1="49" y1="91" x2="53" y2="91" stroke="#2d7fc1" stroke-width="1"/>
-  <text x="65" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">A100</text>
-  <text x="65" y="96" text-anchor="middle" font-size="7" fill="#374151">NVIDIA</text>
-  <text x="49" y="110" text-anchor="middle" font-size="7" fill="#374151">CUDA</text>
-  <rect x="82" y="70" width="70" height="46" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.2"/>
-  <rect x="95" y="78" width="22" height="22" rx="2" fill="#16a34a" opacity="0.15" stroke="#16a34a" stroke-width="1"/>
-  <rect x="99" y="82" width="14" height="14" rx="1" fill="#16a34a" opacity="0.5"/>
-  <text x="133" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#15803d">MI250X</text>
-  <text x="133" y="96" text-anchor="middle" font-size="7" fill="#374151">AMD</text>
-  <text x="117" y="110" text-anchor="middle" font-size="7" fill="#374151">ROCm</text>
-  <rect x="150" y="70" width="70" height="46" rx="4" fill="#fafafa" stroke="#9ca3af" stroke-width="1.2" stroke-dasharray="3,2"/>
-  <rect x="163" y="78" width="22" height="22" rx="2" fill="#9ca3af" opacity="0.15" stroke="#9ca3af" stroke-width="1"/>
-  <rect x="167" y="82" width="14" height="14" rx="1" fill="#9ca3af" opacity="0.4"/>
-  <text x="185" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="#6b7280">CPU</text>
-  <text x="185" y="96" text-anchor="middle" font-size="7" fill="#6b7280">Fallback</text>
-  <text x="185" y="110" text-anchor="middle" font-size="7" fill="#6b7280">OpenMP</text>
-  <text x="117" y="135" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">one binary · three backends</text>
-  <!-- PANEL 2: Cloud Container -->
-  <rect x="243" y="8" width="214" height="20" rx="3" fill="#0d9488"/>
-  <text x="350" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">② Cloud Container</text>
-  <rect x="258" y="34" width="184" height="50" rx="5" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
-  <rect x="266" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.4"/>
-  <rect x="278" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.7"/>
-  <rect x="290" y="41" width="10" height="7" rx="1" fill="#0d9488" opacity="0.4"/>
-  <rect x="266" y="50" width="44" height="8" rx="2" fill="#0d9488" opacity="0.7"/>
-  <rect x="310" y="46" width="8" height="4" rx="1" fill="#0d9488" opacity="0.5"/>
-  <text x="340" y="48" text-anchor="start" font-size="10" font-weight="700" fill="#0f766e">container image</text>
-  <text x="340" y="61" text-anchor="start" font-size="8" fill="#374151">GPU unknown at</text>
-  <text x="340" y="71" text-anchor="start" font-size="8" fill="#374151">build time</text>
-  <circle cx="420" cy="59" r="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
-  <text x="420" y="63" text-anchor="middle" font-size="13" font-weight="900" fill="#d97706">?</text>
-  <line x1="350" y1="87" x2="350" y2="100" stroke="#0d9488" stroke-width="1.5"/>
-  <line x1="290" y1="100" x2="410" y2="100" stroke="#0d9488" stroke-width="1.5"/>
-  <line x1="290" y1="100" x2="290" y2="112" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t-ds)"/>
-  <line x1="410" y1="100" x2="410" y2="112" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t-ds)"/>
-  <rect x="255" y="113" width="70" height="32" rx="4" fill="#eff6ff" stroke="#2d7fc1" stroke-width="1.2"/>
-  <text x="290" y="126" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">AWS p4d</text>
-  <text x="290" y="137" text-anchor="middle" font-size="7" fill="#374151">A100 · CUDA</text>
-  <rect x="374" y="113" width="70" height="32" rx="4" fill="#fdf4ff" stroke="#9333ea" stroke-width="1.2"/>
-  <text x="409" y="126" text-anchor="middle" font-size="7.5" font-weight="700" fill="#7e22ce">Azure ND</text>
-  <text x="409" y="137" text-anchor="middle" font-size="7" fill="#374151">MI300X · ROCm</text>
-  <text x="350" y="160" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">GPU resolved at container launch</text>
-  <!-- PANEL 3: ML Framework -->
-  <rect x="473" y="8" width="219" height="20" rx="3" fill="#ea580c"/>
-  <text x="582" y="21" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">③ ML Framework</text>
-  <rect x="480" y="34" width="85" height="30" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.2"/>
-  <text x="522" y="50" text-anchor="middle" font-size="9" font-weight="700" fill="#c2410c">torch-mlir</text>
-  <rect x="617" y="34" width="75" height="30" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.2"/>
-  <text x="654" y="50" text-anchor="middle" font-size="9" font-weight="700" fill="#c2410c">ONNX-RT</text>
-  <line x1="522" y1="64" x2="522" y2="77" stroke="#ea580c" stroke-width="1.3" marker-end="url(#arr-o-ds)"/>
-  <line x1="654" y1="64" x2="654" y2="72" stroke="#ea580c" stroke-width="1.3"/>
-  <line x1="654" y1="72" x2="590" y2="72" stroke="#ea580c" stroke-width="1.3"/>
-  <line x1="590" y1="72" x2="590" y2="77" stroke="#ea580c" stroke-width="1.3" marker-end="url(#arr-o-ds)"/>
-  <rect x="487" y="79" width="110" height="26" rx="4" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.3"/>
-  <text x="542" y="90" text-anchor="middle" font-size="8.5" font-weight="700" fill="#92400e">gpu.binary</text>
-  <text x="542" y="100" text-anchor="middle" font-size="7.5" fill="#78350f">both emit same IR</text>
-  <line x1="542" y1="105" x2="542" y2="115" stroke="#0d9488" stroke-width="1.5" marker-end="url(#arr-t-ds)"/>
-  <rect x="480" y="117" width="195" height="28" rx="4" fill="#0d9488"/>
-  <text x="577" y="129" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">#gpu.runtime_select</text>
-  <text x="577" y="140" text-anchor="middle" font-size="7.5" fill="#ccfbf1">single dispatch layer</text>
-  <text x="582" y="162" text-anchor="middle" font-size="8" fill="#6b7280" font-style="italic">no per-framework reimplementation</text>
-  <rect x="0" y="175" width="700" height="20" rx="0" fill="#f9fafb"/>
-  <line x1="0" y1="175" x2="700" y2="175" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="350" y="188" text-anchor="middle" font-size="8" fill="#6b7280">
-    Runtime binary selection eliminates per-target build matrices and per-framework dispatch reimplementation
-  </text>
-</svg>
         </div>
 
         <hr class="div">
@@ -1166,7 +797,7 @@ pre .op   { color: #1a4fa0; }
         <div class="h3">The Status Quo Cost</div>
         <ul>
           <li>N build pipelines per vendor instead of one fat binary</li>
-          <li><code>image:cuda</code> / <code>image:rocm</code> / <code>image:sycl</code> — 3× storage &amp; CI</li>
+          <li><code>image:cuda</code> / <code>image:rocm</code> / <code>image:sycl</code> — 3x storage &amp; CI</li>
           <li>PyTorch, JAX, ONNX-RT each reimplement their own GPU dispatch</li>
           <li><strong>No published latency data</strong> on the GPU dispatch stack</li>
         </ul>
@@ -1186,189 +817,41 @@ pre .op   { color: #1a4fa0; }
             <div class="ba-lbl">With This Work</div>
             <div class="ba-item">One fat binary, runtime dispatch</div>
             <div class="ba-item">LLVM-native selection, shared by all</div>
-            <div class="ba-item">First published flame graph (36 µs → 3 ns)</div>
+            <div class="ba-item">First published flame graph (36 us to 3 ns)</div>
             <div class="ba-item">5 new typed metadata keys standardized</div>
           </div>
         </div>
 
-        <hr class="div">
-
-        <div class="h3">Upstreaming Path</div>
-        <div class="upstream-col">
-          <div class="up-step">
-            <div class="up-num done">1</div>
-            <div class="up-body">
-              <div class="up-title">Metadata RFC — in review</div>
-              <div class="up-desc">5 new keys for <code>OffloadBinary</code>; PR #185663 hook already merged. ~30 LOC header patch.</div>
-            </div>
-          </div>
-          <div class="up-step">
-            <div class="up-num done">2</div>
-            <div class="up-body">
-              <div class="up-title">Flame graph — poster artifact</div>
-              <div class="up-desc">Benchmark harness open-sourced. Repro in &lt;10 min on any CUDA host. Target: <code>llvm-test-suite</code>.</div>
-            </div>
-          </div>
-          <div class="up-step">
-            <div class="up-num wip">3</div>
-            <div class="up-body">
-              <div class="up-title"><code>#gpu.runtime_select</code> — RFC draft</div>
-              <div class="up-desc">~780 LOC, implements <code>OffloadingLLVMTranslationAttrInterface</code>. LLVM-dev RFC planned post-conference.</div>
-            </div>
-          </div>
-          <div class="up-step">
-            <div class="up-num next">4</div>
-            <div class="up-body">
-              <div class="up-title">Integration &amp; adoption</div>
-              <div class="up-desc">vLLM, torch-mlir, CERN HEP-CCE identified as early adopters once C1+C3 land.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="callout blue" style="margin-top: 4mm;">
+        <div class="callout" style="margin-top:4mm;">
           <p>Runtime variant selection is not theoretical — every heterogeneous deployment works around it today, each in its own ad-hoc way.</p>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- ─── COLUMN 2: OUR CONTRIBUTIONS ─────────────────────── -->
   <div class="col">
-    <div class="col-label teal">2 — Our Contributions</div>
+    <div class="col-label">2 — Our Contributions</div>
 
-    <!-- Hero: Architecture SVG -->
-    <div class="card teal-card">
+    <!-- Architecture diagram — THE HERO -->
+    <div class="card teal-card" style="flex-grow:3;">
       <div class="card-head">
-        <h2><span class="sec-num">2</span> System Architecture</h2>
+        <h2>System Architecture</h2>
       </div>
-      <div class="card-body tight">
-        <!-- INLINE SVG: architecture -->
+      <div class="card-body">
         <div class="fig-wrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400" font-family="Arial, Helvetica, sans-serif">
-  <defs>
-    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000022"/>
-    </filter>
-    <filter id="desaturate">
-      <feColorMatrix type="saturate" values="0.15"/>
-    </filter>
-    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#2d7fc1"/>
-    </marker>
-    <marker id="arrow-teal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#0d9488"/>
-    </marker>
-    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
-    </marker>
-  </defs>
-  <rect width="700" height="400" fill="#ffffff"/>
-  <g filter="url(#shadow)">
-    <rect x="30" y="28" width="200" height="60" rx="8" ry="8" fill="#f0f6fc" stroke="#2d7fc1" stroke-width="2"/>
-  </g>
-  <rect x="30" y="28" width="6" height="60" rx="3" ry="3" fill="#2d7fc1"/>
-  <text x="148" y="53" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a365d">MLIR</text>
-  <text x="148" y="71" text-anchor="middle" font-size="13" font-family="'Courier New', monospace" fill="#2d7fc1">gpu.module</text>
-  <line x1="130" y1="88" x2="130" y2="118" stroke="#2d7fc1" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="60" y="93" width="168" height="20" rx="10" ry="10" fill="#dbeafe" stroke="#2d7fc1" stroke-width="1"/>
-  <text x="144" y="107" text-anchor="middle" font-size="10" font-family="'Courier New', monospace" fill="#1a365d">gpu-module-to-binary</text>
-  <g filter="url(#shadow)">
-    <rect x="30" y="120" width="200" height="110" rx="8" ry="8" fill="#f0f6fc" stroke="#2d7fc1" stroke-width="2"/>
-  </g>
-  <rect x="30" y="120" width="6" height="110" rx="3" ry="3" fill="#2d7fc1"/>
-  <text x="148" y="143" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a365d">OffloadBinary</text>
-  <text x="148" y="160" text-anchor="middle" font-size="10" fill="#64748b">N device images</text>
-  <line x1="42" y1="167" x2="224" y2="167" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4,3"/>
-  <g filter="url(#desaturate)">
-    <rect x="46" y="173" width="55" height="20" rx="4" ry="4" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1"/>
-    <text x="73" y="187" text-anchor="middle" font-size="9" font-weight="bold" fill="#0369a1">sm_75</text>
-    <text x="73" y="198" text-anchor="middle" font-size="7" fill="#64748b">CUBIN</text>
-  </g>
-  <text x="98" y="188" font-size="12" fill="#dc2626" font-weight="bold">✕</text>
-  <rect x="113" y="173" width="60" height="20" rx="4" ry="4" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="143" y="187" text-anchor="middle" font-size="9" font-weight="bold" fill="#15803d">gfx90a</text>
-  <text x="143" y="198" text-anchor="middle" font-size="7" fill="#15803d">HSACO</text>
-  <text x="171" y="188" font-size="12" fill="#16a34a" font-weight="bold">✓</text>
-  <g filter="url(#desaturate)">
-    <rect x="182" y="173" width="45" height="20" rx="4" ry="4" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
-    <text x="204" y="187" text-anchor="middle" font-size="9" font-weight="bold" fill="#854d0e">x86</text>
-    <text x="204" y="198" text-anchor="middle" font-size="7" fill="#64748b">ELF</text>
-  </g>
-  <text x="225" y="188" font-size="12" fill="#dc2626" font-weight="bold">✕</text>
-  <line x1="130" y1="230" x2="130" y2="264" stroke="#2d7fc1" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <text x="138" y="251" font-size="9.5" fill="#64748b" font-style="italic">evaluate candidates</text>
-  <rect x="24" y="260" width="212" height="92" rx="11" ry="11" fill="none" stroke="#0d948866" stroke-width="4"/>
-  <g filter="url(#shadow)">
-    <rect x="30" y="266" width="200" height="80" rx="8" ry="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5"/>
-  </g>
-  <rect x="30" y="266" width="6" height="80" rx="3" ry="3" fill="#0d9488"/>
-  <text x="148" y="288" text-anchor="middle" font-size="13" font-weight="bold" fill="#134e4a">Runtime Selection</text>
-  <text x="148" y="302" text-anchor="middle" font-size="9" font-family="'Courier New', monospace" fill="#0d9488">#gpu.runtime_select</text>
-  <rect x="44" y="308" width="66" height="14" rx="3" ry="3" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.8"/>
-  <text x="77" y="319" text-anchor="middle" font-size="8" fill="#0f766e">min_sm</text>
-  <rect x="116" y="308" width="82" height="14" rx="3" ry="3" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.8"/>
-  <text x="157" y="319" text-anchor="middle" font-size="8" fill="#0f766e">req_features</text>
-  <rect x="44" y="326" width="100" height="14" rx="3" ry="3" fill="#ccfbf1" stroke="#5eead4" stroke-width="0.8"/>
-  <text x="94" y="337" text-anchor="middle" font-size="8" fill="#0f766e">variant_priority</text>
-  <circle cx="228" cy="266" r="16" fill="#0d9488" stroke="#fff" stroke-width="2" filter="url(#shadow)"/>
-  <text x="228" y="271" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">NEW</text>
-  <g filter="url(#shadow)">
-    <rect x="430" y="190" width="230" height="100" rx="8" ry="8" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  </g>
-  <rect x="430" y="190" width="6" height="100" rx="3" ry="3" fill="#ea580c"/>
-  <text x="553" y="214" text-anchor="middle" font-size="13" font-weight="bold" fill="#7c2d12">GPU Kernel Launch</text>
-  <line x1="442" y1="220" x2="654" y2="220" stroke="#fed7aa" stroke-width="1"/>
-  <rect x="444" y="228" width="140" height="20" rx="4" ry="4" fill="#ffedd5" stroke="#fb923c" stroke-width="1"/>
-  <text x="514" y="242" text-anchor="middle" font-size="10" font-family="'Courier New', monospace" fill="#c2410c">cuModuleLoadData</text>
-  <rect x="444" y="254" width="140" height="20" rx="4" ry="4" fill="#ffedd5" stroke="#fb923c" stroke-width="1"/>
-  <text x="514" y="268" text-anchor="middle" font-size="10" font-family="'Courier New', monospace" fill="#c2410c">cuLaunchKernel</text>
-  <rect x="596" y="228" width="46" height="46" rx="4" ry="4" fill="#1a365d" stroke="#2d7fc1" stroke-width="1.5"/>
-  <text x="619" y="248" text-anchor="middle" font-size="9" fill="#93c5fd" font-weight="bold">GPU</text>
-  <text x="619" y="263" text-anchor="middle" font-size="7" fill="#60a5fa">device</text>
-  <circle cx="608" cy="270" r="1.5" fill="#60a5fa"/>
-  <circle cx="616" cy="270" r="1.5" fill="#60a5fa"/>
-  <circle cx="624" cy="270" r="1.5" fill="#60a5fa"/>
-  <circle cx="632" cy="270" r="1.5" fill="#60a5fa"/>
-  <path d="M 230 306 L 350 306 L 350 240 L 425 240" stroke="#0d9488" stroke-width="2.5" fill="none" marker-end="url(#arrow-teal)"/>
-  <text x="290" y="298" text-anchor="middle" font-size="9.5" fill="#0f766e" font-weight="bold">best match</text>
-  <rect x="430" y="28" width="230" height="148" rx="8" ry="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
-  <text x="545" y="50" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a365d">Selection Strategy</text>
-  <line x1="440" y1="57" x2="652" y2="57" stroke="#e2e8f0" stroke-width="1"/>
-  <rect x="440" y="64" width="8" height="8" rx="2" fill="#94a3b8"/>
-  <text x="455" y="73" font-size="10" fill="#475569" font-weight="bold">Current:</text>
-  <text x="455" y="87" font-size="9.5" fill="#64748b">Select first compatible binary</text>
-  <text x="455" y="100" font-size="9.5" fill="#64748b">— ignores performance data</text>
-  <line x1="440" y1="108" x2="652" y2="108" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"/>
-  <rect x="440" y="115" width="8" height="8" rx="2" fill="#0d9488"/>
-  <text x="455" y="124" font-size="10" fill="#0d9488" font-weight="bold">Proposed:</text>
-  <text x="455" y="138" font-size="9.5" fill="#134e4a">#gpu.runtime_select attr</text>
-  <text x="455" y="152" font-size="9.5" fill="#134e4a">— ranked by SM, features,</text>
-  <text x="455" y="166" font-size="9.5" fill="#134e4a">  variant priority metadata</text>
-  <circle cx="278" cy="58" r="11" fill="#2d7fc1"/>
-  <text x="278" y="62" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">1</text>
-  <circle cx="278" cy="175" r="11" fill="#2d7fc1"/>
-  <text x="278" y="179" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">2</text>
-  <circle cx="278" cy="306" r="11" fill="#0d9488"/>
-  <text x="278" y="310" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">3</text>
-  <circle cx="406" cy="240" r="11" fill="#ea580c"/>
-  <text x="406" y="244" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">4</text>
-  <text x="293" y="54" font-size="8.5" fill="#64748b">Compilation</text>
-  <text x="293" y="171" font-size="8.5" fill="#64748b">Fat binary</text>
-  <text x="293" y="302" font-size="8.5" fill="#0f766e" font-weight="bold">Selection</text>
-  <text x="420" y="236" font-size="8.5" fill="#c2410c">Launch</text>
-  <text x="350" y="388" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">LLVM/MLIR GPU Kernel Dispatch Pipeline — Runtime Binary Selection</text>
-</svg>
+          <img src="figures/architecture.svg" alt="LLVM/MLIR GPU dispatch pipeline architecture">
         </div>
+        <p class="fig-caption">MLIR gpu.module compiles to OffloadBinary with N variants. #gpu.runtime_select picks the best match at load time via metadata ranking. GPU launch path is unchanged.</p>
       </div>
     </div>
 
-    <!-- Card: C1 Metadata table -->
+    <!-- C1: Metadata Vocabulary -->
     <div class="card teal-card">
       <div class="card-head">
         <h2>C1: Metadata Vocabulary (5 New Keys)</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <table>
           <thead><tr><th>Key</th><th>Tier</th><th>Example</th><th>Semantics</th></tr></thead>
           <tbody>
@@ -1387,7 +870,7 @@ pre .op   { color: #1a4fa0; }
             <tr>
               <td class="td-mono">requires_features</td>
               <td><strong>MUST</strong></td>
-              <td class="td-mono">"tensor_core_nv,bf16"</td>
+              <td class="td-mono">"tensor_core,bf16"</td>
               <td>Named tokens; rejects if absent</td>
             </tr>
             <tr>
@@ -1404,353 +887,120 @@ pre .op   { color: #1a4fa0; }
             </tr>
           </tbody>
         </table>
-        <p style="font-size:10pt;margin:0"><strong>Backward-compatible:</strong> Missing keys = no constraint. Old runtimes ignore unknown keys. No format version bump.</p>
+        <p style="font-size:11pt;margin:0"><strong>Backward-compatible:</strong> Missing keys = no constraint. Old runtimes ignore unknown keys.</p>
       </div>
     </div>
 
-    <!-- Card: C2 Flame graph SVG -->
-    <div class="card teal-card grow">
+    <!-- C2: Latency breakdown — MAIN RESULT -->
+    <div class="card teal-card" style="flex-grow:4;">
       <div class="card-head">
         <h2>C2: First Published Dispatch Flame Graph</h2>
       </div>
-      <div class="card-body tight">
-        <!-- INLINE SVG: latency-breakdown -->
+      <div class="card-body">
         <div class="fig-wrap">
-<svg xmlns="http://www.w3.org/2000/svg" width="650" height="350" viewBox="0 0 650 350" font-family="Arial, Helvetica, sans-serif">
-  <defs>
-    <style>
-      .title { font-size: 13px; font-weight: 700; fill: #111; }
-      .subtitle { font-size: 9.5px; fill: #555; }
-      .axis-label { font-size: 9px; fill: #444; }
-      .tick-label { font-size: 8.5px; fill: #555; }
-      .bar-label { font-size: 9px; font-weight: 600; fill: #111; }
-      .annotation { font-size: 8px; fill: #555; }
-      .callout-label { font-size: 8px; font-weight: 700; fill: #0d9488; }
-      .bracket-label { font-size: 8px; fill: #dc2626; font-weight: 600; }
-    </style>
-    <marker id="arrow-teal-lb" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L6,3 z" fill="#0d9488"/>
-    </marker>
-    <marker id="arrow-red-lb" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L6,3 z" fill="#dc2626"/>
-    </marker>
-  </defs>
-  <rect width="650" height="350" fill="#ffffff" rx="4"/>
-  <text x="325" y="22" text-anchor="middle" class="title">Cold-Path Dispatch Latency Decomposition</text>
-  <text x="325" y="36" text-anchor="middle" class="subtitle">GTX 1650 (sm_75), CUDA 13.1, null kernel CUBIN</text>
-  <line x1="130" y1="52" x2="130" y2="252" stroke="#e5e7eb" stroke-width="1"/>
-  <line x1="210" y1="52" x2="210" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="290" y1="52" x2="290" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="370" y1="52" x2="370" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="450" y1="52" x2="450" y2="252" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="530" y1="52" x2="530" y2="252" stroke="#e5e7eb" stroke-width="1"/>
-  <line x1="130" y1="252" x2="530" y2="252" stroke="#9ca3af" stroke-width="1.5"/>
-  <text x="130" y="266" text-anchor="middle" class="tick-label">0.001</text>
-  <text x="210" y="266" text-anchor="middle" class="tick-label">0.01</text>
-  <text x="290" y="266" text-anchor="middle" class="tick-label">0.1</text>
-  <text x="370" y="266" text-anchor="middle" class="tick-label">1</text>
-  <text x="450" y="266" text-anchor="middle" class="tick-label">10</text>
-  <text x="530" y="266" text-anchor="middle" class="tick-label">100</text>
-  <text x="330" y="282" text-anchor="middle" class="axis-label">Latency (µs) — log scale</text>
-  <!-- Row 1: cuModuleLoadData -->
-  <rect x="130" y="60" width="364" height="28" fill="#dc2626" rx="2"/>
-  <line x1="494" y1="56" x2="494" y2="61" stroke="#dc2626" stroke-width="1.5"/>
-  <line x1="130" y1="56" x2="494" y2="56" stroke="#dc2626" stroke-width="1.5"/>
-  <line x1="130" y1="56" x2="130" y2="61" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="312" y="53" text-anchor="middle" class="bracket-label">90% of total cold path</text>
-  <text x="499" y="79" class="bar-label" fill="#dc2626">36.0 µs</text>
-  <!-- Row 2: cuStreamSynchronize -->
-  <rect x="130" y="98" width="271" height="28" fill="#2d7fc1" rx="2"/>
-  <text x="406" y="117" class="bar-label" fill="#2d7fc1">2.45 µs</text>
-  <!-- Row 3: cuLaunchKernel -->
-  <rect x="130" y="136" width="257" height="28" fill="#7c3aed" rx="2"/>
-  <text x="392" y="155" class="bar-label" fill="#7c3aed">1.65 µs</text>
-  <!-- Row 4: cuModuleGetFunction -->
-  <rect x="130" y="174" width="144" height="28" fill="#6b7280" rx="2"/>
-  <text x="279" y="193" class="bar-label" fill="#6b7280">0.063 µs</text>
-  <!-- Row 5: Selection -->
-  <rect x="130" y="212" width="3" height="28" fill="#0d9488" rx="1"/>
-  <rect x="380" y="200" width="130" height="58" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5" rx="4"/>
-  <text x="445" y="213" text-anchor="middle" font-size="8" font-weight="700" fill="#0d9488">ZOOMED: Selection</text>
-  <rect x="390" y="218" width="110" height="12" fill="#e5e7eb" rx="1"/>
-  <rect x="462" y="218" width="6" height="12" fill="#0d9488" rx="1"/>
-  <text x="390" y="243" font-size="7" fill="#555">0.001 µs</text>
-  <text x="500" y="243" font-size="7" fill="#555">0.01 µs</text>
-  <text x="445" y="255" text-anchor="middle" class="callout-label">3–6 ns</text>
-  <line x1="132" y1="226" x2="376" y2="226" stroke="#0d9488" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow-teal-lb)"/>
-  <!-- Y labels -->
-  <text x="126" y="79" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuModuleLoadData</text>
-  <text x="126" y="90" text-anchor="end" font-size="7.5" fill="#666">(cold)</text>
-  <text x="126" y="117" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuStreamSynchronize</text>
-  <text x="126" y="155" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuLaunchKernel</text>
-  <text x="126" y="193" text-anchor="end" font-size="9" fill="#222" font-weight="600">cuModuleGetFunction</text>
-  <text x="126" y="226" text-anchor="end" font-size="9" fill="#222" font-weight="600">Selection overhead</text>
-  <text x="325" y="304" text-anchor="middle" font-size="9" fill="#0d9488" font-weight="700">Selection overhead: &lt; 0.01% of total cold-path latency</text>
-  <rect x="136" y="316" width="10" height="10" fill="#dc2626" rx="1"/>
-  <text x="150" y="325" font-size="8" fill="#444">Module load (cold)</text>
-  <rect x="248" y="316" width="10" height="10" fill="#2d7fc1" rx="1"/>
-  <text x="262" y="325" font-size="8" fill="#444">Stream sync</text>
-  <rect x="338" y="316" width="10" height="10" fill="#7c3aed" rx="1"/>
-  <text x="352" y="325" font-size="8" fill="#444">Kernel launch</text>
-  <rect x="420" y="316" width="10" height="10" fill="#6b7280" rx="1"/>
-  <text x="434" y="325" font-size="8" fill="#444">Get function</text>
-  <rect x="502" y="316" width="10" height="10" fill="#0d9488" rx="1"/>
-  <text x="516" y="325" font-size="8" fill="#444">Selection</text>
-</svg>
+          <img src="figures/latency-breakdown.svg" alt="Cold-path dispatch latency decomposition">
         </div>
+        <p class="fig-caption">GTX 1650 (sm_75), CUDA 13.1, null kernel CUBIN. cuModuleLoadData dominates at 36 us (90% of cold path). Selection overhead: 3-6 ns.</p>
 
-        <div class="stat-row">
-          <div class="sbox teal">
-            <div class="sval">4.1 µs</div>
-            <div class="slbl">Hot-path total<br>(launch + sync)</div>
-          </div>
-          <div class="sbox orange">
-            <div class="sval">36.0 µs</div>
-            <div class="slbl">Cold module load<br>~90% of cold path</div>
-          </div>
-          <div class="sbox blue">
-            <div class="sval">3-6 ns</div>
-            <div class="slbl">Selection overhead<br>&lt;0.01% of dispatch</div>
-          </div>
-        </div>
-
-        <hr class="div">
-
-        <div class="h3">Selection Policy: rank_by_priority</div>
-        <ul>
-          <li>Reads <code>variant_priority</code> key from each binary's <code>StringMap</code></li>
-          <li>Returns highest-priority binary that passes all <code>min_sm</code> / <code>min_gfx</code> / <code>requires_features</code> guards</li>
-          <li>Tied priorities: falls back to <strong>insertion order</strong> (deterministic)</li>
-          <li>Pluggable <code>SelectionPolicyInterface</code> — future strategies (ISA-score, power-cap) slot in without changing the attribute</li>
-        </ul>
-
-        <hr class="div">
-
-        <div class="h3">Key Design Properties</div>
-        <ul>
-          <li><strong>Backward-compatible:</strong> Falls back to index-0 if no metadata keys present. Existing <code>#gpu.select_object</code> users unaffected.</li>
-          <li><strong>Compile-time emission:</strong> Selection logic emitted as IR during <code>embedBinary()</code> — no runtime library dependency.</li>
-          <li><strong>CPU FMV analogy:</strong> Same pattern as <code>target_clones</code> IFunc resolvers — compile-time emission of runtime selection, now for cross-vendor GPU binaries.</li>
-          <li><strong>Zero incremental cost:</strong> After one-time <code>global_ctors</code> selection, hot path is a single pointer load.</li>
-        </ul>
-
-        <div class="callout" style="margin-top: 4mm;">
-          <p><strong>~780 LOC</strong> to implement <code>OffloadingLLVMTranslationAttrInterface</code> — a standalone RFC, independent of the metadata vocabulary patch.</p>
+        <div class="fig-wrap" style="margin:4mm auto;max-width:55%;">
+          <img src="figures/hero-stat.svg" alt="3-6 ns selection overhead per dispatch">
         </div>
       </div>
     </div>
 
-  </div>
-
-  <!-- ─── COLUMN 3: EVIDENCE & RESULTS ─────────────────────── -->
-  <div class="col">
-    <div class="col-label orange">3 — Evidence &amp; Results</div>
-
-    <!-- Card: C3 Design -->
-    <div class="card orange-card">
+    <!-- C3: MLIR code snippet -->
+    <div class="card teal-card">
       <div class="card-head">
         <h2>C3: <code>#gpu.runtime_select</code></h2>
       </div>
-      <div class="card-body tight">
-        <pre><span class="cm">// Compile once → 3 vendor binaries → pick best at runtime</span>
+      <div class="card-body">
+        <pre><span class="cm">// Compile once, 3 vendor binaries, pick best at runtime</span>
 <span class="ty">gpu.binary</span> <span class="attr">@kernels</span> &lt;<span class="op">#gpu.runtime_select</span>&lt;
     strategy=<span class="str">"rank_by_priority"</span>, fallback=<span class="str">"cpu"</span>&gt;&gt; [
   <span class="op">#gpu.object</span>&lt;<span class="op">#nvvm.target</span>&lt;chip=<span class="str">"sm_75"</span>&gt;, bin=<span class="str">"...cubin..."</span>&gt;,
   <span class="op">#gpu.object</span>&lt;<span class="op">#rocdl.target</span>&lt;chip=<span class="str">"gfx90a"</span>&gt;, bin=<span class="str">"...hsaco..."</span>&gt;
 ]</pre>
 
-        <div class="h3">embedBinary() Emission Flow</div>
         <div class="arch-flow">
           <div class="abox blue">N gpu.object<br>blobs</div>
-          <div class="aarrow">→</div>
+          <div class="aarrow">&rarr;</div>
           <div class="abox dark">@kernels_blob_0<br>@kernels_blob_1</div>
-          <div class="aarrow">→</div>
+          <div class="aarrow">&rarr;</div>
           <div class="abox teal">Dispatch Table<br>global_ctors</div>
-          <div class="aarrow">→</div>
+          <div class="aarrow">&rarr;</div>
           <div class="abox orange">@kernels_<br>module_ptr</div>
         </div>
 
         <p><code>launchKernel()</code> loads from <code>@kernels_module_ptr</code> — identical codepath to <code>SelectObjectAttr</code>. <strong>Zero hot-path overhead after one-time selection.</strong></p>
       </div>
     </div>
+  </div>
 
-    <!-- Card: dispatch latency table -->
+  <!-- ─── COLUMN 3: EVIDENCE & RESULTS ─────────────────────── -->
+  <div class="col">
+    <div class="col-label">3 — Evidence &amp; Results</div>
+
+    <!-- Dispatch latency table -->
     <div class="card orange-card">
       <div class="card-head">
         <h2>Dispatch Latency: Layer Decomposition</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <table>
           <thead><tr><th>Operation</th><th>Median</th><th>p99</th></tr></thead>
           <tbody>
-            <tr><td><code>cuModuleLoadData</code> cold</td><td class="td-num td-hl">36.0 µs</td><td class="td-num">111.3 µs</td></tr>
-            <tr><td><code>cuModuleLoadData</code> warm</td><td class="td-num">10.0 µs</td><td class="td-num">16.3 µs</td></tr>
+            <tr><td><code>cuModuleLoadData</code> cold</td><td class="td-num td-hl">36.0 &micro;s</td><td class="td-num">111.3 &micro;s</td></tr>
+            <tr><td><code>cuModuleLoadData</code> warm</td><td class="td-num">10.0 &micro;s</td><td class="td-num">16.3 &micro;s</td></tr>
             <tr><td><code>cuModuleGetFunction</code></td><td class="td-num">60 ns</td><td class="td-num">61 ns</td></tr>
-            <tr><td><code>cuLaunchKernel</code></td><td class="td-num">1.6 µs</td><td class="td-num">3.5 µs</td></tr>
-            <tr><td><code>cuStreamSynchronize</code></td><td class="td-num">2.5 µs</td><td class="td-num">3.6 µs</td></tr>
-            <tr class="row-this"><td><strong>Hot-path total</strong></td><td class="td-num td-hl">4.1 µs</td><td class="td-num">7.1 µs</td></tr>
-            <tr class="row-this"><td><strong>Selection overhead</strong></td><td class="td-num td-hl">4–6 ns</td><td class="td-num">—</td></tr>
+            <tr><td><code>cuLaunchKernel</code></td><td class="td-num">1.6 &micro;s</td><td class="td-num">3.5 &micro;s</td></tr>
+            <tr><td><code>cuStreamSynchronize</code></td><td class="td-num">2.5 &micro;s</td><td class="td-num">3.6 &micro;s</td></tr>
+            <tr class="row-this"><td><strong>Hot-path total</strong></td><td class="td-num td-hl">4.1 &micro;s</td><td class="td-num">7.1 &micro;s</td></tr>
+            <tr class="row-this"><td><strong>Selection overhead</strong></td><td class="td-num td-hl">4-6 ns</td><td class="td-num">&mdash;</td></tr>
           </tbody>
         </table>
-        <p class="fig-caption">GTX 1650 (sm_75), CUDA 13.1, null CUBIN (4,328 B). 100 cold trials via exec-child isolation, 10K warm iterations, CPU-pinned.</p>
+        <p class="fig-caption">GTX 1650 (sm_75), CUDA 13.1, null CUBIN (4,328 B). 100 cold trials via exec-child isolation, 10K warm iterations.</p>
       </div>
     </div>
 
-    <!-- Card: variant scaling SVG -->
-    <div class="card orange-card">
+    <!-- Variant scaling chart -->
+    <div class="card orange-card" style="flex-grow:3;">
       <div class="card-head">
         <h2>Selection Scales to 100 Variants</h2>
       </div>
-      <div class="card-body tight">
-        <!-- INLINE SVG: variant-scaling -->
+      <div class="card-body">
         <div class="fig-wrap">
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" font-family="Arial, Helvetica, sans-serif">
-  <defs>
-    <style>
-      .vs-title { font-size: 11px; font-weight: 700; fill: #111; }
-      .vs-sub { font-size: 8px; fill: #666; }
-      .vs-ax { font-size: 8.5px; fill: #444; }
-      .vs-tick { font-size: 8px; fill: #555; }
-      .vs-ref { font-size: 8px; fill: #555; font-style: italic; }
-      .vs-data { font-size: 8px; fill: #0d9488; font-weight: 600; }
-      .vs-annot { font-size: 7.5px; fill: #374151; }
-    </style>
-    <marker id="vs-dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
-      <circle cx="3" cy="3" r="2.5" fill="#0d9488"/>
-    </marker>
-  </defs>
-  <rect width="400" height="300" fill="#ffffff" rx="4"/>
-  <text x="200" y="18" text-anchor="middle" class="vs-title">Selection Time vs. Number of Kernel Variants</text>
-  <text x="200" y="30" text-anchor="middle" class="vs-sub">Linear O(n) scan — stays negligible even at 100 variants</text>
-  <line x1="60" y1="220" x2="360" y2="220" stroke="#9ca3af" stroke-width="1.5"/>
-  <line x1="60" y1="185" x2="360" y2="185" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="60" y1="150" x2="360" y2="150" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="60" y1="115" x2="360" y2="115" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="60" y1="80" x2="360" y2="80" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="60" y1="45" x2="360" y2="45" stroke="#e5e7eb" stroke-width="1"/>
-  <line x1="60" y1="45" x2="60" y2="220" stroke="#9ca3af" stroke-width="1.5"/>
-  <text x="56" y="223" text-anchor="end" class="vs-tick">1</text>
-  <text x="56" y="188" text-anchor="end" class="vs-tick">10</text>
-  <text x="56" y="153" text-anchor="end" class="vs-tick">100</text>
-  <text x="56" y="118" text-anchor="end" class="vs-tick">1k</text>
-  <text x="56" y="83" text-anchor="end" class="vs-tick">10k</text>
-  <text x="56" y="48" text-anchor="end" class="vs-tick">100k</text>
-  <text x="14" y="140" text-anchor="middle" class="vs-ax" transform="rotate(-90, 14, 140)">Selection time (ns)</text>
-  <text x="60" y="233" text-anchor="middle" class="vs-tick">1</text>
-  <text x="87" y="233" text-anchor="middle" class="vs-tick">10</text>
-  <text x="151" y="233" text-anchor="middle" class="vs-tick">30</text>
-  <text x="212" y="233" text-anchor="middle" class="vs-tick">50</text>
-  <text x="360" y="233" text-anchor="middle" class="vs-tick">100</text>
-  <text x="210" y="246" text-anchor="middle" class="vs-ax">Number of kernel variants</text>
-  <!-- Reference lines -->
-  <line x1="60" y1="107" x2="360" y2="107" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3"/>
-  <text x="362" y="110" class="vs-ref" fill="#7c3aed">cuLaunchKernel</text>
-  <text x="362" y="119" class="vs-ref" fill="#7c3aed">1,650 ns</text>
-  <line x1="60" y1="61" x2="360" y2="61" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3"/>
-  <text x="362" y="58" class="vs-ref" fill="#dc2626">cuModuleLoadData</text>
-  <text x="362" y="67" class="vs-ref" fill="#dc2626">36,000 ns</text>
-  <!-- Data line -->
-  <polyline points="60,210 66,196 87,179 148,164 360,157" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-  <circle cx="60"  cy="210" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
-  <circle cx="66"  cy="196" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
-  <circle cx="87"  cy="179" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
-  <circle cx="148" cy="164" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
-  <circle cx="360" cy="157" r="4" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
-  <text x="55"  y="208" text-anchor="end"  class="vs-data">2 ns</text>
-  <text x="61"  y="193" text-anchor="end"  class="vs-data">5 ns</text>
-  <text x="91"  y="176" text-anchor="start" class="vs-data">15 ns</text>
-  <text x="152" y="161" text-anchor="start" class="vs-data">40 ns</text>
-  <text x="355" y="153" text-anchor="end"   class="vs-data">62.5 ns</text>
-  <!-- Gap annotation -->
-  <line x1="378" y1="61" x2="378" y2="157" stroke="#374151" stroke-width="1" marker-end="url(#vs-dot)"/>
-  <line x1="373" y1="61" x2="383" y2="61" stroke="#374151" stroke-width="1"/>
-  <line x1="373" y1="157" x2="383" y2="157" stroke="#374151" stroke-width="1"/>
-  <text x="381" y="113" class="vs-annot" transform="rotate(90, 381, 113)" text-anchor="middle">26,000× cheaper than module load</text>
-  <!-- Legend -->
-  <line x1="65" y1="265" x2="90" y2="265" stroke="#0d9488" stroke-width="2.2"/>
-  <circle cx="77" cy="265" r="3.5" fill="#0d9488" stroke="#fff" stroke-width="1"/>
-  <text x="94" y="268" font-size="8" fill="#333">Selection time (O(n) scan)</text>
-  <line x1="65" y1="278" x2="90" y2="278" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3"/>
-  <text x="94" y="281" font-size="8" fill="#333">cuLaunchKernel baseline</text>
-  <line x1="65" y1="291" x2="90" y2="291" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3"/>
-  <text x="94" y="294" font-size="8" fill="#333">cuModuleLoadData baseline</text>
-</svg>
+          <img src="figures/variant-scaling.svg" alt="Selection time vs number of kernel variants">
         </div>
+        <p class="fig-caption">Linear O(n) scan stays negligible. Even at 100 variants, selection (62.5 ns) is 26,000x cheaper than module load.</p>
       </div>
     </div>
 
-    <!-- Card: overhead comparison SVG -->
-    <div class="card orange-card">
+    <!-- Overhead comparison chart -->
+    <div class="card orange-card" style="flex-grow:3;">
       <div class="card-head">
         <h2>Selection Overhead vs. Real Kernels</h2>
       </div>
-      <div class="card-body tight">
-        <!-- INLINE SVG: overhead-comparison -->
+      <div class="card-body">
         <div class="fig-wrap">
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250" font-family="Arial, Helvetica, sans-serif">
-  <defs>
-    <style>
-      .oc-title { font-size: 11px; font-weight: 700; fill: #111; }
-      .oc-sub { font-size: 8px; fill: #666; }
-      .oc-lbl { font-size: 8.5px; fill: #333; }
-      .oc-pct { font-size: 7.5px; fill: #888; }
-      .oc-callout { font-size: 8px; font-weight: 700; fill: #0d9488; }
-      .oc-mlbl { font-size: 8px; fill: #333; font-weight: 600; }
-    </style>
-    <marker id="oc-teal" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-      <path d="M0,0 L0,5 L5,2.5 z" fill="#0d9488"/>
-    </marker>
-  </defs>
-  <rect width="400" height="250" fill="#ffffff" rx="4"/>
-  <text x="200" y="18" text-anchor="middle" class="oc-title">Selection Overhead vs. Real ML Kernel Duration</text>
-  <text x="200" y="30" text-anchor="middle" class="oc-sub">Proportional comparison — selection is invisible at every scale</text>
-  <!-- Bars -->
-  <rect x="50" y="48" width="300" height="26" fill="#f59e0b" opacity="0.85" rx="2"/>
-  <rect x="50" y="48" width="1" height="26" fill="#0d9488" rx="0"/>
-  <text x="46" y="65" text-anchor="end" class="oc-mlbl" fill="#b45309">Large GEMM</text>
-  <text x="46" y="74" text-anchor="end" class="oc-pct">100 ms</text>
-  <text x="354" y="65" class="oc-pct">overhead: 6×10⁻⁶%</text>
-  <rect x="50" y="86" width="300" height="26" fill="#3b82f6" opacity="0.75" rx="2"/>
-  <rect x="50" y="86" width="1" height="26" fill="#0d9488" rx="0"/>
-  <text x="46" y="103" text-anchor="end" class="oc-mlbl" fill="#1d4ed8">Attention</text>
-  <text x="46" y="112" text-anchor="end" class="oc-pct">10 ms</text>
-  <text x="354" y="103" class="oc-pct">overhead: 6×10⁻⁵%</text>
-  <rect x="50" y="124" width="300" height="26" fill="#10b981" opacity="0.75" rx="2"/>
-  <rect x="50" y="124" width="1" height="26" fill="#0d9488" rx="0"/>
-  <text x="46" y="141" text-anchor="end" class="oc-mlbl" fill="#065f46">Norm kernel</text>
-  <text x="46" y="150" text-anchor="end" class="oc-pct">1 ms</text>
-  <text x="354" y="141" class="oc-pct">overhead: 6×10⁻⁴%</text>
-  <rect x="50" y="162" width="300" height="26" fill="#8b5cf6" opacity="0.75" rx="2"/>
-  <rect x="50" y="162" width="1" height="26" fill="#0d9488" rx="0"/>
-  <text x="46" y="179" text-anchor="end" class="oc-mlbl" fill="#5b21b6">Micro-kernel</text>
-  <text x="46" y="188" text-anchor="end" class="oc-pct">100 µs</text>
-  <text x="354" y="179" class="oc-pct">overhead: 6×10⁻³%</text>
-  <!-- Callout -->
-  <line x1="110" y1="205" x2="53" y2="175" stroke="#0d9488" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#oc-teal)"/>
-  <text x="113" y="203" class="oc-callout">← Selection (all four rows)</text>
-  <text x="113" y="214" font-size="7.5" fill="#0d9488">Faster than a single L2 cache access</text>
-  <text x="113" y="224" font-size="7.5" fill="#0d9488">(~5 ns vs ~40 ns L2 hit)</text>
-  <rect x="52" y="37" width="8" height="8" fill="#0d9488" rx="1"/>
-  <text x="63" y="45" font-size="7.5" fill="#0d9488" font-weight="700">Selection overhead (1px = too wide to scale)</text>
-  <text x="200" y="242" text-anchor="middle" font-size="7.5" fill="#9ca3af">Each bar = 100% of kernel duration. Overhead is sub-pixel at every scale.</text>
-</svg>
+          <img src="figures/overhead-comparison.svg" alt="Selection overhead vs real ML kernel duration">
         </div>
+        <p class="fig-caption">Selection overhead is sub-pixel at every kernel scale: 6x10^-6% for large GEMM to 6x10^-3% for micro-kernels.</p>
       </div>
     </div>
 
-    <!-- Card: Prototype + Key Findings -->
+    <!-- Prototype stats + key findings -->
     <div class="card orange-card grow">
       <div class="card-head">
-        <h2>Prototype Validation &amp; Key Findings</h2>
+        <h2>Prototype &amp; Key Findings</h2>
       </div>
-      <div class="card-body tight">
+      <div class="card-body">
         <div class="big-nums">
-          <div class="bignum" style="padding:2.5mm 3mm;">
-            <span class="bignum-val" style="font-size:22pt;">5,100</span>
+          <div class="bignum">
+            <span class="bignum-val">5,100</span>
             <div class="bignum-lbl">LOC C prototype (libkdl)</div>
           </div>
-          <div class="bignum" style="padding:2.5mm 3mm;">
-            <span class="bignum-val" style="font-size:22pt;">664</span>
+          <div class="bignum">
+            <span class="bignum-val">664</span>
             <div class="bignum-lbl">LOC PoC OffloadBinary reader</div>
           </div>
         </div>
@@ -1759,45 +1009,25 @@ pre .op   { color: #1a4fa0; }
 
         <div class="finding">
           <div class="fnum">1</div>
-          <div class="fbody"><strong>Module loading dominates.</strong> <code>cuModuleLoadData</code> is ~90% of total cold dispatch (36.0 µs of ~40 µs). Selection is noise-floor (&lt;0.01%).</div>
+          <div class="fbody"><strong>Module loading dominates.</strong> <code>cuModuleLoadData</code> is ~90% of total cold dispatch (36.0 &micro;s of ~40 &micro;s). Selection is noise-floor (&lt;0.01%).</div>
         </div>
 
         <div class="finding">
           <div class="fnum">2</div>
-          <div class="fbody"><strong>Not the bottleneck.</strong> At 4–6 ns, a scan of 3 entries is 7,000× cheaper than a single kernel launch. Scales to ~40 ns for 30 variants — still within noise.</div>
+          <div class="fbody"><strong>Not the bottleneck.</strong> At 4-6 ns, a scan of 3 entries is 7,000x cheaper than a single kernel launch. Scales to ~40 ns for 30 variants.</div>
         </div>
 
         <div class="finding">
           <div class="fnum">3</div>
-          <div class="fbody"><strong>Hot path: zero overhead.</strong> After one-time selection, the module handle is cached in a global pointer. Subsequent launches are identical to <code>#gpu.select_object</code>.</div>
+          <div class="fbody"><strong>Hot path: zero overhead.</strong> After one-time selection, the module handle is cached in a global pointer. Subsequent launches identical to <code>#gpu.select_object</code>.</div>
         </div>
 
         <div class="finding">
           <div class="fnum">4</div>
           <div class="fbody"><strong>The ld.so analogy.</strong> Resolves in <code>global_ctors</code>, hot path is a single pointer load — same pattern as the dynamic linker's PLT, now for cross-vendor GPU binaries.</div>
         </div>
-
-        <hr class="div">
-
-        <div class="h3">PoC Pipeline Output</div>
-        <pre class="poc-pre" style="font-size:8pt;line-height:1.45;padding:2.5mm 3.5mm;"><span class="cm"># Vendor detection</span>
-vendor: NVIDIA  device: GeForce GTX 1650  sm_version: <span class="num">75</span> (sm_75)
-
-<span class="cm"># Dispatch table (from OffloadBinary)</span>
-[0] sm_86 nvptx64-nvidia-cuda <span class="str">(4712 B)</span>
-[1] sm_89 nvptx64-nvidia-cuda <span class="str">(4712 B)</span>
-[2] sm_75 nvptx64-nvidia-cuda <span class="str">(4328 B)</span>
-
-<span class="cm"># Selection: rank_by_priority</span>
-selected: <span class="fn">[2] sm_75</span> (min_sm=75)  select_ns: <span class="num">6</span>  <span class="cm"># ← 3-6 ns</span>
-<span class="cm"># Kernel launch: SUCCESS</span></pre>
-
-        <div class="callout orange">
-          <p><strong>PoC validated:</strong> 3 CUBINs (sm_75 + sm_86 + sm_89) packed into LLVM OffloadBinary. Correctly selects sm_75 on GTX 1650, rejects sm_86/sm_89 — select_ns: 6.</p>
-        </div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -1807,68 +1037,9 @@ selected: <span class="fn">[2] sm_75</span> (min_sm=75)  select_ns: <span class=
 <div class="bottom-bar">
   <div class="bottom-left">
     <h2>Related Work Comparison</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>System</th>
-          <th>Runtime Select?</th>
-          <th>Cross-Vendor?</th>
-          <th>MLIR-Native?</th>
-          <th>Ranked?</th>
-          <th>Layer</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>IREE HAL</strong></td>
-          <td><span class="dot-y">●</span> Yes</td>
-          <td><span class="dot-y">●</span> Yes</td>
-          <td><span class="dot-y">●</span> MLIR</td>
-          <td><span class="dot-p">◐</span> Partial (unimplemented)</td>
-          <td>Full-stack runtime</td>
-        </tr>
-        <tr>
-          <td><strong>chipStar</strong></td>
-          <td><span class="dot-y">●</span> SPIR-V</td>
-          <td><span class="dot-y">●</span> Yes</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td>Portability layer</td>
-        </tr>
-        <tr>
-          <td><strong>Proteus</strong> (LLNL)</td>
-          <td><span class="dot-y">●</span> JIT</td>
-          <td><span class="dot-p">◐</span> Partial</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td>JIT runtime</td>
-        </tr>
-        <tr>
-          <td><strong>HetGPU</strong></td>
-          <td><span class="dot-y">●</span> IR translate</td>
-          <td><span class="dot-y">●</span> Yes</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td>Binary portability</td>
-        </tr>
-        <tr>
-          <td><strong>CPU FMV</strong> (target_clones)</td>
-          <td><span class="dot-y">●</span> Yes</td>
-          <td>N/A</td>
-          <td><span class="dot-n">○</span> No</td>
-          <td><span class="dot-y">●</span> IFunc</td>
-          <td>Compiler + linker</td>
-        </tr>
-        <tr class="row-this">
-          <td><strong>This Work</strong></td>
-          <td><span class="dot-this">●</span> Metadata+Measurement+Design</td>
-          <td><span class="dot-this">●</span> Yes</td>
-          <td><span class="dot-this">●</span> Yes</td>
-          <td><span class="dot-this">●</span> variant_priority</td>
-          <td>MLIR + OffloadBinary</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="fig-wrap" style="margin:0;">
+      <img src="figures/comparison-dots.svg" alt="Feature comparison dot matrix" style="width:70%;height:auto;">
+    </div>
   </div>
 
   <div class="bottom-mid">
@@ -1878,8 +1049,8 @@ selected: <span class="fn">[2] sm_75</span> (min_sm=75)  select_ns: <span class=
       <li><strong>Flame graph</strong> publication — benchmark in <code>llvm-test-suite</code>, repro in &lt; 10 min</li>
       <li><strong><code>#gpu.runtime_select</code> RFC</strong> — ~780 LOC, implements <code>OffloadingLLVMTranslationAttrInterface</code></li>
     </ol>
-    <p style="font-size:8pt;color:var(--mid);margin-top:3mm;line-height:1.4;font-family:Georgia,serif;font-style:italic;">
-      <strong style="color:var(--navy)">Refs:</strong> IREE HAL [iree.dev] · chipStar [CHIP-SPV] · Proteus [CGO 2025] · HetGPU [arXiv:2506.15993] · KernelEvolve [ISCA 2026] · AdaptiveCpp [IWOCL 2025]
+    <p style="font-size:9pt;color:var(--mid);margin-top:4mm;line-height:1.4;font-style:italic;">
+      <strong style="color:var(--navy)">Refs:</strong> IREE HAL [iree.dev] &middot; chipStar [CHIP-SPV] &middot; Proteus [CGO 2025] &middot; HetGPU [arXiv:2506.15993] &middot; KernelEvolve [ISCA 2026] &middot; AdaptiveCpp [IWOCL 2025]
     </p>
   </div>
 
