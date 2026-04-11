@@ -1,0 +1,6 @@
+operation,median_ns,p99_ns
+kdl_load_bundle,4949,7894
+kdl_select_cold,46197,68448
+kdl_select_cached,44924,73938
+cuda_direct_launch,841,1102
+runtime_select_poc,3,10

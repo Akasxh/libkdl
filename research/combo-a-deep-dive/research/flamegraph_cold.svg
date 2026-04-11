@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="264" viewBox="0 0 1200 264">
+  <rect width="1200" height="264" fill="#ffffff" />
+  <text x="600" y="28" fill="#2c3e50" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle">LLVM GPU Dispatch Stack — Cold Path</text>
+  <text x="600" y="48" fill="#7f8c8d" font-family="monospace" font-size="11" text-anchor="middle">GTX 1650, sm_75, CUDA 13.1 | bench_layers.c</text>
+  <rect x="20.0" y="215.0" width="1160.0" height="26" fill="#a93226" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="600.0" y="232.7" fill="#000000" opacity="0.3" font-family="monospace" font-size="12" text-anchor="middle" dominant-baseline="auto">Total Cold Dispatch (46.8 µs)</text>
+  <text x="600.0" y="232.2" fill="#ffffff" font-family="monospace" font-size="12" text-anchor="middle" dominant-baseline="auto">Total Cold Dispatch (46.8 µs)</text>
+  <rect x="20.0" y="186.0" width="1058.0" height="26" fill="#c0392b" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="549.0" y="203.7" fill="#000000" opacity="0.3" font-family="monospace" font-size="12" text-anchor="middle" dominant-baseline="auto">cuModuleLoadData (42.7 µs, 91%)</text>
+  <text x="549.0" y="203.2" fill="#ffffff" font-family="monospace" font-size="12" text-anchor="middle" dominant-baseline="auto">cuModuleLoadData (42.7 µs, 91%)</text>
+  <rect x="20.0" y="157.0" width="61.4" height="26" fill="#d35400" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="86.4" y="174.2" fill="#2c3e50" font-family="monospace" font-size="12" text-anchor="start" dominant-baseline="auto">cuStreamSynchronize (2.5 µs, 5.3%)</text>
+  <rect x="20.0" y="128.0" width="39.0" height="26" fill="#e67e22" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="64.0" y="145.2" fill="#2c3e50" font-family="monospace" font-size="12" text-anchor="start" dominant-baseline="auto">cuLaunchKernel (1.6 µs, 3.4%)</text>
+  <rect x="20.0" y="99.0" width="1.5" height="26" fill="#f39c12" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="26.5" y="116.2" fill="#2c3e50" font-family="monospace" font-size="12" text-anchor="start" dominant-baseline="auto">cuModuleGetFunction (60 ns, 0.1%)</text>
+  <rect x="20.0" y="70.0" width="1.0" height="26" fill="#f1c40f" stroke="#000000" stroke-width="1" rx="2" ry="2" />
+  <text x="26.0" y="87.2" fill="#2c3e50" font-family="monospace" font-size="12" text-anchor="start" dominant-baseline="auto">Selection (6 ns, 0.01%)</text>
+</svg>

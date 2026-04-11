@@ -1,0 +1,138 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.5cm,top=1.2cm,bottom=1.2cm]{geometry}
+\usepackage{multicol}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{titlesec}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\columnsep}{0.6cm}
+
+\titleformat{\section}{\bfseries\normalsize}{}{0pt}{}
+\titlespacing*{\section}{0pt}{4pt}{2pt}
+\titleformat{\subsection}{\bfseries\small}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  framerule=0.3pt,
+  xleftmargin=2pt,
+  xrightmargin=2pt,
+  aboveskip=3pt,
+  belowskip=3pt,
+  breaklines=true,
+}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Measuring and Improving Multi-Target Binary Selection\\
+in LLVM's GPU Offload Stack}\\[3pt]
+{\normalsize S.\ Akash\quad \textit{IIT Patna\enspace$\cdot$\enspace CERN GSoC alumnus\enspace$\cdot$\enspace vLLM contributor}}
+\end{center}
+
+\vspace{-2pt}
+\hrule height 0.5pt
+\vspace{4pt}
+
+\begin{multicols}{2}
+
+\section{Thesis}
+
+MLIR can compile a single \texttt{gpu.module} to N GPU targets (NVIDIA, AMD, Intel),
+and \texttt{OffloadBinary} can carry all N images in one fat binary.
+But at runtime, LLVM's offload stack picks the \emph{first compatible image} and stops---there
+is no standard metadata for ``best-compatible'' selection, and no published measurement of
+what this costs.
+
+\section{Contributions}
+
+\begin{enumerate}[leftmargin=1.2em,itemsep=1pt,topsep=1pt]
+\item \textbf{Standard metadata vocabulary} for \texttt{OffloadBinary}:
+  5 new keys enabling runtime selection beyond triple/arch matching
+  (additive, backward-compatible, $\sim$30 LOC header patch).
+\item \textbf{First published flame graph} of the LLVM GPU dispatch stack:
+  per-layer latency from \texttt{OffloadBinary} parse through
+  \texttt{cuLaunchKernel} on a GTX~1650 (10{,}000 iterations, 100 cold trials).
+\item \textbf{Design sketch} for \texttt{\#gpu.runtime\_select}:
+  an MLIR attribute deferring binary selection from compile time to runtime.
+\end{enumerate}
+
+\section{Dispatch Latency Breakdown}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Layer} & \textbf{Median} & \\
+\midrule
+\texttt{cuModuleLoadData} (cold)   & 42.7 & $\mu$s \\
+\texttt{cuModuleLoadData} (warm)   & 10.0 & $\mu$s \\
+\texttt{cuModuleGetFunction}       &   60 & ns \\
+\texttt{cuLaunchKernel} (submit)   &  1.6 & $\mu$s \\
+Hot-path (launch + sync)           &  4.0 & $\mu$s \\
+Binary selection logic             &    6 & ns \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1pt}
+{\scriptsize GTX 1650 (sm\_75), null kernel, CUBIN pre-compiled.
+Cold = \texttt{execve}-isolated trials. Selection = variant table scan.}
+
+\section{MLIR Syntax: \texttt{\#gpu.runtime\_select}}
+
+\begin{lstlisting}
+gpu.binary @kernels [
+  #gpu.object<#nvptx, "sm_75.cubin">,
+  #gpu.object<#amdgcn, "gfx90a.hsaco">
+] { select = #gpu.runtime_select }
+\end{lstlisting}
+
+\section{OffloadBinary Metadata (5 New Keys)}
+
+\begin{center}
+\small
+\begin{tabular}{@{}llp{3.2cm}@{}}
+\toprule
+\textbf{Key} & \textbf{Tier} & \textbf{Semantics} \\
+\midrule
+\texttt{min\_sm}             & MUST & Min CUDA compute cap \\
+\texttt{min\_gfx}            & MUST & Min AMD GFX + family \\
+\texttt{requires\_features}  & MUST & Capability tokens \\
+\texttt{variant\_priority}   & MAY  & Ranking (higher = preferred) \\
+\texttt{variant\_tag}        & MAY  & Label: \texttt{optimized}, \texttt{fallback} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1pt}
+{\scriptsize MUST = runtime rejects if violated.
+MAY = ranking only. Missing keys = no constraint (backward-compatible).}
+
+\section{Links}
+
+\begin{tabular}{@{}lp{3.5cm}@{}}
+{[QR: GitHub]}        & Source, benchmarks, patch \\
+{[QR: Discourse RFC]} & RFC discussion thread \\
+\end{tabular}
+
+\end{multicols}
+
+\vspace*{\fill}
+\hrule height 0.3pt
+\vspace{2pt}
+\begin{center}
+\small EuroLLVM Dublin 2026 \enspace---\enspace S.\ Akash (akash@iitpatna.ac.in)
+\end{center}
+
+\end{document}

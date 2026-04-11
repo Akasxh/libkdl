@@ -1,0 +1,54 @@
+# Build artifacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Compiled objects
+*.o
+*.so
+*.a
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+credentials.json
+
+# Local config
+.claude/
+.playwright-mcp/
+
+# Compiled binaries
+experiments/prototype/src/bench_dispatch
+experiments/prototype/src/bench_layers
+experiments/prototype/src/bench_variant_scaling
+experiments/prototype/src/bench_ptx_vs_cubin
+experiments/prototype/src/runtime_select_poc
+experiments/prototype/src/offloadbinary_parse
+experiments/prototype/src/libkdl.so
+poster-*.png
+poster-*.jpeg
+iteration-*.png
+final-*.png
+poster/references/*.pdf

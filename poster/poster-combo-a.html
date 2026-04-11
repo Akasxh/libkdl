@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Measuring and Improving Multi-Target Binary Selection in LLVM's GPU Offload Stack — EuroLLVM Dublin 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Page Setup ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { margin: 0 !important; padding: 0 !important; }
+
+:root {
+  --gap:  5.5mm;
+  --pad:  11mm;
+
+  /* EuroLLVM 2026 Conference-Accurate Palette */
+  --bg:          #f0f2f5;   /* light cool gray — Trail of Bits VAST/PoTATo standard */
+  --surface:     #ffffff;
+  --card:        #ffffff;
+
+  /* Primary: LLVM wyvern teal-blue */
+  --blue:        #0B99D2;
+  --blue-mid:    #1aaae0;
+  --blue-light:  #bae8f9;
+  --blue-dim:    #e8f6fd;
+
+  /* Secondary: EuroLLVM 2026 navy */
+  --navy:        #00425E;
+  --navy-mid:    #005a80;
+
+  /* Tertiary: EuroLLVM 2026 teal-green */
+  --teal:        #009771;
+  --teal-mid:    #00b388;
+  --teal-light:  #b3e8d8;
+  --teal-dim:    #e6f7f2;
+
+  /* Accent: Orange (kept for warnings/emphasis) */
+  --orange:      #ea580c;
+  --orange-mid:  #f97316;
+  --orange-light:#fed7aa;
+  --orange-dim:  #fff7ed;
+
+  /* Text */
+  --text:        #1a1f2e;
+  --text-mid:    #475569;
+  --text-dim:    #94a3b8;
+
+  /* Borders */
+  --border:      #e2e5ea;
+  --border-mid:  #c8cdd6;
+
+  /* Code */
+  --code-bg:     #f1f5f9;
+  --code-fg:     #1e293b;
+  --code-border: #b8d9ee;
+
+  /* Status colors */
+  --green:       #16a34a;
+  --red:         #dc2626;
+  --amber:       #d97706;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@page { size: 841mm 1189mm; margin: 0; }
+
+body {
+  width: 841mm;
+  height: 1189mm;
+  overflow: hidden;
+  margin: 0;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.45;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════ */
+.header {
+  background: linear-gradient(125deg, #111720 0%, #1a1f2e 55%, #00425E 100%);
+  color: #fff;
+  padding: 13mm var(--pad) 11mm;
+  display: flex;
+  align-items: center;
+  gap: 10mm;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 5px solid #009771;
+}
+
+/* Subtle diagonal stripe texture */
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -55deg,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 1px,
+    transparent 22px
+  );
+  pointer-events: none;
+}
+
+/* LLVM teal-blue accent band on left edge */
+.header::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6mm;
+  background: linear-gradient(180deg, #0B99D2 0%, #009771 100%);
+}
+
+.header-text { flex: 1; position: relative; z-index: 1; padding-left: 4mm; }
+
+.header-text h1 {
+  font-family: 'Oswald', 'Fira Sans', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 50pt;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.2pt;
+  margin-bottom: 5mm;
+  color: #ffffff;
+}
+
+.header-text h1 .hl-title {
+  color: #5dd8f5;
+  background: linear-gradient(180deg, transparent 60%, rgba(11,153,210,0.22) 60%);
+  padding-bottom: 1pt;
+  position: relative;
+}
+
+.header-text h1 .hl-title::after {
+  content: "";
+  position: absolute;
+  bottom: -2pt;
+  left: 0; right: 0;
+  height: 2.5pt;
+  background: linear-gradient(90deg, #0B99D2, #009771, #0B99D2);
+  border-radius: 1.5pt;
+}
+
+.header-meta {
+  font-size: 14pt;
+  font-weight: 500;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 3mm;
+  letter-spacing: 0.1pt;
+}
+
+.header-meta code {
+  background: rgba(125,211,252,0.18);
+  border: 1px solid rgba(125,211,252,0.35);
+  padding: 0.5pt 4pt;
+  border-radius: 2pt;
+  font-family: 'IBM Plex Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 0.84em;
+  color: #7dd3fc;
+}
+
+.header-authors {
+  font-size: 13.5pt;
+  font-weight: 500;
+  color: rgba(255,255,255,0.80);
+}
+
+.header-authors strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3mm;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.venue-badge {
+  background: rgba(0,66,94,0.55);
+  border: 2px solid rgba(0,151,113,0.65);
+  border-radius: 4mm;
+  padding: 5mm 8mm;
+  text-align: center;
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.venue-badge em {
+  font-style: normal;
+  color: #5de8c0;
+  font-size: 10pt;
+  display: block;
+  margin-top: 1.5mm;
+  letter-spacing: 0.5pt;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THESIS STRIP
+   ═══════════════════════════════════════════════════════════ */
+.thesis-strip {
+  background: linear-gradient(90deg, #e4f4fb 0%, #eef8fc 60%, #e4f4fb 100%);
+  border-bottom: 2px solid var(--blue-light);
+  border-top: 2px solid var(--blue-light);
+  padding: 6mm var(--pad);
+  display: flex;
+  align-items: center;
+  gap: 10mm;
+  flex-shrink: 0;
+}
+
+.thesis-strip .thesis-text {
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+  font-size: 14pt;
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.48;
+  flex: 1;
+}
+
+.thesis-strip .thesis-text em {
+  font-style: normal;
+  color: var(--orange);
+  font-weight: 700;
+}
+
+.thesis-strip code {
+  font-family: 'IBM Plex Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 0.85em;
+  background: rgba(45,127,193,0.10);
+  border: 1px solid rgba(45,127,193,0.25);
+  padding: 0.5pt 4pt;
+  border-radius: 2pt;
+  color: var(--blue);
+}
+
+.thesis-stats {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid var(--border-mid);
+  border-radius: 3.5mm;
+  overflow: hidden;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.thesis-stat {
+  text-align: center;
+  padding: 5mm 9mm;
+  border-right: 1.5px solid var(--border);
+  position: relative;
+}
+
+.thesis-stat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--teal);
+}
+
+.thesis-stat:last-child { border-right: none; }
+
+.thesis-stat .val {
+  font-family: 'IBM Plex Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 32pt;
+  font-weight: 800;
+  color: var(--teal);
+  line-height: 1;
+  letter-spacing: -0.5pt;
+}
+
+.thesis-stat .lbl {
+  font-size: 10pt;
+  color: var(--text-mid);
+  font-weight: 500;
+  margin-top: 2mm;
+  line-height: 1.3;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PLAIN-ENGLISH CALLOUT BAR
+   ═══════════════════════════════════════════════════════════ */
+.plain-english-bar {
+  background: linear-gradient(90deg, #d4f0e8 0%, #e6f5f0 30%, #f0faf7 100%);
+  border-bottom: 2px solid var(--teal-light);
+  border-top: 2px solid var(--teal-light);
+  padding: 7mm var(--pad) 7mm calc(var(--pad) + 6mm);
+  flex-shrink: 0;
+  text-align: left;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6mm;
+}
+
+.plain-english-bar::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6mm;
+  background: linear-gradient(180deg, var(--teal) 0%, var(--teal-mid) 100%);
+}
+
+.plain-english-bar::after {
+  content: "💬";
+  font-size: 24pt;
+  flex-shrink: 0;
+  order: -1;
+  margin-left: -2mm;
+}
+
+.plain-english-bar p {
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+  font-size: 14pt;
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.45;
+}
+
+.plain-english-bar strong {
+  color: var(--teal);
+  font-weight: 800;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 1.05em;
+  letter-spacing: 0.2pt;
+}
+
+.plain-english-bar em {
+  font-style: normal;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3-COLUMN POSTER BODY
+   ═══════════════════════════════════════════════════════════ */
+.poster-body {
+  display: flex;
+  gap: var(--gap);
+  padding: var(--gap) var(--pad);
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch;
+  position: relative;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-height: 0;
+  flex: 1;
+  height: 100%;
+}
+
+.col-left  { flex: 0.95; }
+.col-mid   { flex: 1.10; }
+.col-right { flex: 0.95; }
+
+/* ═══════════════════════════════════════════════════════════
+   CARDS — Clean Academic
+   ═══════════════════════════════════════════════════════════ */
+.card {
+  background: var(--card);
+  border-radius: 3mm;
+  padding: 8mm 9mm;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 0 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card-blue   { border-top: 4px solid var(--blue); }
+.card-teal   { border-top: 4px solid var(--teal); }
+.card-orange { border-top: 4px solid var(--orange); }
+
+.card.grow {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--card);
+}
+
+.card-blue.grow {
+  background: linear-gradient(180deg, #ffffff 0%, #eaf6fc 100%);
+}
+
+.card-teal.grow {
+  background: linear-gradient(180deg, #ffffff 0%, #eaf6f2 100%);
+}
+
+.card-orange.grow {
+  background: linear-gradient(180deg, #ffffff 0%, #fff8f4 100%);
+}
+
+/* grow card children get generous spacing */
+.card.grow > * { flex-shrink: 0; }
+.card.grow > p { margin-bottom: 3mm; }
+.card.grow > ul { margin-bottom: 3mm; }
+.card.grow > ul > li { margin-bottom: 2mm; }
+.card.grow > .callout { margin: 4mm 0; }
+.card.grow > h3 { margin: 5mm 0 2.5mm; }
+.card.grow > p:last-child { margin-bottom: 0; }
+.card.grow > .sdiv { margin: 4mm 0; }
+
+/* Spacer that fills remaining empty space in grow cards */
+.grow-spacer {
+  flex: 1 1 0;
+  min-height: 4mm;
+}
+
+/* The final spacer before margin-top:auto elements is the gap filler */
+.grow-spacer.cap {
+  max-height: 80mm;
+}
+
+/* Use case grid for "Why This Matters Now" */
+.use-case-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3mm;
+  flex-shrink: 0;
+}
+
+.use-case {
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-light);
+  border-radius: 2.5mm;
+  padding: 4mm 4.5mm;
+  border-top: 2.5px solid var(--blue);
+}
+
+.use-case-tag {
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 10pt;
+  font-weight: 800;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+  margin-bottom: 2mm;
+}
+
+.use-case p {
+  font-size: 11pt !important;
+  line-height: 1.48 !important;
+  color: var(--text) !important;
+  margin: 0 !important;
+}
+
+/* Key Finding items */
+.finding-item {
+  display: flex;
+  gap: 3.5mm;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.finding-num {
+  width: 8mm;
+  height: 8mm;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 11.5pt;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.5mm;
+  box-shadow: 0 2px 6px rgba(234,88,12,0.35);
+}
+
+.finding-body { flex: 1; }
+.finding-body p { margin: 0; font-size: 12pt; line-height: 1.52; }
+
+.finding-scope {
+  font-size: 9.5pt;
+  color: var(--text-mid);
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.42;
+  flex-shrink: 0;
+  margin-top: auto !important; /* push to very bottom of grow card */
+}
+
+/* ── Before/After comparison table ── */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3mm;
+  flex-shrink: 0;
+}
+
+.ba-col {
+  border-radius: 2.5mm;
+  padding: 4.5mm 5mm;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+}
+
+.ba-col.before {
+  background: #fff5f5;
+  border: 1.5px solid #fecaca;
+  border-top: 3px solid var(--red);
+}
+
+.ba-col.after {
+  background: #eaf6f2;
+  border: 1.5px solid #9de3cc;
+  border-top: 3px solid var(--teal);
+}
+
+.ba-label {
+  font-size: 9.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6pt;
+  margin-bottom: 1mm;
+}
+
+.ba-col.before .ba-label { color: var(--red); }
+.ba-col.after  .ba-label { color: var(--teal); }
+
+.ba-item {
+  font-size: 10.5pt;
+  line-height: 1.45;
+  color: var(--text);
+  display: flex;
+  gap: 2mm;
+  align-items: flex-start;
+}
+
+.ba-item::before {
+  flex-shrink: 0;
+  font-weight: 700;
+  margin-top: 0.3mm;
+}
+
+.ba-col.before .ba-item::before { content: "✗"; color: var(--red); }
+.ba-col.after  .ba-item::before { content: "✓"; color: var(--teal); }
+
+/* ── Upstreaming path timeline ── */
+.upstream-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+  flex-shrink: 0;
+}
+
+.upstream-step {
+  display: flex;
+  gap: 3mm;
+  align-items: flex-start;
+}
+
+.step-dot {
+  width: 7mm;
+  height: 7mm;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9pt;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 0.5mm;
+}
+
+.step-dot.done  { background: var(--teal); }
+.step-dot.wip   { background: var(--orange); }
+.step-dot.next  { background: var(--blue); }
+
+.step-body { flex: 1; }
+.step-title { font-size: 11pt; font-weight: 700; line-height: 1.3; color: var(--navy); }
+.step-desc  { font-size: 10pt; line-height: 1.42; color: var(--text-mid); margin-top: 0.5mm; }
+
+/* ── Mini stat pills for left column ── */
+.mini-stats {
+  display: flex;
+  gap: 3mm;
+  flex-shrink: 0;
+}
+
+.mini-stat {
+  flex: 1;
+  background: var(--blue-dim);
+  border: 1.5px solid var(--blue-light);
+  border-top: 3px solid var(--blue);
+  border-radius: 2.5mm;
+  padding: 4mm 4mm;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5mm;
+}
+
+.mini-stat.teal {
+  background: var(--teal-dim);
+  border-color: var(--teal-light);
+  border-top-color: var(--teal);
+}
+
+.mini-stat.orange {
+  background: var(--orange-dim);
+  border-color: var(--orange-light);
+  border-top-color: var(--orange);
+}
+
+.mini-stat-val {
+  font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+  font-size: 20pt;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.5pt;
+}
+
+.mini-stat.teal .mini-stat-val   { color: var(--teal); }
+.mini-stat.orange .mini-stat-val { color: var(--orange); }
+.mini-stat .mini-stat-val        { color: var(--blue); }
+
+.mini-stat-label {
+  font-size: 9pt;
+  font-weight: 600;
+  color: var(--text-mid);
+  line-height: 1.3;
+}
+
+/* ── Card Typography ── */
+.card h2 {
+  font-family: 'Oswald', 'Fira Sans', 'IBM Plex Sans', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14.5pt;
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+  margin-bottom: 5mm;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+  flex-wrap: wrap;
+}
+
+.card-blue h2   { color: var(--navy); }
+.card-teal h2   { color: var(--navy); }
+.card-orange h2 { color: var(--navy); }
+
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 9mm; height: 9mm;
+  border-radius: 50%;
+  font-size: 12pt;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.card-blue   .section-num { background: var(--navy);   box-shadow: 0 2px 6px rgba(0,66,94,0.45); }
+.card-teal   .section-num { background: var(--teal);   box-shadow: 0 2px 6px rgba(0,151,113,0.4); }
+.card-orange .section-num { background: var(--orange); box-shadow: 0 2px 6px rgba(234,88,12,0.4); }
+
+.card h3 {
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 4mm 0 2.5mm;
+  line-height: 1.2;
+}
+
+.card p, .card li {
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+  font-size: 12.5pt;
+  line-height: 1.56;
+  color: var(--text);
+}
+
+.card p { margin-bottom: 3mm; }
+
+.card ul {
+  padding-left: 5.5mm;
+  margin-bottom: 3mm;
+}
+
+.card li { margin-bottom: 2.2mm; }
+
+.card-blue li::marker   { color: var(--blue);   font-weight: 700; }
+.card-teal li::marker   { color: var(--teal);   font-weight: 700; }
+.card-orange li::marker { color: var(--orange); font-weight: 700; }
+
+.card strong {
+  font-weight: 700;
+  color: var(--navy);
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* inline code */
+code {
+  font-family: 'IBM Plex Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 0.86em;
+  background: var(--code-bg);
+  border: 1px solid var(--border-mid);
+  padding: 0 3pt;
+  border-radius: 2pt;
+  color: var(--navy-mid);
+}
+
+/* ── Callout / Highlight Box ── */
+.callout {
+  border-left: 4px solid var(--blue);
+  background: linear-gradient(90deg, #e8f3ff, var(--blue-dim));
+  padding: 5mm 6mm;
+  border-radius: 0 3mm 3mm 0;
+  margin: 3.5mm 0;
+  box-shadow: 0 1px 6px rgba(45,127,193,0.12);
+}
+
+.callout.teal {
+  border-left-color: var(--teal);
+  background: linear-gradient(90deg, #c8eee3, var(--teal-dim));
+  box-shadow: 0 1px 6px rgba(0,151,113,0.12);
+}
+
+.callout.orange {
+  border-left-color: var(--orange);
+  background: linear-gradient(90deg, #ffe4cc, var(--orange-dim));
+  box-shadow: 0 1px 6px rgba(234,88,12,0.12);
+}
+
+.callout p {
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+  font-size: 12pt;
+  font-weight: 400;
+  line-height: 1.48;
+  color: var(--navy);
+  margin: 0;
+}
+
+/* ── Quote box ── */
+.quote-box {
+  background: var(--blue-dim);
+  border: 1.5px solid var(--blue-light);
+  border-left: 4px solid var(--blue);
+  padding: 6mm 6mm 6mm 10mm;
+  border-radius: 0 3mm 3mm 0;
+  margin: 3.5mm 0;
+  position: relative;
+}
+
+.quote-box::before {
+  content: "\201C";
+  font-family: Georgia, serif;
+  font-size: 36pt;
+  color: var(--blue);
+  position: absolute;
+  top: 1mm; left: 2.5mm;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+.quote-box p {
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+  font-size: 13pt;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.42;
+  color: var(--navy);
+  margin: 0;
+}
+
+.quote-box .src {
+  font-size: 8.5pt;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--text-mid);
+  margin-top: 2mm;
+  display: block;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ── Tables ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11pt;
+  margin: 2.5mm 0;
+}
+
+thead th {
+  font-family: 'Oswald', 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 600;
+  padding: 3mm 3.5mm;
+  text-align: left;
+  font-size: 10pt;
+  white-space: nowrap;
+  color: #fff;
+  letter-spacing: 0.5pt;
+  text-transform: uppercase;
+  background: var(--navy);
+}
+
+.card-teal   thead th { background: var(--teal); }
+.card-orange thead th { background: var(--orange); }
+
+tbody td {
+  padding: 3mm 3.5mm;
+  border-bottom: 1px solid var(--border);
+  font-size: 11pt;
+  vertical-align: top;
+  color: var(--text);
+  font-family: 'IBM Plex Serif', Georgia, 'Noto Serif', serif;
+}
+
+tbody tr:nth-child(even) { background: #f8fafc; }
+
+/* "This Work" row — EuroLLVM teal-green highlight */
+.row-this-work td {
+  background: linear-gradient(90deg, #a8e6d5, #c5f0e4) !important;
+  border-top: 2px solid #009771 !important;
+  border-bottom: 2px solid #009771 !important;
+  color: #006b50 !important;
+  font-weight: 700;
+  font-size: 10.5pt;
+}
+
+.row-this-work td strong { color: #006b50; }
+
+/* Highlighted result row */
+.row-hl-teal td {
+  background: var(--teal-dim) !important;
+  border-bottom: 1px solid var(--teal-light) !important;
+}
+
+.row-hl-green td {
+  background: #f0fdf4 !important;
+  border-bottom: 1px solid #bbf7d0 !important;
+}
+
+.num-right { text-align: right; font-variant-numeric: tabular-nums; font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace; }
+
+.val-hl {
+  font-weight: 700;
+  color: var(--teal);
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+}
+
+.val-dim {
+  color: var(--text-dim);
+  font-size: 9pt;
+}
+
+/* ── Code blocks ── */
+pre {
+  background: #f6f8fa;
+  color: #24292f;
+  font-family: 'IBM Plex Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 10.5pt;
+  padding: 5mm 5.5mm;
+  border-radius: 2.5mm;
+  line-height: 1.6;
+  overflow: hidden;
+  margin: 3.5mm 0;
+  flex-shrink: 0;
+  border: 1px solid #d0d7de;
+  border-left: 4px solid var(--blue);
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-teal pre   { border-left-color: var(--teal); }
+.card-orange pre { border-left-color: var(--orange); }
+
+/* GitHub-style light syntax colors — high contrast on white */
+pre .kw   { color: #cf222e; font-weight: 700; }
+pre .ty   { color: #0550ae; font-weight: 600; }
+pre .fn   { color: #6639ba; font-weight: 700; }
+pre .str  { color: #0a3069; }
+pre .cm   { color: #8b949e; font-style: italic; }
+pre .num  { color: #0550ae; font-weight: 700; }
+pre .op   { color: #0550ae; }
+pre .attr { color: #953800; font-weight: 700; }
+
+/* ── Flame Graph — Clean Solid ── */
+.flame-graph {
+  margin: 4mm 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+}
+
+.flame-row {
+  display: flex;
+  align-items: stretch;
+  height: 13mm;
+}
+
+.flame-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 5mm;
+  border-radius: 2mm;
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 10.5pt;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.flame-bar .flame-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.flame-bar .flame-val   { margin-left: 2mm; font-weight: 700; flex-shrink: 0; }
+
+.flame-bar.l1 { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 2px 8px rgba(220,38,38,0.35); }
+.flame-bar.l2 { background: linear-gradient(90deg, #ea580c, #f97316); box-shadow: 0 2px 8px rgba(234,88,12,0.35); }
+.flame-bar.l3 { background: linear-gradient(90deg, #2563eb, #3b82f6); box-shadow: 0 2px 8px rgba(37,99,235,0.35); }
+.flame-bar.l4 { background: linear-gradient(90deg, var(--teal), var(--teal-mid)); box-shadow: 0 2px 8px rgba(13,148,136,0.35); }
+.flame-bar.l5 { background: linear-gradient(90deg, #7c3aed, #8b5cf6); box-shadow: 0 2px 8px rgba(124,58,237,0.35); }
+.flame-bar.sel {
+  background: linear-gradient(90deg, #15803d, #16a34a);
+  box-shadow: 0 2px 8px rgba(22,163,74,0.45), 0 0 0 2px rgba(22,163,74,0.2);
+  min-width: 20mm;
+  overflow: visible;
+  position: relative;
+  animation: pulse-sel 2s ease-in-out infinite;
+}
+
+@keyframes pulse-sel {
+  0%, 100% { box-shadow: 0 2px 8px rgba(22,163,74,0.45), 0 0 0 2px rgba(22,163,74,0.2); }
+  50% { box-shadow: 0 2px 16px rgba(22,163,74,0.7), 0 0 0 3px rgba(22,163,74,0.4); }
+}
+
+.flame-bar.sel::after {
+  content: "← Selection: 3-6 ns (0.01%)";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 3mm;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 10.5pt;
+  font-weight: 800;
+  color: var(--teal);
+  white-space: nowrap;
+  background: linear-gradient(90deg, #d4f0e8, #e6f6f1);
+  padding: 1.5mm 3mm;
+  border-radius: 1.5mm;
+  border: 2px solid var(--teal-mid);
+  box-shadow: 0 2px 6px rgba(0,151,113,0.2);
+}
+
+.flame-caption {
+  font-size: 9.5pt;
+  color: var(--text-dim);
+  margin-top: 2.5mm;
+  line-height: 1.38;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ── Stat boxes ── */
+.stat-row {
+  display: flex;
+  gap: 4mm;
+  margin: 5mm 0;
+}
+
+.stat-box {
+  flex: 1;
+  background: #fff;
+  border-radius: 3mm;
+  padding: 6mm 5mm;
+  text-align: center;
+  border: 1.5px solid var(--border-mid);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-box::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3mm;
+  background: var(--border-mid);
+  border-radius: 3mm 3mm 0 0;
+}
+
+.stat-box.blue {
+  background: linear-gradient(160deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: var(--blue-light);
+  box-shadow: 0 2px 12px rgba(45,127,193,0.12);
+}
+.stat-box.blue::before { background: var(--blue); }
+
+.stat-box.teal {
+  background: linear-gradient(160deg, #eaf6f2 0%, #c4e8da 100%);
+  border-color: var(--teal-light);
+  box-shadow: 0 2px 12px rgba(0,151,113,0.12);
+}
+.stat-box.teal::before { background: var(--teal); }
+
+.stat-box.orange {
+  background: linear-gradient(160deg, #fff7ed 0%, #fed7aa 100%);
+  border-color: var(--orange-light);
+  box-shadow: 0 2px 12px rgba(234,88,12,0.12);
+}
+.stat-box.orange::before { background: var(--orange); }
+
+.stat-box .sv {
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 30pt;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.5pt;
+}
+
+.stat-box.blue   .sv { color: var(--blue); }
+.stat-box.teal   .sv { color: var(--teal); }
+.stat-box.orange .sv { color: var(--orange); }
+
+.stat-box .sl {
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 10.5pt;
+  color: var(--text-mid);
+  font-weight: 500;
+  line-height: 1.38;
+  margin-top: 2mm;
+}
+
+/* ── PR/Issue badges ── */
+.pr-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 9pt;
+  font-weight: 700;
+  padding: 1mm 3mm;
+  border-radius: 2mm;
+  vertical-align: middle;
+  letter-spacing: 0.2pt;
+}
+
+.pr-badge.merged { background: #ede9fe; border: 1.5px solid #c4b5fd; color: #5b21b6; }
+.pr-badge.open   { background: #dcfce7; border: 1.5px solid #86efac; color: #15803d; }
+.pr-badge.issue  { background: #fef9c3; border: 1.5px solid #fde047; color: #854d0e; }
+.pr-badge.rfc    { background: var(--blue-dim); border: 1.5px solid var(--blue-light); color: var(--blue); }
+
+/* ── Section divider ── */
+.sdiv {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4mm 0;
+}
+
+/* ── Small / Caption ── */
+.small   { font-size: 10pt; color: var(--text-mid); font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+.caption { font-size: 9.5pt; color: var(--text-dim); line-height: 1.42; margin-top: 2mm; font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+
+/* ── Percentage bar ── */
+.pct-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+  margin: 1.5mm 0;
+}
+
+.pct-bar-track {
+  flex: 1;
+  height: 6mm;
+  background: var(--border);
+  border-radius: 1.5mm;
+  overflow: hidden;
+  border: 1px solid var(--border-mid);
+}
+
+.pct-bar-fill {
+  height: 100%;
+  border-radius: 1mm;
+  display: flex;
+  align-items: center;
+  padding-left: 2mm;
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 8pt;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pct-label {
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: var(--text-mid);
+  width: 16mm;
+  flex-shrink: 0;
+}
+
+/* ── Architecture diagram ── */
+.arch-diagram {
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+  margin: 4mm 0;
+  flex-wrap: nowrap;
+}
+
+.arch-box {
+  font-family: 'IBM Plex Mono', 'Fira Code', Consolas, monospace;
+  font-size: 9pt;
+  font-weight: 700;
+  padding: 3mm 3.5mm;
+  border-radius: 2.5mm;
+  text-align: center;
+  line-height: 1.35;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.arch-box.blue  { background: var(--blue-dim);  color: var(--blue);  border: 1.5px solid var(--blue-light); }
+.arch-box.teal  { background: var(--teal-dim);  color: var(--teal);  border: 1.5px solid var(--teal-light); }
+.arch-box.orange { background: var(--orange-dim); color: var(--orange); border: 1.5px solid var(--orange-light); }
+.arch-box.dark  { background: var(--code-bg); color: var(--navy); border: 1.5px solid var(--border-mid); }
+
+.arch-arrow {
+  font-size: 12pt;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  padding: 0 0.5mm;
+}
+
+/* ── Bottom Bar ── */
+.bottom-bar {
+  background: #00425E;
+  border-top: 4px solid #009771;
+  padding: 10mm var(--pad);
+  flex-shrink: 0;
+  display: flex;
+  gap: 8mm;
+  color: #fff;
+}
+
+.bottom-bar h2 {
+  font-family: 'Oswald', 'Fira Sans', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 12.5pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+  color: #5de8c0;
+  margin-bottom: 4.5mm;
+}
+
+.bottom-left { flex: 1.8; }
+.bottom-mid  { flex: 1; }
+.bottom-right {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3mm;
+}
+
+.bottom-bar table { font-size: 11pt; }
+
+.bottom-bar thead th {
+  background: rgba(0,151,113,0.22);
+  border-bottom: 1.5px solid rgba(0,151,113,0.5);
+  color: #5de8c0;
+  font-size: 10pt;
+  padding: 3mm 3.5mm;
+  letter-spacing: 0.3pt;
+  text-transform: uppercase;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 700;
+}
+
+.bottom-bar tbody td {
+  color: rgba(255,255,255,0.88);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 3mm 3.5mm;
+  font-size: 11pt;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  vertical-align: middle;
+}
+
+.bottom-bar tbody tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+
+.bottom-bar .row-this-work td {
+  background: linear-gradient(90deg, rgba(0,151,113,0.45), rgba(0,179,136,0.25)) !important;
+  border-top: 2.5px solid rgba(0,151,113,0.85) !important;
+  border-bottom: 2.5px solid rgba(0,151,113,0.85) !important;
+  color: #5de8c0 !important;
+  font-weight: 700;
+  font-size: 12pt;
+  text-shadow: 0 0 12px rgba(0,151,113,0.4);
+}
+
+/* Star marker on first cell of This Work row */
+.bottom-bar .row-this-work td:first-child {
+  position: relative;
+}
+.bottom-bar .row-this-work td:first-child::before {
+  content: "★ ";
+  color: #5de8c0;
+  font-size: 10pt;
+}
+
+.dot-y    { color: #4ade80; font-weight: 700; font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+.dot-p    { color: #fbbf24; font-weight: 600; font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+.dot-n    { color: rgba(255,255,255,0.25); font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+.dot-this { color: #5de8c0; font-weight: 700; font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif; }
+
+.upstream-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+}
+
+.upstream-steps li {
+  counter-increment: step;
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 11pt;
+  color: rgba(255,255,255,0.84);
+  padding: 2.5mm 0;
+  padding-left: 9mm;
+  position: relative;
+  line-height: 1.45;
+}
+
+.upstream-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 1mm;
+  width: 5.5mm; height: 5.5mm;
+  border-radius: 50%;
+  background: #009771;
+  color: #fff;
+  font-size: 7.5pt;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ── QR Placeholder ── */
+.qr-placeholder {
+  width: 46mm;
+  height: 46mm;
+  background: rgba(255,255,255,0.07);
+  border-radius: 3.5mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  color: rgba(93,232,192,0.75);
+  text-align: center;
+  line-height: 1.6;
+  border: 1.5px solid rgba(0,151,113,0.4);
+  background-image:
+    linear-gradient(rgba(0,151,113,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,151,113,0.1) 1px, transparent 1px);
+  background-size: 5px 5px;
+  position: relative;
+}
+
+/* QR corner squares */
+.qr-placeholder::before {
+  content: "▪▫▫▫▪\A▪▫▫▫▪\A▫▫▫▫▫\A▪▫▫▫▪\A▪▫▫▫▪";
+  white-space: pre;
+  font-size: 5pt;
+  line-height: 1.1;
+  color: rgba(0,151,113,0.55);
+  font-family: monospace;
+  display: block;
+  margin-bottom: 1mm;
+  letter-spacing: 1px;
+}
+
+/* ── Screen preview ── */
+@media screen {
+  html { background: #e5e7eb; overflow: auto; }
+  body {
+    margin: 10mm auto;
+    box-shadow: 0 4mm 20mm rgba(0,0,0,0.20), 0 1mm 6mm rgba(0,0,0,0.12);
+    border-radius: 2mm;
+  }
+}
+
+@media print {
+  body { box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-text">
+    <h1>Measuring and Improving <span class="hl-title">Multi-Target Binary Selection</span><br>in LLVM's GPU Offload Stack</h1>
+    <div class="header-meta">Metadata Vocabulary + Dispatch Flame Graph + <code>#gpu.runtime_select</code> Design</div>
+    <div class="header-authors"><strong>S. Akash</strong> &mdash; IIT Patna &ensp;|&ensp; CERN GSoC &ensp;|&ensp; vLLM contributor &ensp;|&ensp; EuroLLVM Dublin 2026</div>
+  </div>
+  <div class="header-right">
+    <div class="venue-badge">EuroLLVM<br>Developers' Meeting<br><strong>Dublin 2026</strong><em>Poster Session</em></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     THESIS STRIP
+     ═══════════════════════════════════════════════════════════ -->
+<div class="thesis-strip">
+  <div class="thesis-text">
+    MLIR compiles one <code>gpu.module</code> to 3 GPU vendors.
+    <code>OffloadBinary</code> carries N device images.
+    But at runtime, the offload stack picks the <em>first compatible image</em> and stops.
+    There is no metadata vocabulary. No published measurement. No "best-compatible" mechanism.
+  </div>
+  <div class="thesis-stats">
+    <div class="thesis-stat">
+      <div class="val">3-6 ns</div>
+      <div class="lbl">Selection<br>overhead</div>
+    </div>
+    <div class="thesis-stat">
+      <div class="val">5</div>
+      <div class="lbl">New metadata<br>keys</div>
+    </div>
+    <div class="thesis-stat">
+      <div class="val">0%</div>
+      <div class="lbl">Hot-path<br>penalty</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PLAIN-ENGLISH CALLOUT BAR
+     ═══════════════════════════════════════════════════════════ -->
+<div class="plain-english-bar">
+  <p><strong>In plain English:</strong> When you compile a GPU program for multiple vendors (NVIDIA, AMD, Intel), LLVM currently picks the first binary that works. We measure the cost and propose a way to pick the <em>best</em> one.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     3-COLUMN BODY
+     ═══════════════════════════════════════════════════════════ -->
+<div class="poster-body">
+
+  <!-- ─── LEFT COLUMN: "The Gap" ──────────────────────────── -->
+  <div class="col col-left">
+
+    <div class="card card-blue">
+      <h2><span class="section-num">1</span> The Gap: Compile-Time Done, Runtime Missing</h2>
+
+      <p><strong>Tri-vendor compilation works.</strong> Since August 2025, MLIR's GPU dialect supports NVVM (NVIDIA Virtual Machine) + ROCDL (ROCm Device Library) + XeVM (Intel Xe GPU) targets in a single compilation pipeline.</p>
+
+      <ul>
+        <li><code>gpu-module-to-binary</code> produces a multi-vendor <code>gpu.binary</code> with N embedded device objects</li>
+        <li><code>#gpu.select_object</code> resolves ONE target at <strong>compile time</strong> &mdash; index-based, no runtime path</li>
+      </ul>
+
+      <hr class="sdiv">
+
+      <h3>Upstream Evidence of the Gap</h3>
+
+      <p><span class="pr-badge merged">PR #148286</span> XeVM target upstreamed (Aug 2025) &mdash; tri-vendor compilation is now possible</p>
+
+      <p><span class="pr-badge open">PR #186088</span> <code>liboffload</code> loads first compatible GPU binary &mdash; explicitly defers ranked selection to higher layers</p>
+
+      <p><span class="pr-badge merged">PR #185663</span> <code>isMetadataCompatible()</code> consumer hook merged &mdash; but only checks <code>triple</code> + <code>arch</code> strings</p>
+
+      <p><span class="pr-badge issue">Issue #75356</span> Open 2.5 years &mdash; Chapel team needs <code>dlsym</code>-for-GPUs: "target-specific binary selection at runtime"</p>
+
+      <p><span class="pr-badge rfc">RFC #88170</span> GPU dialect cleanup separates container from dispatch policy &mdash; the <strong>policy slot is empty</strong></p>
+    </div>
+
+    <div class="card card-blue">
+      <div class="quote-box">
+        <p>The compile-time half is done. The runtime policy is not.</p>
+        <span class="src">Summary of the gap &mdash; 3 PRs shipped, 0 address runtime selection</span>
+      </div>
+    </div>
+
+    <div class="card card-blue grow">
+      <h2>Why This Matters Now</h2>
+
+      <p><strong>The pressure is real and growing:</strong></p>
+
+      <div class="use-case-grid">
+        <div class="use-case">
+          <div class="use-case-tag">CERN HEP-CCE</div>
+          <p>Maintains ~80 build configs for heterogeneous GPU clusters (A100 + MI250X + CPU). A fat binary with runtime selection eliminates combinatorial explosion.</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">vLLM</div>
+          <p>Separate NVIDIA/AMD codepaths per kernel. Runtime variant selection enables a single serving binary for both vendors.</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">Cloud Containers</div>
+          <p>AWS p4/p5, GCP A3 &mdash; GPU model is unknown at compile time for containerized ML workloads.</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">torch-mlir / ONNX-RT</div>
+          <p>Each framework reimplements dispatch for <code>gpu.binary</code> with 3 targets. Moving selection into LLVM eliminates per-framework duplication.</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>The Status Quo Cost</h3>
+      <ul>
+        <li>Each project maintains <strong>separate build pipelines</strong> per GPU vendor instead of a single fat binary</li>
+        <li>Container images must be duplicated: <code>image:cuda</code>, <code>image:rocm</code>, <code>image:sycl</code> &mdash; tripling storage and CI time</li>
+        <li>Selection logic is duplicated in every framework: PyTorch, JAX, TensorFlow, ONNX-RT each implement their own GPU dispatch</li>
+        <li><strong>No published latency data</strong> on the GPU dispatch stack &mdash; developers optimize blindly without knowing where time is spent</li>
+      </ul>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>What We Propose</h3>
+      <div class="use-case-grid">
+        <div class="use-case">
+          <div class="use-case-tag">C1: Vocabulary</div>
+          <p>5 new <code>OffloadBinary</code> metadata keys (<code>min_sm</code>, <code>min_gfx</code>, <code>requires_features</code>, <code>variant_priority</code>, <code>variant_tag</code>).</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">C2: Measurement</div>
+          <p>First published per-layer GPU dispatch flame graph. 36.0 µs cold load, 3-6 ns selection &mdash; now documented.</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">C3: Design</div>
+          <p><code>#gpu.runtime_select</code> attribute &mdash; defers selection to runtime with ranked, vendor-aware policy.</p>
+        </div>
+        <div class="use-case">
+          <div class="use-case-tag">All Together</div>
+          <p>Three independent contributions, each upstreamable standalone. Together: a complete runtime selection story for LLVM's GPU stack.</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>Before vs. After</h3>
+      <div class="before-after">
+        <div class="ba-col before">
+          <div class="ba-label">Status Quo</div>
+          <div class="ba-item">N build pipelines, one per vendor</div>
+          <div class="ba-item">Each framework reimplements dispatch</div>
+          <div class="ba-item">No runtime perf data for developers</div>
+          <div class="ba-item">Metadata vocabulary frozen at 2 keys</div>
+        </div>
+        <div class="ba-col after">
+          <div class="ba-label">With This Work</div>
+          <div class="ba-item">One fat binary, runtime dispatch</div>
+          <div class="ba-item">LLVM-native selection, shared by all</div>
+          <div class="ba-item">First published flame graph (36 µs → 3 ns)</div>
+          <div class="ba-item">5 new typed metadata keys standardized</div>
+        </div>
+      </div>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>Upstreaming Path</h3>
+      <div class="upstream-steps">
+        <div class="upstream-step">
+          <div class="step-dot done">1</div>
+          <div class="step-body">
+            <div class="step-title">C1: Metadata RFC — in review</div>
+            <div class="step-desc">5 new keys proposed for <code>OffloadBinary</code>; PR #185663 hook already merged.</div>
+          </div>
+        </div>
+        <div class="upstream-step">
+          <div class="step-dot done">2</div>
+          <div class="step-body">
+            <div class="step-title">C2: Flame graph — poster artifact</div>
+            <div class="step-desc">Benchmark harness open-sourced. Repro in &lt; 10 min on any CUDA/ROCm host.</div>
+          </div>
+        </div>
+        <div class="upstream-step">
+          <div class="step-dot wip">3</div>
+          <div class="step-body">
+            <div class="step-title">C3: <code>#gpu.runtime_select</code> — RFC draft</div>
+            <div class="step-desc">MLIR attribute + <code>embedBinary()</code> lowering. LLVM-dev RFC planned post-conference.</div>
+          </div>
+        </div>
+        <div class="upstream-step">
+          <div class="step-dot next">4</div>
+          <div class="step-body">
+            <div class="step-title">Integration &amp; adoption</div>
+            <div class="step-desc">vLLM, torch-mlir, and CERN HEP-CCE identified as early adopters once C1+C3 land.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>Impact by the Numbers</h3>
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <div class="mini-stat-val">3–6 ns</div>
+          <div class="mini-stat-label">Runtime selection latency</div>
+        </div>
+        <div class="mini-stat teal">
+          <div class="mini-stat-val">36 µs</div>
+          <div class="mini-stat-label">Cold GPU binary load</div>
+        </div>
+        <div class="mini-stat orange">
+          <div class="mini-stat-val">664</div>
+          <div class="mini-stat-label">Lines of new MLIR code</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>Runtime variant selection is not theoretical &mdash; every heterogeneous deployment works around it today, each in its own ad-hoc way.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── CENTER COLUMN: "Our Contributions" ──────────────── -->
+  <div class="col col-mid">
+
+    <!-- Contribution 1 -->
+    <div class="card card-teal">
+      <h2><span class="section-num">2</span> C1: OffloadBinary Metadata Vocabulary</h2>
+
+      <p>The <code>OffloadBinary</code> format (D122069, 2022) includes a flexible <code>StringMap</code> per image &mdash; but only <strong>2 keys</strong> are standardized (<code>triple</code>, <code>arch</code>). Four years later, the vocabulary has not grown.</p>
+
+      <div class="callout teal">
+        <p>The consumer hook exists (PR #185663). The vocabulary does not. Until now.</p>
+      </div>
+
+      <h3>5 New Standard Keys</h3>
+      <table>
+        <thead><tr><th>Key</th><th>Tier</th><th>Type</th><th>Example</th><th>Semantics</th></tr></thead>
+        <tbody>
+          <tr><td><code>min_sm</code></td><td><strong>MUST</strong></td><td>uint</td><td><code>"75"</code></td><td>Min CUDA compute capability (e.g. sm_75 = NVIDIA Turing, compute capability 7.5); rejects if device &lt; value</td></tr>
+          <tr><td><code>min_gfx</code></td><td><strong>MUST</strong></td><td>arch:family</td><td><code>"gfx90a:cdna2"</code></td><td>Min AMD GFX within ISA (Instruction Set Architecture) family (family-tagged)</td></tr>
+          <tr><td><code>requires_features</code></td><td><strong>MUST</strong></td><td>comma-list</td><td><code>"tensor_core_nv,bf16"</code></td><td>Named capability tokens; rejects if absent</td></tr>
+          <tr><td><code>variant_priority</code></td><td>MAY</td><td>uint</td><td><code>"10"</code></td><td>Higher = preferred among compatible images</td></tr>
+          <tr><td><code>variant_tag</code></td><td>MAY</td><td>string</td><td><code>"optimized"</code></td><td>Human label: generic, optimized, fallback, debug</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Extension to <code>isMetadataCompatible()</code></h3>
+      <pre><span class="cm">// Current (PR #185663): triple + arch only</span>
+<span class="cm">// Extended (opt-in when keys present):</span>
+<span class="kw">bool</span> <span class="fn">isMetadataCompatible</span>(image, device) {
+  <span class="kw">if</span> (image.Triple != device.Triple) <span class="kw">return</span> <span class="num">false</span>;
+  <span class="kw">if</span> (<span class="kw">auto</span> minSm = image.getString(<span class="str">"min_sm"</span>))
+    <span class="kw">if</span> (parseSm(device.Arch) &lt; stoul(*minSm))
+      <span class="kw">return</span> <span class="num">false</span>;
+  <span class="kw">if</span> (<span class="kw">auto</span> feats = image.getString(<span class="str">"requires_features"</span>))
+    <span class="kw">for</span> (<span class="kw">auto</span> &amp;tok : split(*feats, <span class="str">','</span>))
+      <span class="kw">if</span> (!device.hasCapability(tok)) <span class="kw">return</span> <span class="num">false</span>;
+  <span class="kw">return</span> <span class="num">true</span>;
+}</pre>
+      <p class="small"><strong>Backward-compatible:</strong> Missing keys = no constraint. Old runtimes ignore unknown keys. No format version bump, no ABI break.</p>
+    </div>
+
+    <!-- Contribution 2 -->
+    <div class="card card-teal">
+      <h2>C2: First Dispatch Stack Flame Graph</h2>
+      <p>Nobody has published a per-layer latency breakdown of the LLVM GPU dispatch path. We measured each layer individually on a GTX 1650 (sm_75), CUDA 13.1.</p>
+
+      <div class="flame-graph">
+        <div class="flame-row">
+          <div class="flame-bar l1" style="width:100%">
+            <span class="flame-label">cuModuleLoadData (ELF parse + device alloc)</span>
+            <span class="flame-val">36.0 &micro;s &mdash; 90%</span>
+          </div>
+        </div>
+        <div class="flame-row">
+          <div class="flame-bar l2" style="width:18%">
+            <span class="flame-label">cuStreamSync</span>
+            <span class="flame-val">2.5 &micro;s</span>
+          </div>
+        </div>
+        <div class="flame-row">
+          <div class="flame-bar l3" style="width:12%">
+            <span class="flame-label">cuLaunchKernel</span>
+            <span class="flame-val">1.6 &micro;s</span>
+          </div>
+        </div>
+        <div class="flame-row">
+          <div class="flame-bar l4" style="width:3%">
+            <span class="flame-label" style="font-size:7.5pt">cuModuleGetFn</span>
+            <span class="flame-val" style="font-size:7.5pt">60 ns</span>
+          </div>
+          <div style="width:1mm"></div>
+          <div class="flame-bar sel" style="width:2.5%">
+            <span class="flame-label" style="font-size:7.5pt">Selection</span>
+            <span class="flame-val" style="font-size:7.5pt">3-6 ns</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="caption"><strong>Cold-path dispatch decomposition.</strong> Measured on GTX 1650 (sm_75), CUDA 13.1, CPU-pinned (taskset -c 0). 100 cold trials (exec-child isolation), 10K hot iterations, 3-run cross-run medians. Null kernel (1 thread, 0 shared mem, pre-compiled CUBIN). Width = fraction of total cold-path latency.</p>
+
+      <div class="stat-row">
+        <div class="stat-box teal">
+          <div class="sv" style="font-size:28pt">4.1 &micro;s</div>
+          <div class="sl">Hot-path total<br><strong>(launch + sync)</strong></div>
+        </div>
+        <div class="stat-box orange">
+          <div class="sv" style="font-size:28pt">36.0 &micro;s</div>
+          <div class="sl">Cold module load<br><strong>~90% of cold path</strong></div>
+        </div>
+        <div class="stat-box blue">
+          <div class="sv" style="font-size:28pt">3-6 ns</div>
+          <div class="sl">Selection overhead<br><strong>&lt;0.01% of dispatch</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contribution 3 -->
+    <div class="card card-teal grow">
+      <h2>C3: <code style="background:var(--teal-dim);border-color:var(--teal-light);color:var(--teal)">#gpu.runtime_select</code> Design Sketch</h2>
+
+      <pre><span class="cm">// MLIR: defer binary selection to runtime</span>
+<span class="cm">// Compile once &rarr; 3 vendor binaries &rarr; pick best at runtime</span>
+<span class="ty">gpu.binary</span> <span class="attr">@kernels</span> &lt;<span class="op">#gpu.runtime_select</span>&lt;
+    strategy = <span class="str">"rank_by_priority"</span>,
+    fallback = <span class="str">"cpu"</span>&gt;&gt; [
+  <span class="op">#gpu.object</span>&lt;<span class="op">#nvvm.target</span>&lt;chip=<span class="str">"sm_75"</span>&gt;, bin=<span class="str">"...cubin (CUDA Binary)..."</span>&gt;,
+  <span class="op">#gpu.object</span>&lt;<span class="op">#rocdl.target</span>&lt;chip=<span class="str">"gfx90a"</span>&gt;, bin=<span class="str">"...hsaco (HSA Code Object)..."</span>&gt;,
+  <span class="op">#gpu.object</span>&lt;<span class="op">#nvvm.target</span>&lt;chip=<span class="str">"sm_90"</span>&gt;, bin=<span class="str">"...cubin (CUDA Binary)..."</span>&gt;
+]</pre>
+
+      <h3>Architecture: <code>embedBinary()</code> Emission</h3>
+      <div class="arch-diagram">
+        <div class="arch-box blue">N gpu.object<br>blobs</div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-box dark">@kernels_blob_0<br>@kernels_blob_1<br>@kernels_blob_2</div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-box teal">Dispatch Table<br>+ Vendor Detect<br>(global_ctors)</div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-box orange">@kernels_<br>module_ptr</div>
+      </div>
+
+      <p><code>launchKernel()</code> loads from <code>@kernels_module_ptr</code> &mdash; identical codepath to <code>SelectObjectAttr</code>. <strong>Zero hot-path overhead after one-time selection.</strong></p>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>Selection Policy: <code>rank_by_priority</code></h3>
+      <ul>
+        <li>Reads <code>variant_priority</code> key from each binary's <code>StringMap</code></li>
+        <li>Returns the binary with the <strong>highest numeric priority</strong> that passes all <code>min_sm</code> / <code>min_gfx</code> / <code>requires_features</code> guards</li>
+        <li>Tied priorities: falls back to <strong>insertion order</strong> (deterministic)</li>
+        <li>Policy is a pluggable <code>SelectionPolicyInterface</code> — future strategies (ISA-score, power-cap) slot in without changing the attribute</li>
+      </ul>
+
+      <div class="grow-spacer cap"></div>
+
+      <h3>Key Design Properties</h3>
+      <ul>
+        <li><strong>Backward-compatible:</strong> Falls back to index-0 if no metadata keys present. Existing <code>#gpu.select_object</code> users unaffected.</li>
+        <li><strong>Compile-time emission:</strong> Selection logic emitted as IR during <code>embedBinary()</code> &mdash; no runtime library dependency, no dynamic linking overhead.</li>
+        <li><strong>Strategy-pluggable:</strong> <code>rank_by_priority</code> uses <code>variant_priority</code> key; future strategies (e.g. ISA-score, power-cap) slot in via the attribute interface.</li>
+        <li><strong>CPU FMV analogy:</strong> Same pattern as <code>target_clones</code> IFunc resolvers &mdash; compile-time emission of runtime selection, now for cross-vendor GPU binaries.</li>
+      </ul>
+
+      <div class="callout teal" style="margin-top:auto">
+        <p><strong>~780 LOC</strong> to implement <code>OffloadingLLVMTranslationAttrInterface</code> &mdash; a standalone RFC, independent of the metadata vocabulary patch.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── RIGHT COLUMN: "Evidence" ────────────────────────── -->
+  <div class="col col-right">
+
+    <div class="card card-orange">
+      <h2><span class="section-num">3</span> Dispatch Overhead: Layer Decomposition</h2>
+
+      <table>
+        <thead><tr><th>Operation</th><th>Median</th><th>p99</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>cuModuleLoadData</code> cold</td><td class="num-right val-hl">36.0 &micro;s</td><td class="num-right">111.3 &micro;s</td><td>100 exec-child trials, CPU-pinned</td></tr>
+          <tr><td><code>cuModuleLoadData</code> warm</td><td class="num-right">10.0 &micro;s</td><td class="num-right">16.3 &micro;s</td><td>Same context, 10K iter</td></tr>
+          <tr><td><code>cuModuleGetFunction</code></td><td class="num-right">60 ns</td><td class="num-right">61 ns</td><td>Hash lookup in driver</td></tr>
+          <tr><td><code>cuLaunchKernel</code></td><td class="num-right">1.6 &micro;s</td><td class="num-right">3.5 &micro;s</td><td>CPU-side submit</td></tr>
+          <tr><td><code>cuStreamSynchronize</code></td><td class="num-right">2.5 &micro;s</td><td class="num-right">3.6 &micro;s</td><td>GPU round-trip (PCIe 3.0)</td></tr>
+          <tr class="row-hl-teal"><td><strong>Hot-path total</strong></td><td class="num-right val-hl">4.1 &micro;s</td><td class="num-right">7.1 &micro;s</td><td>launch + sync</td></tr>
+          <tr class="row-hl-green"><td><strong>Selection overhead</strong></td><td class="num-right val-hl">4&ndash;6 ns</td><td class="num-right">&mdash;</td><td>100K iter microbench</td></tr>
+        </tbody>
+      </table>
+
+      <p class="caption">GTX 1650 (sm_75), CUDA 13.1, null kernel CUBIN (4,328 bytes). 100 cold trials via exec-child isolation, 10K warm iterations. Medians from 3-run CPU-pinned data. p99 from single run &mdash; pinned p99 values are tighter (e.g., cold p99: 59.6 &micro;s pinned vs 111.3 &micro;s unpinned).</p>
+    </div>
+
+    <div class="card card-orange">
+      <h2>Selection as % of ML Kernel Duration</h2>
+
+      <table>
+        <thead><tr><th>Kernel Duration</th><th>Selection (3-6 ns)</th><th>Overhead</th></tr></thead>
+        <tbody>
+          <tr><td>100 ms (large GEMM, transformer)</td><td class="num-right">3-6 ns</td><td class="num-right val-hl">0.000003-0.000006%</td></tr>
+          <tr><td>10 ms (medium attention, FFN)</td><td class="num-right">3-6 ns</td><td class="num-right val-hl">0.00003-0.00006%</td></tr>
+          <tr><td>1 ms (small activation, norm)</td><td class="num-right">3-6 ns</td><td class="num-right val-hl">0.0003-0.0006%</td></tr>
+          <tr><td>100 &micro;s (micro-kernel)</td><td class="num-right">3-6 ns</td><td class="num-right">0.003-0.006%</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout orange">
+        <p>At 3-6 ns per dispatch, a kernel launched at 1 MHz frequency incurs 0.3-0.6% selection overhead. For real ML workloads (~10 kHz), this is unmeasurable.</p>
+      </div>
+    </div>
+
+    <div class="card card-orange">
+      <h2>Prototype Validation</h2>
+
+      <div class="stat-row">
+        <div class="stat-box orange">
+          <div class="sv" style="font-size:38pt">5,100</div>
+          <div class="sl">LOC C<br><strong>prototype</strong> (libkdl)</div>
+        </div>
+        <div class="stat-box teal">
+          <div class="sv" style="font-size:38pt">664</div>
+          <div class="sl">LOC PoC<br><strong>OffloadBinary reader</strong></div>
+        </div>
+      </div>
+
+      <h3>PoC End-to-End: Real OffloadBinary Dispatch</h3>
+      <ul>
+        <li>Packed 3 real CUBINs (sm_75 + sm_86 + sm_89) into LLVM OffloadBinary format (compatible magic <code>0x10FF10AD</code>, simplified entry layout; 14,064 bytes)</li>
+        <li><strong>Correctly selects sm_75</strong> on GTX 1650, <strong>rejects sm_86/sm_89</strong> without touching GPU memory</li>
+        <li>Launches kernel on GPU via <code>cuModuleLoadData</code> &rarr; <code>cuLaunchKernel</code> &rarr; <code>cuStreamSynchronize</code></li>
+        <li>Selection microbenchmark: <strong>4&ndash;6 ns</strong> per call (100K iterations)</li>
+      </ul>
+
+      <hr class="sdiv">
+
+      <h3>PoC Pipeline Output</h3>
+      <pre><span class="cm"># Vendor detection</span>
+vendor:     NVIDIA (id=1)
+device:     GeForce GTX 1650
+sm_version: <span class="num">75</span> (sm_75)
+
+<span class="cm"># Dispatch table (from OffloadBinary)</span>
+[0] sm_86 nvptx64-nvidia-cuda <span class="str">(4712 B)</span>
+[1] sm_89 nvptx64-nvidia-cuda <span class="str">(4712 B)</span>
+[2] sm_75 nvptx64-nvidia-cuda <span class="str">(4328 B)</span>
+
+<span class="cm"># Selection: rank_by_priority</span>
+selected: <span class="fn">[2] sm_75</span> (min_sm=75)
+select_ns: <span class="num">6</span>
+
+<span class="cm"># Kernel launch: SUCCESS</span></pre>
+    </div>
+
+    <div class="card card-orange grow">
+      <h2>Key Findings</h2>
+
+      <div class="finding-item">
+        <div class="finding-num">1</div>
+        <div class="finding-body">
+          <p><strong>Module loading dominates cold path.</strong> <code>cuModuleLoadData</code> is ~90% of total cold dispatch latency (36.0 &micro;s of ~40.1 &micro;s end-to-end). The selection algorithm is noise-floor (&lt;0.01%).</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer"></div>
+
+      <div class="finding-item">
+        <div class="finding-num">2</div>
+        <div class="finding-body">
+          <p><strong>Selection is not the bottleneck.</strong> At 4&ndash;6 ns, dispatch table scan for 3 entries is 7,000&times; cheaper than a single kernel launch (1.6 &micro;s). Scales to ~40 ns for 30 variants &mdash; still within noise.</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer"></div>
+
+      <div class="finding-item">
+        <div class="finding-num">3</div>
+        <div class="finding-body">
+          <p><strong>Hot path has zero overhead.</strong> After one-time selection, the module handle is cached in a global pointer. Subsequent <code>launchKernel</code> calls are identical to compile-time <code>#gpu.select_object</code>.</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer"></div>
+
+      <div class="finding-item">
+        <div class="finding-num">4</div>
+        <div class="finding-body">
+          <p><strong>The ld.so analogy holds.</strong> Think of it like a phone app store that auto-installs the right version for your device. <code>#gpu.runtime_select</code> picks the right GPU binary once at program start; every subsequent kernel launch uses that choice with zero overhead. (Technically: resolves in <code>global_ctors</code>, hot path is a single pointer load &mdash; same pattern as the dynamic linker's PLT.)</p>
+        </div>
+      </div>
+
+      <div class="grow-spacer"></div>
+
+      <p class="finding-scope"><strong>Scope:</strong> Measured on GTX 1650 (sm_75). Layer fractions are hardware-specific; the decomposition methodology generalizes. AMD path validated via mocked HIP; physical ROCm pending.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOTTOM BAR: Related Work + Upstream Path
+     ═══════════════════════════════════════════════════════════ -->
+<div class="bottom-bar">
+  <div class="bottom-left">
+    <h2>Related Work Comparison</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>System</th>
+          <th>Runtime Select?</th>
+          <th>Cross-Vendor?</th>
+          <th>MLIR-Native?</th>
+          <th>Ranked?</th>
+          <th>Layer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>IREE HAL</strong> <span style="font-size:8pt;color:rgba(255,255,255,0.45)">(Google's ML compiler runtime)</span></td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-y">MLIR-based</span></td>
+          <td><span class="dot-p">Partial</span> (issues #12230, #15334 &mdash; ranked selection unimplemented)</td>
+          <td>Full-stack runtime</td>
+        </tr>
+        <tr>
+          <td><strong>chipStar</strong> <span style="font-size:8pt;color:rgba(255,255,255,0.45)">(HIP-over-SPIR-V portability layer)</span></td>
+          <td><span class="dot-y">Yes</span> (SPIR-V)</td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td>Portability layer</td>
+        </tr>
+        <tr>
+          <td><strong>Proteus</strong> (LLNL) <span style="font-size:8pt;color:rgba(255,255,255,0.45)">(GPU JIT specializer)</span></td>
+          <td><span class="dot-y">Yes</span> (JIT)</td>
+          <td><span class="dot-p">Partial</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td>JIT runtime</td>
+        </tr>
+        <tr>
+          <td><strong>HetGPU</strong> <span style="font-size:8pt;color:rgba(255,255,255,0.45)">(cross-vendor binary translation)</span></td>
+          <td><span class="dot-y">Yes</span> (IR translate)</td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td>Binary portability layer</td>
+        </tr>
+        <tr>
+          <td><strong>liboffload</strong> #186088</td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-y">Yes</span></td>
+          <td><span class="dot-n">No</span></td>
+          <td><span class="dot-n">No</span> (first-wins)</td>
+          <td>LLVM offload runtime</td>
+        </tr>
+        <tr>
+          <td><strong>CPU FMV</strong> (target_clones)</td>
+          <td><span class="dot-y">Yes</span></td>
+          <td>N/A (CPU)</td>
+          <td><span class="dot-n">No</span></td>
+          <td><span class="dot-y">Yes</span> (IFunc)</td>
+          <td>Compiler + linker</td>
+        </tr>
+        <tr class="row-this-work">
+          <td><strong style="color:#5eead4">This Work</strong></td>
+          <td><span class="dot-this">Metadata + Measurement + Design</span></td>
+          <td><span class="dot-this">Yes</span></td>
+          <td><span class="dot-this">Yes</span></td>
+          <td><span class="dot-this">Yes</span> (variant_priority)</td>
+          <td style="color:#5eead4;font-weight:700">MLIR + OffloadBinary</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bottom-mid">
+    <h2>Upstream Path</h2>
+    <ol class="upstream-steps">
+      <li><strong>Metadata RFC</strong> on Discourse (Runtimes category) &mdash; 5 keys, ~30 LOC header patch</li>
+      <li><strong>Flame graph publication</strong> &mdash; benchmark in <code>llvm-test-suite</code></li>
+      <li><strong><code>#gpu.runtime_select</code> RFC</strong> &mdash; ~780 LOC, implements <code>OffloadingLLVMTranslationAttrInterface</code></li>
+    </ol>
+    <p style="font-size:9pt;color:rgba(255,255,255,0.45);margin-top:2.5mm;font-family:-apple-system,'Segoe UI',Roboto,sans-serif">Steps are independent after step 1. Each is a standalone contribution.</p>
+    <p style="font-size:7.5pt;color:rgba(255,255,255,0.32);margin-top:3mm;line-height:1.38;font-family:-apple-system,'Segoe UI',Roboto,sans-serif">
+      <strong>Key references:</strong> IREE HAL [iree.dev], chipStar [github.com/CHIP-SPV], Proteus [CGO 2025],
+      HetGPU [arXiv:2506.15993], Universal GPU ISA [arXiv:2603.28793],
+      KernelEvolve [ISCA 2026, arXiv:2512.23236], AdaptiveCpp [IWOCL 2025]
+    </p>
+  </div>
+
+  <div class="bottom-right">
+    <div class="qr-placeholder">[QR: GitHub]<br>Prototype + Data</div>
+    <div class="qr-placeholder">[QR: RFC]<br>Discourse Thread</div>
+  </div>
+</div>
+
+</body>
+</html>

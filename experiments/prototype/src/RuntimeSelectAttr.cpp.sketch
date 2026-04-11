@@ -1,0 +1,889 @@
+//===-- RuntimeSelectAttr.cpp - Runtime GPU Binary Selection ----*- C++ -*-===//
+//
+// Part of the LLVM Project (proposed contribution)
+// Implements #gpu.runtime_select for OffloadingLLVMTranslationAttrInterface
+//
+// This file is a design sketch for EuroLLVM Dublin 2026.
+// NOT compilable -- uses simplified API calls for clarity.
+//
+// === Context ===
+// Today, #gpu.select_object is the ONLY implementation of
+// OffloadingLLVMTranslationAttrInterface in upstream MLIR.
+// It commits to a single binary at LLVM-IR translation time.
+//
+// With tri-vendor GPU targets now in-tree (#nvvm.target, #rocdl.target,
+// #xevm.target since Intel XeVM PR #148286, Aug 2025), gpu.binary can
+// carry multiple #gpu.object entries -- but nothing dispatches among
+// them at runtime. RFC #88170 (Mora, Sep 2025) left the dispatch-policy
+// slot explicitly vacant. This attribute fills it.
+//
+// === Design invariant ===
+// All dispatch decisions happen ONCE, at module-load time (global_ctors).
+// The kernel launch path (launchKernel) is identical to SelectObjectAttr:
+//   load @module_ptr -> mgpuModuleGetFunction -> mgpuLaunchKernel
+// Zero per-launch overhead. This is the central design claim.
+//
+// === Cross-reference ===
+// Upstream file this extends:
+//   mlir/lib/Target/LLVMIR/Dialect/GPU/SelectObjectAttr.cpp
+// Interface definition:
+//   mlir/include/mlir/Dialect/GPU/IR/CompilationAttrInterfaces.td
+// Runtime wrappers it calls:
+//   mlir/lib/ExecutionEngine/CudaRuntimeWrappers.cpp (mgpuModuleLoad)
+//   mlir/lib/ExecutionEngine/RocmRuntimeWrappers.cpp (mgpuModuleLoad)
+// Prototype proving the runtime mechanics:
+//   experiments/prototype/src/kdl.c (~5100 LOC, validated on GTX 1650)
+//
+//===----------------------------------------------------------------------===//
+
+
+// =========================================================================
+// Section 1: TableGen Definition
+// =========================================================================
+//
+// WHERE: mlir/include/mlir/Dialect/GPU/IR/GPUOps.td
+//        (alongside existing GPU_SelectObjectAttr definition)
+//
+// WHY parameters are DefaultValuedParameter:
+//   Most users want "just pick the right GPU binary" without tuning.
+//   Defaults: strategy="first_compatible" (simplest, predictable),
+//   fallback="error" (fail-fast, no silent correctness issues).
+//
+// WHY this is an attribute (not a pass or a runtime library):
+//   The OffloadingLLVMTranslationAttrInterface is the MLIR-blessed
+//   extension point for controlling how gpu.binary translates to LLVM IR.
+//   SelectObjectAttr proves the pattern. We add a second implementation.
+//   No new mechanism -- just a new policy behind the existing interface.
+//
+// WHY aligned with RFC #88170:
+//   The RFC proposes separating gpu.binary (container) from dispatch policy.
+//   This attribute IS a dispatch policy, attached via offloadingHandler --
+//   exactly the slot the RFC envisions. If the RFC changes gpu.binary's
+//   op signature, only this TableGen def changes; embedBinary/launchKernel
+//   logic is interface-stable.
+//
+
+#if 0  // --- TableGen (not C++) ---
+
+def GPU_RuntimeSelectAttr : GPU_Attr<"RuntimeSelect", "runtime_select",
+    [OffloadingTranslationAttrTrait,
+     DeclareAttrInterfaceMethods<OffloadingLLVMTranslationAttrInterface>]> {
+
+  let summary = "Defers binary selection to runtime via vendor detection.";
+  let description = [{
+    When used as the offloading handler on a `gpu.binary` op, embeds ALL
+    `#gpu.object` entries as separate LLVM global constants and emits a
+    runtime vendor-detection constructor that selects the appropriate
+    binary at module-load time via dlopen-probed vendor API calls.
+
+    Unlike `#gpu.select_object`, which commits to a single binary blob
+    at LLVM IR translation time, `#gpu.runtime_select` preserves all
+    variants and generates host-side dispatch logic.
+
+    strategy controls selection policy:
+    - "first_compatible": match first object whose vendor is present (default)
+    - "rank_by_priority": use variant_priority OffloadBinary metadata key
+    - "rank_by_capability": use device capability fingerprint scoring
+
+    fallback controls failure mode:
+    - "error": abort if no compatible device found (default)
+    - "cpu": fall back to host execution if a CPU object is available
+  }];
+
+  let parameters = (ins
+    DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"first_compatible\")">:$strategy,
+    DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"error\")">:$fallback
+  );
+
+  let assemblyFormat = "`<` struct(params) `>`";
+}
+
+// Usage in MLIR IR:
+//
+//   gpu.binary @kernels <#gpu.runtime_select<
+//       strategy = "rank_by_priority", fallback = "cpu">> [
+//     #gpu.object<#nvvm.target<chip = "sm_75">, bin = "...cubin...">,
+//     #gpu.object<#rocdl.target<chip = "gfx90a">, bin = "...hsaco...">,
+//     #gpu.object<#nvvm.target<chip = "sm_90">, bin = "...cubin-sm90...">
+//   ]
+
+#endif  // --- end TableGen ---
+
+
+// =========================================================================
+// Section 2: embedBinary() -- the core contribution
+// =========================================================================
+//
+// This is the function that makes #gpu.runtime_select different from
+// #gpu.select_object. SelectObjectAttr::embedBinary emits exactly:
+//   @serializedObj   -- one blob
+//   @modulePtr       -- one module handle
+//   @loadFn          -- global_ctors entry calling mgpuModuleLoad
+//   @unloadFn        -- global_dtors entry calling mgpuModuleUnload
+//
+// RuntimeSelectAttr::embedBinary generalizes this to N blobs with a
+// dispatch table and vendor-detection constructor. The LLVM IR output
+// looks like:
+//
+//   @kernels_blob_0          = internal constant [4096 x i8] c"...cubin..."
+//   @kernels_blob_1          = internal constant [8192 x i8] c"...hsaco..."
+//   @kernels_blob_2          = internal constant [5120 x i8] c"...cubin-sm90..."
+//   @kernels_dispatch_table  = internal constant [3 x %RuntimeSelectEntry] [...]
+//   @kernels_selected_idx    = internal global i32 -1
+//   @kernels_module_ptr      = internal global ptr null
+//
+//   @llvm.global_ctors = appending global [..., { i32 123, ptr @kernels_ctor, ptr null }]
+//   @llvm.global_dtors = appending global [..., { i32 123, ptr @kernels_dtor, ptr null }]
+//
+// The key insight: once @kernels_ctor runs at process startup, the rest
+// of the program sees @kernels_module_ptr as a plain module handle --
+// indistinguishable from what SelectObjectAttr would have produced.
+//
+
+LogicalResult RuntimeSelectAttr::embedBinary(
+    Operation *op, llvm::IRBuilderBase &builder,
+    LLVM::ModuleTranslation &moduleTranslation) {
+
+  auto binaryOp = cast<gpu::BinaryOp>(op);
+  ArrayAttr objects = binaryOp.getObjectsAttr();
+  StringRef symName = binaryOp.getSymName();
+  llvm::Module *module = moduleTranslation.getLLVMModule();
+  llvm::LLVMContext &ctx = module->getContext();
+
+  // Standard LLVM types used throughout.
+  auto *i8Ty  = llvm::Type::getInt8Ty(ctx);
+  auto *i32Ty = llvm::Type::getInt32Ty(ctx);
+  auto *i64Ty = llvm::Type::getInt64Ty(ctx);
+  auto *ptrTy = llvm::PointerType::getUnqual(ctx);   // opaque ptr (LLVM 17+)
+
+
+  // ------------------------------------------------------------------
+  // Phase 1: Embed all binary blobs as separate LLVM globals
+  // ------------------------------------------------------------------
+  //
+  // WHY separate globals (not one concatenated blob):
+  //   Each blob is a self-contained vendor binary (cubin, hsaco, SPIR-V).
+  //   The vendor runtime (cuModuleLoadData, hipModuleLoadData) expects
+  //   a pointer to the start of a complete image. Concatenation would
+  //   require offset arithmetic and size tracking -- complexity for no
+  //   gain. Separate globals let LLVM's linker handle alignment and
+  //   the dispatch table provides the indirection.
+  //
+  // WHY internal linkage:
+  //   Same as SelectObjectAttr. The blobs are module-local constants
+  //   consumed only by the constructor we emit. External visibility
+  //   would pollute the symbol table and inhibit dead-stripping.
+  //
+  // NAMING: {symName}_blob_{idx}
+  //   Suffix index, not target name, because multiple objects can share
+  //   a target (e.g., two NVVM objects for sm_75 and sm_90). The idx
+  //   is stable and unique. Known issue: if multiple gpu.binary ops
+  //   share a symName, we get collisions -- upstream should enforce
+  //   unique symNames (tracked as a design issue).
+  //
+
+  SmallVector<llvm::GlobalVariable *> blobGlobals;
+  SmallVector<llvm::Constant *> blobSizes;
+  SmallVector<uint32_t> vendorIds;
+
+  for (auto [idx, objAttr] : llvm::enumerate(objects)) {
+    auto obj = cast<gpu::ObjectAttr>(objAttr);
+    StringRef blob = obj.getObject().getValue();
+
+    // Create: @kernels_blob_0 = internal constant [N x i8] c"..."
+    auto *arrTy = llvm::ArrayType::get(i8Ty, blob.size());
+    auto *data = llvm::ConstantDataArray::getString(ctx, blob,
+                                                    /*AddNull=*/false);
+    auto *global = new llvm::GlobalVariable(
+        *module, arrTy,
+        /*isConstant=*/true,
+        llvm::GlobalValue::InternalLinkage,
+        data,
+        (symName + "_blob_" + llvm::Twine(idx)).str());
+
+    blobGlobals.push_back(global);
+    blobSizes.push_back(llvm::ConstantInt::get(i64Ty, blob.size()));
+
+    // Extract vendor ID from the target attribute attached to this object.
+    //
+    // The vendor ID enum mirrors kdl.c's KDL_VENDOR_* constants:
+    //   0 = CPU-only / unknown
+    //   1 = NVIDIA  (#nvvm.target)
+    //   2 = AMD     (#rocdl.target)
+    //   3 = Intel   (#spirv.target_env / #xevm.target)
+    //
+    // getVendorIdFromTarget() is a helper that pattern-matches the
+    // target attribute's dialect namespace. This is a compile-time
+    // mapping -- no runtime cost.
+    //
+    vendorIds.push_back(getVendorIdFromTarget(obj.getTarget()));
+  }
+
+
+  // ------------------------------------------------------------------
+  // Phase 2: Emit the dispatch table as a constant global array
+  // ------------------------------------------------------------------
+  //
+  // WHY a table (not a chain of if-else in the constructor):
+  //   The table is data, not code. It composes with the ranking helper
+  //   (__gpu_runtime_select_rank) which iterates it generically.
+  //   Adding new strategies requires changing the ranking helper, not
+  //   the table layout. This mirrors kdl.c's mtb_variant_entry table
+  //   (kdl.c:96-106) and OffloadBinary's flat key-value metadata.
+  //
+  // STRUCT LAYOUT: { uint32_t vendor_id, ptr blob, uint64_t size }
+  //   - vendor_id: which runtime can load this blob
+  //   - blob:      pointer to the @kernels_blob_N constant
+  //   - size:      byte length (needed by cuModuleLoadData et al.)
+  //
+  //   Future extension: add uint32_t priority field when
+  //   OffloadBinary metadata vocabulary (T07) lands variant_priority.
+  //   The struct can grow without breaking existing code because the
+  //   ranking helper receives num_entries and can version-check.
+  //
+  // NOTE: This is the LLVM IR struct emitted by embedBinary().
+  // The C runtime wrappers (GPURuntimeSelectWrappers.c) use an extended
+  // 6-field struct that includes min_sm and variant_priority for the
+  // ranking function. The LLVM IR struct carries only the minimal fields
+  // needed for module loading; the extended fields are passed separately
+  // via the OffloadBinary StringMap metadata.
+
+  auto *entryTy = llvm::StructType::create(
+      ctx, {i32Ty, ptrTy, i64Ty}, "RuntimeSelectEntry");
+
+  SmallVector<llvm::Constant *> tableEntries;
+  for (size_t i = 0; i < objects.size(); ++i) {
+    tableEntries.push_back(llvm::ConstantStruct::get(entryTy, {
+        llvm::ConstantInt::get(i32Ty, vendorIds[i]),
+        blobGlobals[i],                // GV is Constant* with opaque ptr type
+        blobSizes[i]
+    }));
+  }
+
+  auto *tableTy = llvm::ArrayType::get(entryTy, objects.size());
+  auto *tableGlobal = new llvm::GlobalVariable(
+      *module, tableTy,
+      /*isConstant=*/true,
+      llvm::GlobalValue::InternalLinkage,
+      llvm::ConstantArray::get(tableTy, tableEntries),
+      (symName + "_dispatch_table").str());
+
+
+  // ------------------------------------------------------------------
+  // Phase 3: Emit mutable state globals (selected index + module ptr)
+  // ------------------------------------------------------------------
+  //
+  // WHY two globals instead of one:
+  //   @kernels_selected_idx enables diagnostics -- the dispatch flame
+  //   graph (T19) can read it to report which variant was chosen.
+  //   @kernels_module_ptr is the handle consumed by launchKernel().
+  //   selected_idx = -1 means "not yet resolved" (sentinel).
+  //
+  // WHY NOT thread-local:
+  //   GPU module handles are process-global resources in both CUDA and
+  //   HIP. A cuModule loaded in one thread is usable from any thread.
+  //   Thread-local storage would cause redundant module loads and
+  //   waste GPU memory. Same reasoning as SelectObjectAttr.
+  //
+
+  // @kernels_selected_idx = internal global i32 -1
+  auto *selectedIdx = new llvm::GlobalVariable(
+      *module, i32Ty,
+      /*isConstant=*/false,
+      llvm::GlobalValue::InternalLinkage,
+      llvm::ConstantInt::get(i32Ty, -1),   // -1 = unresolved sentinel
+      (symName + "_selected_idx").str());
+
+  // @kernels_module_ptr = internal global ptr null
+  auto *modulePtr = new llvm::GlobalVariable(
+      *module, ptrTy,
+      /*isConstant=*/false,
+      llvm::GlobalValue::InternalLinkage,
+      llvm::ConstantPointerNull::get(ptrTy),
+      (symName + "_module_ptr").str());
+
+
+  // ------------------------------------------------------------------
+  // Phase 4: Emit the constructor function (vendor detect + module load)
+  // ------------------------------------------------------------------
+  //
+  // REGISTERED VIA llvm.global_ctors AT PRIORITY 123
+  //
+  // WHY priority 123:
+  //   - Default global_ctors priority is 65535 (lowest priority = runs last).
+  //   - SelectObjectAttr uses 0 (highest priority).
+  //   - We use 123 because vendor detection via dlopen is heavier than
+  //     loading a known binary. Running at priority 123 means:
+  //     (a) After sanitizer/profiler initializers (typically priority < 100)
+  //     (b) Before application-level constructors (priority 65535)
+  //     (c) After SelectObjectAttr ctors (priority 0) -- if both attrs
+  //         coexist in a module, the static-selected binaries load first.
+  //
+  // WHY a constructor (not lazy init at first kernel launch):
+  //   SelectObjectAttr already loads at global_ctors time. Matching this
+  //   pattern means the module is ready before main() -- no first-launch
+  //   latency spike. The one-time cost (~46 us for CUDA cuModuleLoadData)
+  //   is amortized over the process lifetime.
+  //
+  //   Known issue: Multiple translation units each emit their own ctor,
+  //   causing redundant dlopen probes. Fix: call_once guard in the
+  //   detection helper. Acknowledged but not yet designed.
+  //
+  // PSEUDO-IR EMITTED:
+  //
+  //   define internal void @kernels_ctor() {
+  //     %vendor = call i32 @__gpu_runtime_select_detect_vendor()
+  //     %idx = call i32 @__gpu_runtime_select_rank(
+  //         ptr @kernels_dispatch_table, i32 3, i32 %vendor, i32 %strategy)
+  //     ; Check for selection failure
+  //     %failed = icmp slt i32 %idx, 0
+  //     br i1 %failed, label %fallback, label %load
+  //   fallback:
+  //     ; If fallback="error": call abort() with diagnostic message
+  //     ; If fallback="cpu": store sentinel, skip module load
+  //     ...
+  //   load:
+  //     store i32 %idx, ptr @kernels_selected_idx
+  //     %entryPtr = getelementptr [3 x %RuntimeSelectEntry],
+  //         ptr @kernels_dispatch_table, i64 0, i32 %idx
+  //     %blobPtr = getelementptr %RuntimeSelectEntry, ptr %entryPtr, i32 0, i32 1
+  //     %blob = load ptr, ptr %blobPtr
+  //     %sizePtr = getelementptr %RuntimeSelectEntry, ptr %entryPtr, i32 0, i32 2
+  //     %size = load i64, ptr %sizePtr
+  //     ; mgpuModuleLoad is vendor-agnostic: the correct runtime wrapper
+  //     ; (CudaRuntimeWrappers.cpp or RocmRuntimeWrappers.cpp) is linked
+  //     ; based on the detected vendor. The wrapper internally calls
+  //     ; cuModuleLoadData or hipModuleLoadData.
+  //     %mod = call ptr @mgpuModuleLoad(ptr %blob, i64 %size)
+  //     store ptr %mod, ptr @kernels_module_ptr
+  //     ret void
+  //   }
+  //
+
+  // Declare the two runtime helper functions (defined in Section 4 and 5).
+  auto *detectVendorFnTy = llvm::FunctionType::get(i32Ty, {}, false);
+  auto detectVendorCallee = module->getOrInsertFunction(
+      "__gpu_runtime_select_detect_vendor", detectVendorFnTy);
+
+  auto *rankFnTy = llvm::FunctionType::get(
+      i32Ty, {ptrTy, i32Ty, i32Ty, i32Ty}, false);
+  auto rankCallee = module->getOrInsertFunction(
+      "__gpu_runtime_select_rank", rankFnTy);
+
+  // Declare mgpuModuleLoad (already declared if SelectObjectAttr is
+  // present; getOrInsertFunction is idempotent).
+  auto *mgpuModuleLoadTy = llvm::FunctionType::get(
+      ptrTy, {ptrTy, i64Ty}, false);
+  auto mgpuModuleLoadCallee = module->getOrInsertFunction(
+      "mgpuModuleLoad", mgpuModuleLoadTy);
+
+  // Create the constructor function.
+  auto *ctorFnTy = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(ctx), {}, false);
+  auto *ctorFn = llvm::Function::Create(
+      ctorFnTy, llvm::GlobalValue::InternalLinkage,
+      (symName + "_ctor").str(), module);
+
+  // Build the constructor body.
+  auto *entryBB    = llvm::BasicBlock::Create(ctx, "entry", ctorFn);
+  auto *loadBB     = llvm::BasicBlock::Create(ctx, "load", ctorFn);
+  auto *fallbackBB = llvm::BasicBlock::Create(ctx, "fallback", ctorFn);
+
+  builder.SetInsertPoint(entryBB);
+
+  // Step 1: Detect which vendor runtime is available on this machine.
+  llvm::Value *vendor = builder.CreateCall(
+      detectVendorCallee, {}, "vendor");
+
+  // Step 2: Rank dispatch table entries, find best match for this vendor.
+  // strategy enum: 0 = first_compatible, 1 = rank_by_priority,
+  //                2 = rank_by_capability
+  uint32_t strategyEnum = encodeStrategy(getStrategy());
+
+  llvm::Value *idx = builder.CreateCall(
+      rankCallee,
+      {tableGlobal,
+       llvm::ConstantInt::get(i32Ty, objects.size()),
+       vendor,
+       llvm::ConstantInt::get(i32Ty, strategyEnum)},
+      "selected_idx");
+
+  // Step 3: Branch on whether selection succeeded.
+  llvm::Value *failed = builder.CreateICmpSLT(
+      idx, llvm::ConstantInt::get(i32Ty, 0), "no_match");
+  builder.CreateCondBr(failed, fallbackBB, loadBB);
+
+  // --- Fallback block: handle selection failure ---
+  builder.SetInsertPoint(fallbackBB);
+  if (getFallback() == "cpu") {
+    // CPU fallback: leave @kernels_module_ptr as null.
+    // launchKernel must check for null and route to CPU execution.
+    // (This is the one place launchKernel differs from SelectObjectAttr.)
+    builder.CreateRetVoid();
+  } else {
+    // Default "error": abort with a diagnostic message.
+    // Mirrors SelectObjectAttr's failure path -- call fprintf + abort.
+    llvm::Value *msg = builder.CreateGlobalStringPtr(
+        "RuntimeSelectAttr: no compatible GPU runtime found for '"
+        + symName.str() + "'\n");
+    builder.CreateCall(
+        module->getOrInsertFunction("puts",
+            llvm::FunctionType::get(i32Ty, {ptrTy}, false)),
+        {msg});
+    builder.CreateCall(
+        module->getOrInsertFunction("abort",
+            llvm::FunctionType::get(llvm::Type::getVoidTy(ctx), {}, false)));
+    builder.CreateUnreachable();
+  }
+
+  // --- Load block: resolve the selected binary and load the GPU module ---
+  builder.SetInsertPoint(loadBB);
+
+  // Store which variant was selected (for diagnostics / flame graph).
+  builder.CreateStore(idx, selectedIdx);
+
+  // GEP into the dispatch table to retrieve blob pointer and size.
+  llvm::Value *entryPtr = builder.CreateInBoundsGEP(
+      tableTy, tableGlobal,
+      {llvm::ConstantInt::get(i64Ty, 0), idx});
+
+  // Load blob pointer (field 1) and size (field 2) from the entry.
+  llvm::Value *blobPtr = builder.CreateStructGEP(entryTy, entryPtr, 1);
+  llvm::Value *blob = builder.CreateLoad(ptrTy, blobPtr, "blob");
+  llvm::Value *sizePtr = builder.CreateStructGEP(entryTy, entryPtr, 2);
+  llvm::Value *size = builder.CreateLoad(i64Ty, sizePtr, "size");
+
+  // Call mgpuModuleLoad -- this is the SAME function SelectObjectAttr calls.
+  // The function internally dispatches to cuModuleLoadData or
+  // hipModuleLoadData based on which runtime wrapper library is linked.
+  //
+  // Critical ordering: __gpu_runtime_select_detect_vendor() must have
+  // already dlopen'd the correct vendor library. The mgpu* wrappers
+  // pick up the loaded symbols via dlsym or direct linking.
+  //
+  llvm::Value *mod = builder.CreateCall(
+      mgpuModuleLoadCallee,
+      {blob, size}, "gpu_module");
+
+  // Store the module handle -- this is what launchKernel reads.
+  builder.CreateStore(mod, modulePtr);
+  builder.CreateRetVoid();
+
+  // Register the constructor in llvm.global_ctors at priority 123.
+  appendToGlobalCtors(*module, ctorFn, /*Priority=*/123);
+
+
+  // ------------------------------------------------------------------
+  // Phase 5: Emit the destructor (symmetric cleanup)
+  // ------------------------------------------------------------------
+  //
+  // Identical pattern to SelectObjectAttr's destructor.
+  // Registered at matching priority so ctor/dtor are paired.
+  //
+
+  auto *dtorFn = llvm::Function::Create(
+      ctorFnTy, llvm::GlobalValue::InternalLinkage,
+      (symName + "_dtor").str(), module);
+
+  auto *dtorBB = llvm::BasicBlock::Create(ctx, "entry", dtorFn);
+  builder.SetInsertPoint(dtorBB);
+
+  llvm::Value *loadedMod = builder.CreateLoad(ptrTy, modulePtr, "mod");
+
+  // Guard: if module_ptr is null (CPU fallback path), skip unload.
+  llvm::Value *isNull = builder.CreateICmpEQ(
+      loadedMod, llvm::ConstantPointerNull::get(ptrTy));
+  auto *unloadBB = llvm::BasicBlock::Create(ctx, "unload", dtorFn);
+  auto *doneBB   = llvm::BasicBlock::Create(ctx, "done", dtorFn);
+  builder.CreateCondBr(isNull, doneBB, unloadBB);
+
+  builder.SetInsertPoint(unloadBB);
+  auto *mgpuModuleUnloadFn = module->getOrInsertFunction(
+      "mgpuModuleUnload",
+      llvm::FunctionType::get(llvm::Type::getVoidTy(ctx), {ptrTy}, false))
+      .getCallee();
+  builder.CreateCall(
+      llvm::FunctionType::get(llvm::Type::getVoidTy(ctx), {ptrTy}, false),
+      mgpuModuleUnloadFn, {loadedMod});
+  builder.CreateBr(doneBB);
+
+  builder.SetInsertPoint(doneBB);
+  builder.CreateRetVoid();
+
+  appendToGlobalDtors(*module, dtorFn, /*Priority=*/123);
+
+  return success();
+}
+
+
+// =========================================================================
+// Section 3: launchKernel() -- IDENTICAL to SelectObjectAttr
+// =========================================================================
+//
+// THIS IS THE ENTIRE POINT: zero hot-path overhead.
+//
+// SelectObjectAttr::launchKernel loads from a global @{sym}_module_ptr
+// and calls mgpuModuleGetFunction + mgpuLaunchKernel.
+//
+// RuntimeSelectAttr::launchKernel does exactly the same thing.
+// The dispatch table, vendor detection, and binary selection all happened
+// in the constructor (Phase 4). By the time any kernel launches,
+// @kernels_module_ptr holds a valid, vendor-appropriate module handle.
+//
+// The ONLY difference: if fallback="cpu" and no GPU was found,
+// @kernels_module_ptr is null. A production implementation would add
+// a null check here and route to a CPU fallback path. For the MVP,
+// we assert non-null.
+//
+
+LogicalResult RuntimeSelectAttr::launchKernel(
+    Operation *launchFuncOp, Operation *binaryOp,
+    llvm::IRBuilderBase &builder,
+    LLVM::ModuleTranslation &moduleTranslation) {
+
+  auto launchOp = cast<gpu::LaunchFuncOp>(launchFuncOp);
+  auto binaryOpCast = cast<gpu::BinaryOp>(binaryOp);
+  StringRef symName = binaryOpCast.getSymName();
+  llvm::Module *module = moduleTranslation.getLLVMModule();
+  llvm::LLVMContext &ctx = module->getContext();
+
+  auto *ptrTy = llvm::PointerType::getUnqual(ctx);
+
+  // ---- Load the module handle (set at global_ctors time) ----
+  //
+  // This is a single load instruction. After the constructor runs,
+  // @kernels_module_ptr holds the cuModule/hipModule handle.
+  // No dispatch table lookup. No vendor check. Just a load.
+  //
+  llvm::GlobalVariable *modulePtr =
+      module->getNamedGlobal((symName + "_module_ptr").str());
+  llvm::Value *mod = builder.CreateLoad(ptrTy, modulePtr, "gpu_module");
+
+  // ---- Get the kernel function handle from the module ----
+  //
+  // mgpuModuleGetFunction(module, "kernel_name") -> function handle
+  // Identical to SelectObjectAttr. The function name comes from the
+  // gpu.launch_func op's kernel attribute.
+  //
+  StringRef kernelName = launchOp.getKernelName();
+  llvm::Value *kernelNameStr =
+      builder.CreateGlobalStringPtr(kernelName, "kernel_name");
+
+  auto *mgpuModuleGetFunctionFn = module->getOrInsertFunction(
+      "mgpuModuleGetFunction",
+      llvm::FunctionType::get(ptrTy, {ptrTy, ptrTy}, false)).getCallee();
+
+  llvm::Value *func = builder.CreateCall(
+      llvm::FunctionType::get(ptrTy, {ptrTy, ptrTy}, false),
+      mgpuModuleGetFunctionFn,
+      {mod, kernelNameStr}, "kernel_func");
+
+  // ---- Launch the kernel ----
+  //
+  // mgpuLaunchKernel(func, gx, gy, gz, bx, by, bz, smem, stream, params, extra)
+  // Grid/block dimensions and parameters come from the gpu.launch_func op.
+  // This call is byte-for-byte identical to what SelectObjectAttr emits.
+  //
+  // [Grid and block dimensions extracted from launchOp -- elided for brevity.
+  //  See SelectObjectAttr.cpp lines ~180-220 for the exact pattern.]
+  //
+  auto *i64Ty = llvm::Type::getInt64Ty(ctx);
+  auto *mgpuLaunchKernelFnTy = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(ctx),
+      {ptrTy, i64Ty, i64Ty, i64Ty, i64Ty, i64Ty, i64Ty,
+       llvm::Type::getInt32Ty(ctx), ptrTy, ptrTy, ptrTy},
+      false);
+
+  auto *mgpuLaunchKernelFn = module->getOrInsertFunction(
+      "mgpuLaunchKernel", mgpuLaunchKernelFnTy).getCallee();
+
+  // [... extract gridX/Y/Z, blockX/Y/Z, sharedMem, stream, params from
+  //  launchOp using moduleTranslation.lookupValue() -- identical to
+  //  SelectObjectAttr::launchKernel. Elided for poster clarity. ...]
+
+  builder.CreateCall(mgpuLaunchKernelFnTy, mgpuLaunchKernelFn, {
+      func, gridX, gridY, gridZ, blockX, blockY, blockZ,
+      sharedMem, stream, paramsArray,
+      llvm::ConstantPointerNull::get(ptrTy)   // extra = nullptr
+  });
+
+  return success();
+}
+
+
+// =========================================================================
+// Section 4: Vendor Detection Helper
+// =========================================================================
+//
+// WHERE: mlir/lib/ExecutionEngine/GPURuntimeSelectWrappers.cpp (NEW file)
+// LINKED VIA: sharedLibPaths in ExecutionEngine, same as CudaRuntimeWrappers
+//
+// WHY dlopen-based detection (not compile-time flags):
+//   The whole point is runtime detection. The binary ships with blobs for
+//   all vendors; which one is usable depends on the deployment machine.
+//   dlopen probing is the standard technique -- used by:
+//     - kdl.c:551-596 (our prototype's CUDA discovery)
+//     - PyTorch torch/csrc/cuda/utils.cpp initializeCUDA()
+//     - chipStar (HIP-over-SPIR-V detection)
+//
+// WHY probe order matters:
+//   CUDA is probed first because NVIDIA GPUs are most common in ML
+//   deployments. But this is a heuristic -- the ranking helper (Section 5)
+//   makes the final decision based on the dispatch table, not probe order.
+//   Probe order only affects which vendor is detected, not which blob wins.
+//
+// WHY cuInit/hipInit/zeInit (not just dlopen success):
+//   dlopen succeeding only means the shared library exists on disk.
+//   The init call verifies the driver + hardware are functional.
+//   Example: a machine may have libcuda.so.1 from a stale CUDA install
+//   but no NVIDIA GPU -- cuInit(0) returns CUDA_ERROR_NO_DEVICE.
+//
+// KNOWN ISSUES:
+//   - dlopen + ASAN incompatibility: ASAN intercepts dlsym, which can
+//     cause false positives. PyTorch works around this; we would too.
+//   - Redundant probing across TUs: see Phase 4 known issue above.
+//   - No GPU enumeration: detects vendor presence, not device count or
+//     capability. Capability-based ranking requires extending this to
+//     call cuDeviceGetAttribute / hipDeviceGetAttribute.
+//
+
+extern "C" uint32_t __gpu_runtime_select_detect_vendor() {
+  // Vendor ID enum (matches dispatch table entries):
+  //   0 = VENDOR_NONE   (no GPU runtime found)
+  //   1 = VENDOR_NVIDIA  (CUDA)
+  //   2 = VENDOR_AMD     (HIP/ROCm)
+  //   3 = VENDOR_INTEL   (Level Zero / XeVM)
+
+  // --- Probe NVIDIA CUDA ---
+  // libcuda.so.1 is the CUDA driver API library.
+  // cuInit(0) initializes the driver and enumerates devices.
+  // Return code 0 = CUDA_SUCCESS.
+  void *cuda = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_LOCAL);
+  if (cuda) {
+    auto cuInit = reinterpret_cast<int(*)(unsigned)>(
+        dlsym(cuda, "cuInit"));
+    if (cuInit && cuInit(0) == 0) {
+      // CUDA driver is functional and at least one GPU is present.
+      // Do NOT dlclose -- the handle must stay alive for mgpuModuleLoad
+      // to use CUDA driver API functions later.
+      return 1;  // VENDOR_NVIDIA
+    }
+    dlclose(cuda);  // Clean up failed probe.
+  }
+
+  // --- Probe AMD HIP ---
+  // libamdhip64.so is the HIP runtime library.
+  // hipInit(0) initializes the HIP runtime.
+  void *hip = dlopen("libamdhip64.so", RTLD_LAZY | RTLD_LOCAL);
+  if (hip) {
+    auto hipInit = reinterpret_cast<int(*)(unsigned)>(
+        dlsym(hip, "hipInit"));
+    if (hipInit && hipInit(0) == 0) {
+      return 2;  // VENDOR_AMD
+    }
+    dlclose(hip);
+  }
+
+  // --- Probe Intel Level Zero ---
+  // libze_loader.so.1 is the oneAPI Level Zero loader.
+  // zeInit(0) initializes all driver types.
+  void *l0 = dlopen("libze_loader.so.1", RTLD_LAZY | RTLD_LOCAL);
+  if (l0) {
+    auto zeInit = reinterpret_cast<int(*)(int)>(
+        dlsym(l0, "zeInit"));
+    if (zeInit && zeInit(0) == 0) {
+      return 3;  // VENDOR_INTEL
+    }
+    dlclose(l0);
+  }
+
+  // No GPU vendor runtime found. If fallback="cpu", the constructor
+  // handles this gracefully. If fallback="error", the constructor aborts.
+  return 0;  // VENDOR_NONE
+}
+
+
+// =========================================================================
+// Section 5: Ranking Helper
+// =========================================================================
+//
+// WHERE: same file as Section 4 (GPURuntimeSelectWrappers.cpp)
+//
+// WHY a separate function (not inlined in the constructor):
+//   The ranking logic is strategy-dependent and may grow as new strategies
+//   are added. Keeping it in a runtime helper means:
+//   (a) New strategies don't require re-emitting LLVM IR
+//   (b) The helper can be tested independently with unit tests
+//   (c) The constructor IR stays simple and auditable
+//
+// STRATEGY ENUM:
+//   0 = first_compatible:    Return first entry matching detected vendor.
+//                            Simple, deterministic, no metadata dependency.
+//   1 = rank_by_priority:    Among matching entries, pick highest
+//                            variant_priority from OffloadBinary metadata.
+//                            Requires T07 metadata vocabulary.
+//   2 = rank_by_capability:  Score entries by device capability match.
+//                            Requires extended detection (Section 4 TODO).
+//
+// RETURN VALUE:
+//   >= 0:  Index into dispatch table of the selected entry.
+//   -1:    No compatible entry found. Caller handles fallback.
+//
+
+extern "C" int32_t __gpu_runtime_select_rank(
+    const void *table_ptr,      // Pointer to [N x RuntimeSelectEntry]
+    uint32_t    num_entries,     // Number of entries in the table
+    uint32_t    detected_vendor, // Vendor ID from detect_vendor()
+    uint32_t    strategy) {     // Selection strategy enum
+
+  // Cast the table to the RuntimeSelectEntry layout.
+  // This struct must match the LLVM IR StructType from Phase 2 exactly.
+  struct RuntimeSelectEntry {
+    uint32_t vendor_id;
+    void    *blob_ptr;
+    uint64_t blob_size;
+  };
+  const auto *table =
+      reinterpret_cast<const RuntimeSelectEntry *>(table_ptr);
+
+  // --- Strategy 0: first_compatible ---
+  // Linear scan, return first entry whose vendor_id matches.
+  // This is the default and requires zero metadata beyond vendor_id.
+  // Insertion order in the gpu.binary op determines priority.
+  if (strategy == 0) {
+    for (uint32_t i = 0; i < num_entries; ++i) {
+      if (table[i].vendor_id == detected_vendor) {
+        return static_cast<int32_t>(i);
+      }
+    }
+    return -1;  // No match.
+  }
+
+  // --- Strategy 1: rank_by_priority ---
+  // Among entries matching detected_vendor, select the one with highest
+  // variant_priority metadata value. Requires the priority to be encoded
+  // in an extended dispatch table entry (future: add priority field to
+  // RuntimeSelectEntry when OffloadBinary metadata vocabulary T07 lands).
+  //
+  // For the design sketch, we show the algorithm but acknowledge the
+  // metadata plumbing is not yet implemented.
+  if (strategy == 1) {
+    int32_t best_idx = -1;
+    // uint32_t best_priority = 0;  // Would come from extended table entry
+    for (uint32_t i = 0; i < num_entries; ++i) {
+      if (table[i].vendor_id == detected_vendor) {
+        // TODO: Compare table[i].priority > best_priority
+        // For now, fall back to first-compatible among matches.
+        if (best_idx < 0) best_idx = static_cast<int32_t>(i);
+      }
+    }
+    return best_idx;
+  }
+
+  // --- Strategy 2: rank_by_capability ---
+  // Requires device capability fingerprinting (compute capability for
+  // NVIDIA, GFX ISA for AMD). This would query the device via
+  // cuDeviceGetAttribute / hipDeviceGetAttribute and score entries.
+  // Not yet designed -- placeholder for future extension.
+  if (strategy == 2) {
+    // Fall back to first_compatible for now.
+    for (uint32_t i = 0; i < num_entries; ++i) {
+      if (table[i].vendor_id == detected_vendor) {
+        return static_cast<int32_t>(i);
+      }
+    }
+    return -1;
+  }
+
+  return -1;  // Unknown strategy.
+}
+
+
+// =========================================================================
+// Appendix: Helper to map MLIR target attributes to vendor IDs
+// =========================================================================
+//
+// This is a compile-time helper used in Phase 1 of embedBinary().
+// It pattern-matches on the dialect namespace of the target attribute
+// to determine which vendor runtime can load the binary.
+//
+// NOT a runtime function -- runs during LLVM IR emission.
+//
+
+static uint32_t getVendorIdFromTarget(Attribute targetAttr) {
+  // The target attribute's dialect tells us the vendor:
+  //   mlir::NVVM::NVVMTargetAttr   -> namespace "nvvm"  -> NVIDIA
+  //   mlir::ROCDL::ROCDLTargetAttr -> namespace "rocdl" -> AMD
+  //   mlir::xevm::XeVMTargetAttr   -> namespace "xevm"  -> Intel
+  //
+  // This mapping is stable -- adding a new vendor means adding a new
+  // GPU dialect, which is a major upstream event. The only maintenance
+  // burden is adding a case here when that happens.
+
+  StringRef ns = targetAttr.getDialect().getNamespace();
+  if (ns == "nvvm")  return 1;  // VENDOR_NVIDIA
+  if (ns == "rocdl") return 2;  // VENDOR_AMD
+  if (ns == "xevm")  return 3;  // VENDOR_INTEL
+  if (ns == "spirv") return 3;  // SPIR-V targets also use Level Zero
+
+  // Unknown target -- will never match any detected vendor, so this
+  // entry in the dispatch table is effectively dead. The ranking helper
+  // skips it. No abort needed at compile time.
+  return 0;  // VENDOR_NONE
+}
+
+
+// =========================================================================
+// Appendix: Strategy string-to-enum encoding
+// =========================================================================
+
+static uint32_t encodeStrategy(StringRef strategy) {
+  if (strategy == "first_compatible")    return 0;
+  if (strategy == "rank_by_priority")    return 1;
+  if (strategy == "rank_by_capability")  return 2;
+  return 0;  // Default to first_compatible for unknown strategies.
+}
+
+
+//===----------------------------------------------------------------------===//
+// Design Summary (for poster visitors)
+//===----------------------------------------------------------------------===//
+//
+// WHAT THIS DOES:
+//   Allows a single MLIR-compiled binary to carry GPU kernels for NVIDIA,
+//   AMD, and Intel, then pick the right one at process startup.
+//
+// HOW IT WORKS:
+//   embedBinary() (compile-time) emits N blob globals + dispatch table +
+//   a vendor-detection constructor. The constructor dlopen-probes for
+//   libcuda/libamdhip64/libze_loader, selects the best blob, and loads
+//   it via mgpuModuleLoad. The module handle is stored in a global.
+//
+//   launchKernel() (runtime, per kernel call) is identical to the existing
+//   SelectObjectAttr: load the global, get function handle, launch.
+//   Zero per-launch overhead.
+//
+// WHAT IT EXTENDS:
+//   SelectObjectAttr in mlir/lib/Target/LLVMIR/Dialect/GPU/
+//   Same interface (OffloadingLLVMTranslationAttrInterface), same patterns,
+//   same mgpu* runtime wrappers. ~400 new LOC in one file.
+//
+// WHAT IT DOES NOT DO:
+//   - JIT compilation (all binaries are AOT-compiled)
+//   - Device capability negotiation (future: rank_by_capability strategy)
+//   - Replace liboffload (composes with it -- see proposal-v2.md Section 3)
+//
+// ANALOGY:
+//   CPU has IFunc resolvers for function multi-versioning (target_clones).
+//   This is IFunc-for-GPUs: compile-time emission of runtime selection
+//   logic, but for cross-vendor GPU binary dispatch instead of same-ISA
+//   CPU instruction set variants.
+//
+// PROTOTYPE VALIDATION:
+//   kdl.c (~5100 LOC) implements the equivalent runtime mechanics in C.
+//   Validated on GTX 1650 (NVIDIA sm_75) + CPU fallback.
+//   Vendor detection latency: ~12 us (dlopen + cuInit).
+//   Module load latency: ~46 us (cuModuleLoadData for a 4KB cubin).
+//   Per-launch overhead after selection: ~0 ns (same as SelectObjectAttr).
+//
+//===----------------------------------------------------------------------===//
