@@ -10,9 +10,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --gap: 4mm;
-  --pad: 12mm;
-  --font-scale: 2.4;
+  --gap: 3mm;
+  --pad: 10mm;
+  --font-scale: 3.2;
 
   --bg: #f0ece6;
   --card-bg: #fff;
@@ -135,7 +135,7 @@ body {
   text-align: center;
   font-size: calc(8.5pt * var(--font-scale));
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.3;
   color: #fff;
 }
 .venue-badge em {
@@ -161,23 +161,24 @@ body {
   flex-direction: column;
   gap: var(--gap);
   min-height: 0;
+  /* Cards distribute via flex-grow, not space-between */
 }
 
 /* === CARDS === */
 .card {
   background: var(--card-bg);
   border-radius: 2.5mm;
-  padding: 6mm 7mm;
+  padding: 3mm 4mm;
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
   border-top: 3px solid var(--blue);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   min-height: 0;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
 }
-.card.grow  { flex: 1 1 0; }
-.card.grow2 { flex: 0.7 1 0; }
+.card.grow  { flex: 3 1 0; }
+.card.grow2 { flex: 2 1 0; }
 .card.teal { border-top-color: var(--teal); }
 .card.orange { border-top-color: var(--orange); }
 
@@ -194,9 +195,11 @@ body {
 
 .card p, .card li {
   font-size: calc(9.5pt * var(--font-scale));
-  line-height: 1.32;
+  line-height: 1.3;
   color: var(--text);
   margin-bottom: 1.5mm;
+  text-align: justify;
+  hyphens: auto;
 }
 .card p:last-child, .card li:last-child { margin-bottom: 0; }
 
@@ -332,7 +335,7 @@ pre {
   border-radius: 2mm;
   font-family: 'Fira Code', monospace;
   font-size: calc(8pt * var(--font-scale));
-  line-height: 1.4;
+  line-height: 1.3;
   padding: 4mm 5mm;
   overflow: hidden;
   margin: 2mm 0;
@@ -581,7 +584,7 @@ pre .op   { color: #38bdf8; }
   font-weight: 700;
   color: var(--blue);
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 /* === SCREEN PREVIEW === */
