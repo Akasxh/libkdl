@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Measuring and Improving Multi-Target Binary Selection in LLVM's GPU Offload Stack -- EuroLLVM Dublin 2026</title>
+<title>Bridging Runtime Gaps in LLVM: Vendor-Agnostic Dispatch for ML Kernels -- EuroLLVM Dublin 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -12,7 +12,7 @@
 :root {
   --gap: 3mm;
   --pad: 10mm;
-  --font-scale: 3.2;
+  --font-scale: 3.5;
 
   --bg: #f0ece6;
   --card-bg: #fff;
@@ -173,7 +173,7 @@ body {
   border-top: 3px solid var(--blue);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   min-height: 0;
   flex: 1 1 auto;
 }
@@ -505,8 +505,8 @@ pre .op   { color: #38bdf8; }
   margin-bottom: 2.5mm;
 }
 
-.footer-left { flex: 2.2; }
-.footer-mid  { flex: 1.2; }
+.footer-left { flex: 1.5; }
+.footer-mid  { flex: 1; }
 .footer-right {
   flex: 0 0 auto;
   display: flex;
@@ -587,6 +587,20 @@ pre .op   { color: #38bdf8; }
   line-height: 1.3;
 }
 
+/* === COMPARISON TABLE (clean inline) === */
+.cmp-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 2mm; overflow: hidden; }
+.cmp-table thead th { background: #1a365d; color: #fff; font-size: calc(8pt * var(--font-scale)); font-weight: 700; padding: 2.5mm 3mm; text-align: center; }
+.cmp-table thead th:first-child { text-align: left; }
+.cmp-table tbody td { padding: 2mm 3mm; font-size: calc(8pt * var(--font-scale)); text-align: center; border-bottom: 1px solid #e2e8f0; color: var(--text); }
+.cmp-table tbody td:first-child { text-align: left; font-weight: 600; }
+.cmp-table tbody tr:nth-child(even) { background: #f8f9fb; }
+.cmp-yes { color: #16a34a; font-weight: 700; }
+.cmp-partial { color: #d97706; font-weight: 600; }
+.cmp-no { color: #9ca3af; }
+.cmp-na { color: #d1d5db; font-style: italic; }
+.cmp-ours td { background: #ccfbf1 !important; border-top: 2px solid var(--teal); border-bottom: 2px solid var(--teal); }
+.cmp-ours td:first-child { color: var(--teal); }
+
 /* === SCREEN PREVIEW === */
 @media screen {
   html {
@@ -613,10 +627,9 @@ pre .op   { color: #38bdf8; }
 <!-- ========== HEADER ========== -->
 <div class="header">
   <div class="header-left">
-    <h1>Measuring &amp; Improving Multi-Target<br>Binary Selection in LLVM's GPU Offload Stack</h1>
+    <h1>Bridging Runtime Gaps in LLVM:<br>Vendor-Agnostic Dispatch for ML Kernels</h1>
     <div class="subtitle">Metadata Vocabulary &ensp;+&ensp; Dispatch Flame Graph &ensp;+&ensp; <code>#gpu.runtime_select</code> Design</div>
-    <div class="authors"><strong>S. Akash</strong> <span>&middot; IIT Patna &middot; CERN GSoC &middot; vLLM contributor</span></div>
-    <div class="gh">github.com/Akasxh/libkdl</div>
+    <div class="authors"><strong>S. Akash</strong> <span>&middot; IIT Patna &middot; CERN GSoC &middot; vLLM contributor &middot; EuroLLVM Dublin 2026</span></div>
   </div>
   <div class="header-right">
     <div class="key-stats">
@@ -706,34 +719,8 @@ pre .op   { color: #38bdf8; }
         <span class="why-text">AWS p4/p5, Azure ND -- GPU model unknown at container image build time. Ship one binary, resolve at launch.</span>
       </div>
 
-      <div class="sub">The Status Quo Cost</div>
-      <ul>
-        <li>N build pipelines per vendor instead of one fat binary</li>
-        <li><code>image:cuda</code> / <code>image:rocm</code> / <code>image:sycl</code> -- 3x storage &amp; CI</li>
-        <li>PyTorch, JAX, ONNX-RT each reimplement their own GPU dispatch</li>
-        <li><strong>No published latency data</strong> on the GPU dispatch stack</li>
-      </ul>
-
-      <div class="sub">Before vs. After</div>
-      <div class="ba-grid">
-        <div class="ba-col ba-before">
-          <div class="ba-lbl">Status Quo</div>
-          <div class="ba-item">N build pipelines, one per vendor</div>
-          <div class="ba-item">Each framework reimplements dispatch</div>
-          <div class="ba-item">No runtime perf data for developers</div>
-          <div class="ba-item">Metadata vocabulary frozen at 2 keys</div>
-        </div>
-        <div class="ba-col ba-after">
-          <div class="ba-lbl">With This Work</div>
-          <div class="ba-item">One fat binary, runtime dispatch</div>
-          <div class="ba-item">LLVM-native selection, shared by all</div>
-          <div class="ba-item">First published flame graph (36 us to 3 ns)</div>
-          <div class="ba-item">5 new typed metadata keys standardized</div>
-        </div>
-      </div>
-
-      <div class="hl" style="margin-top:2mm;">
-        <p>Runtime variant selection is not theoretical -- every heterogeneous deployment works around it today, each in its own ad-hoc way.</p>
+      <div class="hl" style="margin-top:3mm;">
+        <p><strong>The status quo:</strong> N build pipelines per vendor, 3x storage &amp; CI, every framework reimplements dispatch, no published latency data. <strong>We fix all of this.</strong></p>
       </div>
     </div>
   </div>
@@ -769,7 +756,7 @@ pre .op   { color: #38bdf8; }
     </div>
 
     <!-- C2: Latency breakdown - MAIN RESULT -->
-    <div class="card teal grow2">
+    <div class="card teal grow" style="flex-grow:5;">
       <h2>C2: First Published Dispatch Flame Graph</h2>
       <div class="fig">
         <div class="fig-wrap">
@@ -828,7 +815,7 @@ pre .op   { color: #38bdf8; }
     </div>
 
     <!-- Variant scaling chart -->
-    <div class="card orange grow">
+    <div class="card orange grow" style="flex-grow:4;">
       <h2>Selection Scales to 100 Variants</h2>
       <div class="fig">
         <div class="fig-wrap">
@@ -839,7 +826,7 @@ pre .op   { color: #38bdf8; }
     </div>
 
     <!-- Overhead comparison chart -->
-    <div class="card orange grow2">
+    <div class="card orange grow" style="flex-grow:4;">
       <h2>Selection Overhead vs. Real Kernels</h2>
       <div class="fig">
         <div class="fig-wrap">
@@ -850,7 +837,7 @@ pre .op   { color: #38bdf8; }
     </div>
 
     <!-- Prototype & Key Findings -->
-    <div class="card orange grow2">
+    <div class="card orange grow" style="flex-grow:3;">
       <h2>Prototype &amp; Key Findings</h2>
       <div class="stat-row">
         <div class="sbox orange">
@@ -885,11 +872,21 @@ pre .op   { color: #38bdf8; }
 
 <!-- ========== FOOTER ========== -->
 <div class="footer">
-  <div class="footer-left">
+  <div class="footer-left" style="flex:1.2;">
     <h2>Related Work Comparison</h2>
-    <div class="fig-wrap" style="flex:0;min-height:0;">
-      <img src="figures/comparison-dots.svg" alt="Feature comparison dot matrix" style="width:92%;height:auto;">
-    </div>
+    <table class="cmp-table">
+      <thead>
+        <tr><th>System</th><th>Runtime</th><th>Cross-Vendor</th><th>MLIR</th><th>Ranked</th><th>LOC</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>IREE HAL</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-partial">Partial</td><td>100K+</td></tr>
+        <tr><td>chipStar</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td>50K+</td></tr>
+        <tr><td>Proteus</td><td class="cmp-yes">JIT</td><td class="cmp-partial">Partial</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td>10K+</td></tr>
+        <tr><td>liboffload</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td>5K+</td></tr>
+        <tr><td>CPU FMV</td><td class="cmp-yes">Yes</td><td class="cmp-na">N/A</td><td class="cmp-no">No</td><td class="cmp-yes">IFunc</td><td>N/A</td></tr>
+        <tr class="cmp-ours"><td><strong>This Work</strong></td><td class="cmp-yes"><strong>Yes</strong></td><td class="cmp-yes"><strong>Yes</strong></td><td class="cmp-yes"><strong>Yes</strong></td><td class="cmp-yes"><strong>Yes</strong></td><td><strong>~800</strong></td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="footer-mid">
@@ -904,10 +901,7 @@ pre .op   { color: #38bdf8; }
     </div>
   </div>
 
-  <div class="footer-right">
-    <div class="qr-box">[QR]<br>GitHub<br>Prototype + Data</div>
-    <div class="qr-box">[QR]<br>RFC<br>Discourse</div>
-  </div>
+  <!-- QR codes removed -->
 </div>
 
 <script>
