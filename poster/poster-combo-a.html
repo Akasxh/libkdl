@@ -6,7 +6,7 @@
 <style>
 /* ── Reset & Page ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { margin: 0 !important; padding: 0 !important; }
+html, body { margin: 0; padding: 0; }
 
 :root {
   --blue:    #2d7fc1;
@@ -34,6 +34,7 @@ body {
   color: var(--text);
   display: flex;
   flex-direction: column;
+  min-height: 1189mm;
 }
 
 /* ── HEADER ─────────────────────────────────────────────────── */
@@ -150,7 +151,7 @@ body {
   display: flex;
   flex-direction: row;
   gap: var(--gap);
-  padding: 6mm var(--pad);
+  padding: 8mm var(--pad);
   flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
@@ -161,10 +162,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
+  align-items: stretch;
 }
-.col:nth-child(2) { flex: 1.08; }
+.col:nth-child(2) { flex: 1.08 1 0; }
 
 /* ── SECTION CARDS ────────────────────────────────────────── */
 .card {
@@ -180,7 +182,7 @@ body {
 .card:last-child { border-bottom: none; }
 .card.grow { flex-grow: 1; }
 
-/* All columns: last card absorbs remaining space */
+/* Cards with inline flex-grow (figure cards) should stretch their figures */
 .col > .card:last-child { flex-grow: 1; }
 
 .card-head {
@@ -210,10 +212,11 @@ body {
   padding-bottom: 3mm;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  flex-grow: 0;
 }
 
 /* Card body typography */
-.card-body { padding: 0; flex: 1; }
+.card-body { padding: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
 
 .card-body p {
   font-size: 12pt;
@@ -260,11 +263,17 @@ code {
   width: 100%;
   overflow: hidden;
   margin: 3mm 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .fig-wrap img {
   width: 100%;
   height: auto;
+  max-height: 100%;
   display: block;
+  object-fit: contain;
 }
 
 .fig-caption {
@@ -378,7 +387,6 @@ pre {
   padding: 4mm 5mm;
   overflow: hidden;
   margin: 3mm 0;
-  flex-shrink: 0;
 }
 pre .kw   { color: #9b2335; font-weight: 700; }
 pre .ty   { color: #1a4fa0; }
@@ -394,7 +402,6 @@ pre .op   { color: #1a4fa0; }
   display: flex;
   gap: 4mm;
   margin: 4mm 0;
-  flex-shrink: 0;
 }
 .sbox {
   flex: 1;
@@ -426,7 +433,6 @@ pre .op   { color: #1a4fa0; }
   gap: 3mm;
   align-items: flex-start;
   margin-bottom: 3mm;
-  flex-shrink: 0;
 }
 .fnum {
   font-size: 11pt;
@@ -660,17 +666,24 @@ pre .op   { color: #1a4fa0; }
   line-height: 1.5;
 }
 
-/* Screen preview */
+/* Screen preview — scale A0 (841mm ≈ 3178px) to fit viewport */
 @media screen {
-  html { background: #e5e7eb; overflow: auto; }
+  html {
+    background: #555;
+    overflow: auto;
+  }
   body {
     margin: 10mm auto;
-    box-shadow: 0 4mm 20mm rgba(0,0,0,0.2);
-    border-radius: 2mm;
+    overflow: visible;
+    box-shadow: 0 4mm 30mm rgba(0,0,0,0.35);
+    transform-origin: top center;
+    /* Scale for ~1400px viewport: 1360 / 3178 ≈ 0.428 */
+    transform: scale(0.428);
+    margin-bottom: calc(-1189mm * (1 - 0.428) + 10mm);
   }
 }
 @media print {
-  body { box-shadow: none; border-radius: 0; }
+  body { box-shadow: none; }
 }
 </style>
 </head>
@@ -731,7 +744,7 @@ pre .op   { color: #1a4fa0; }
     <p style="font-size:13pt;line-height:1.55;color:var(--navy);border-left:3.5px solid var(--blue);padding-left:5mm;flex-shrink:0;">MLIR compiles one <code>gpu.module</code> to 3 GPU vendors. <code>OffloadBinary</code> carries N device images. But at runtime, the offload stack picks the <strong>first compatible image</strong> — no metadata vocabulary, no published measurement, no "best-compatible" mechanism. We fix all three.</p>
 
     <!-- The Gap + runtime-dispatch-everywhere figure -->
-    <div class="card blue-card" style="flex-grow:1;">
+    <div class="card blue-card" style="flex-grow:2;">
       <div class="card-head">
         <h2>The Gap</h2>
       </div>
@@ -745,7 +758,7 @@ pre .op   { color: #1a4fa0; }
     </div>
 
     <!-- Upstream evidence -->
-    <div class="card blue-card" style="flex-grow:1;">
+    <div class="card blue-card">
       <div class="card-head">
         <h2>Upstream Evidence</h2>
       </div>
@@ -774,7 +787,7 @@ pre .op   { color: #1a4fa0; }
     </div>
 
     <!-- Why this matters -->
-    <div class="card blue-card grow">
+    <div class="card blue-card" style="flex-grow:3;">
       <div class="card-head">
         <h2>Why This Matters</h2>
       </div>
@@ -834,7 +847,7 @@ pre .op   { color: #1a4fa0; }
     <div class="col-label">2 — Our Contributions</div>
 
     <!-- Architecture diagram — THE HERO -->
-    <div class="card teal-card" style="flex-grow:3;">
+    <div class="card teal-card" style="flex-grow:2;">
       <div class="card-head">
         <h2>System Architecture</h2>
       </div>
@@ -847,7 +860,7 @@ pre .op   { color: #1a4fa0; }
     </div>
 
     <!-- C1: Metadata Vocabulary -->
-    <div class="card teal-card">
+    <div class="card teal-card" style="flex-grow:1;">
       <div class="card-head">
         <h2>C1: Metadata Vocabulary (5 New Keys)</h2>
       </div>
@@ -892,7 +905,7 @@ pre .op   { color: #1a4fa0; }
     </div>
 
     <!-- C2: Latency breakdown — MAIN RESULT -->
-    <div class="card teal-card" style="flex-grow:4;">
+    <div class="card teal-card" style="flex-grow:2;">
       <div class="card-head">
         <h2>C2: First Published Dispatch Flame Graph</h2>
       </div>
@@ -902,14 +915,14 @@ pre .op   { color: #1a4fa0; }
         </div>
         <p class="fig-caption">GTX 1650 (sm_75), CUDA 13.1, null kernel CUBIN. cuModuleLoadData dominates at 36 us (90% of cold path). Selection overhead: 3-6 ns.</p>
 
-        <div class="fig-wrap" style="margin:4mm auto;max-width:55%;">
+        <div class="fig-wrap" style="margin:4mm auto;max-width:70%;">
           <img src="figures/hero-stat.svg" alt="3-6 ns selection overhead per dispatch">
         </div>
       </div>
     </div>
 
     <!-- C3: MLIR code snippet -->
-    <div class="card teal-card">
+    <div class="card teal-card" style="flex-grow:1;">
       <div class="card-head">
         <h2>C3: <code>#gpu.runtime_select</code></h2>
       </div>
@@ -941,7 +954,7 @@ pre .op   { color: #1a4fa0; }
     <div class="col-label">3 — Evidence &amp; Results</div>
 
     <!-- Dispatch latency table -->
-    <div class="card orange-card">
+    <div class="card orange-card" style="flex-grow:1;">
       <div class="card-head">
         <h2>Dispatch Latency: Layer Decomposition</h2>
       </div>
@@ -989,7 +1002,7 @@ pre .op   { color: #1a4fa0; }
     </div>
 
     <!-- Prototype stats + key findings -->
-    <div class="card orange-card grow">
+    <div class="card orange-card" style="flex-grow:2;">
       <div class="card-head">
         <h2>Prototype &amp; Key Findings</h2>
       </div>
@@ -1038,7 +1051,7 @@ pre .op   { color: #1a4fa0; }
   <div class="bottom-left">
     <h2>Related Work Comparison</h2>
     <div class="fig-wrap" style="margin:0;">
-      <img src="figures/comparison-dots.svg" alt="Feature comparison dot matrix" style="width:70%;height:auto;">
+      <img src="figures/comparison-dots.svg" alt="Feature comparison dot matrix" style="width:90%;height:auto;">
     </div>
   </div>
 
@@ -1060,5 +1073,25 @@ pre .op   { color: #1a4fa0; }
   </div>
 </div>
 
+<script>
+// Auto-scale A0 poster to fit browser viewport width
+// Uses transform + negative margin for correct scroll behavior
+(function() {
+  if (window.matchMedia('print').matches) return;
+  var body = document.body;
+  function rescale() {
+    body.style.transform = 'none';
+    body.style.marginBottom = '0';
+    var bw = body.offsetWidth;
+    var bh = body.offsetHeight;
+    var vw = window.innerWidth - 40;
+    var scale = Math.min(vw / bw, 1);
+    body.style.transform = 'scale(' + scale + ')';
+    body.style.marginBottom = (-(bh * (1 - scale)) + 40) + 'px';
+  }
+  rescale();
+  window.addEventListener('resize', rescale);
+})();
+</script>
 </body>
 </html>
