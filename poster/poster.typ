@@ -241,6 +241,34 @@
         Every major ML runtime implements kernel selection internally. MLIR's offload stack is the only one without a dispatch policy.
       ]
     ]
+
+    #v(10pt)
+
+    // Related Work — moved into left column to fill space
+    #card(accent: navy)[
+      = #text(fill: navy)[Related Work]
+      #v(4pt)
+      #set table(inset: 5pt, stroke: 0.4pt + luma(210))
+      #table(
+        columns: (1fr, auto, auto, auto, auto, auto),
+        fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
+        table.header(
+          text(weight: "bold", size: 13pt)[*System*],
+          text(weight: "bold", size: 13pt)[*Vendor*],
+          text(weight: "bold", size: 13pt)[*Meta*],
+          text(weight: "bold", size: 13pt)[*Policy*],
+          text(weight: "bold", size: 13pt)[*Data*],
+          text(weight: "bold", size: 13pt)[*Upstr.*],
+        ),
+        text(size: 13pt)[IREE],       text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
+        text(size: 13pt)[chipStar],    text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
+        text(size: 13pt)[Proteus],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗],
+        text(size: 13pt)[liboffload],  text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
+        text(size: 13pt)[CPU FMV],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
+        text(size: 13pt, weight: "bold", fill: llvm-blue)[*Ours*], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓],
+      )
+      #text(size: 12pt, fill: rgb("#666"))[First to combine all five: multi-vendor, metadata, policy, measurement, upstream-ready.]
+    ]
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -465,65 +493,33 @@
         *libkdl* (Kernel Dynamic Linker) is a standalone C library that implements the dispatch algorithm. The PoC wires it into the MLIR GPU runtime via `gpu.launch_func` lowering.
       ]
     ]
+
+    #v(10pt)
+
+    // Upstream Path — moved into right column
+    #card(accent: teal)[
+      = #text(fill: teal)[Upstream Path]
+      #v(4pt)
+      #let step(num, title, desc, accent: teal) = {
+        block(width: 100%, inset: 5pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
+          #grid(columns: (auto, 1fr), column-gutter: 6pt,
+            box(width: 22pt, height: 22pt, radius: 11pt, fill: accent, align(center + horizon)[#text(size: 13pt, weight: "bold", fill: white)[#num]]),
+            [#text(size: 16pt, weight: "bold", fill: navy)[#title] #text(size: 13pt, fill: rgb("#555"))[— #desc]],
+          )
+        ]
+      }
+      #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
+      #v(3pt)
+      #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
+      #v(3pt)
+      #step("3", "MLIR Attribute", "~780 LOC lowering", accent: orange)
+      #v(3pt)
+      #text(size: 12pt, fill: rgb("#666"), style: "italic")[Each step independently useful.]
+    ]
   ],
 )
 
-#v(8pt)
-
-// ═══════════════════════════════════════════════════════════════════
-//  BOTTOM — Related Work + Upstream Path (compact, side by side)
-// ═══════════════════════════════════════════════════════════════════
-
-#grid(
-  columns: (1.4fr, 1fr),
-  column-gutter: 10pt,
-
-  // Related Work — compact table
-  block(width: 100%, inset: 8pt, radius: 4pt, fill: card-bg, stroke: (top: 3pt + navy, left: 0.5pt + luma(210), right: 0.5pt + luma(210), bottom: 0.5pt + luma(210)))[
-    #text(font: "Liberation Sans", size: 22pt, weight: "bold", fill: navy)[Related Work]
-    #v(4pt)
-    #set table(inset: 5pt, stroke: 0.4pt + luma(210))
-    #table(
-      columns: (1fr, auto, auto, auto, auto, auto),
-      fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
-      table.header(
-        text(weight: "bold", size: 13pt)[*System*],
-        text(weight: "bold", size: 13pt)[*Vendor*],
-        text(weight: "bold", size: 13pt)[*Meta*],
-        text(weight: "bold", size: 13pt)[*Policy*],
-        text(weight: "bold", size: 13pt)[*Data*],
-        text(weight: "bold", size: 13pt)[*Upstr.*],
-      ),
-      text(size: 13pt)[IREE],       text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
-      text(size: 13pt)[chipStar],    text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
-      text(size: 13pt)[Proteus],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗],
-      text(size: 13pt)[liboffload],  text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
-      text(size: 13pt)[CPU FMV],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
-      text(size: 13pt, weight: "bold", fill: llvm-blue)[*Ours*], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓],
-    )
-  ],
-
-  // Upstream Path — compact
-  block(width: 100%, inset: 8pt, radius: 4pt, fill: card-bg, stroke: (top: 3pt + teal, left: 0.5pt + luma(210), right: 0.5pt + luma(210), bottom: 0.5pt + luma(210)))[
-    #text(font: "Liberation Sans", size: 22pt, weight: "bold", fill: teal)[Upstream Path]
-    #v(4pt)
-    #let step(num, title, desc, accent: teal) = {
-      block(width: 100%, inset: 5pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
-        #grid(columns: (auto, 1fr), column-gutter: 6pt,
-          box(width: 22pt, height: 22pt, radius: 11pt, fill: accent, align(center + horizon)[#text(size: 13pt, weight: "bold", fill: white)[#num]]),
-          [#text(size: 16pt, weight: "bold", fill: navy)[#title] #text(size: 13pt, fill: rgb("#555"))[— #desc]],
-        )
-      ]
-    }
-    #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
-    #v(4pt)
-    #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
-    #v(4pt)
-    #step("3", "MLIR Attribute", "~780 LOC, gpu.launch_func lowering", accent: orange)
-    #v(4pt)
-    #text(size: 13pt, fill: rgb("#666"), style: "italic")[Each step independently useful.]
-  ],
-)
+// Related Work + Upstream Path moved into columns above
 
 #v(6pt)
 
