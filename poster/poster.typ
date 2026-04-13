@@ -401,13 +401,13 @@
           text(weight: "bold", size: 16pt)[*Latency*],
           text(weight: "bold", size: 16pt)[*Share*],
         ),
-        text(size: 16pt)[cuModuleLoadData (cold)],  text(size: 16pt)[36.0 #sym.mu\s],  text(size: 16pt, weight: "bold", fill: orange)[90.0%],
-        text(size: 16pt)[cuModuleLoadData (warm)],   text(size: 16pt)[1.2 #sym.mu\s],   text(size: 16pt)[3.0%],
-        text(size: 16pt)[cuModuleGetFunction],        text(size: 16pt)[0.8 #sym.mu\s],   text(size: 16pt)[2.0%],
-        text(size: 16pt)[cuLaunchKernel],             text(size: 16pt)[1.5 #sym.mu\s],   text(size: 16pt)[3.8%],
-        text(size: 16pt)[cuStreamSynchronize],        text(size: 16pt)[0.5 #sym.mu\s],   text(size: 16pt)[1.2%],
-        text(size: 16pt, weight: "bold")[Hot-path total], text(size: 16pt, weight: "bold")[40.0 #sym.mu\s], text(size: 16pt, weight: "bold")[100%],
-        text(size: 16pt, fill: teal, weight: "bold")[Selection overhead], text(size: 16pt, fill: teal, weight: "bold")[3 -- 6 ns], text(size: 16pt, fill: teal, weight: "bold")[< 0.01%],
+        text(size: 16pt)[cuModuleLoadData (cold)],  text(size: 16pt, weight: "bold", fill: orange)[36.0 #sym.mu\s],  text(size: 16pt)[89.6%],
+        text(size: 16pt)[cuModuleLoadData (warm)],   text(size: 16pt)[9.6 #sym.mu\s],   text(size: 16pt)[—],
+        text(size: 16pt)[cuModuleGetFunction],        text(size: 16pt)[63 ns],            text(size: 16pt)[0.2%],
+        text(size: 16pt)[cuLaunchKernel],             text(size: 16pt)[1.65 #sym.mu\s],   text(size: 16pt)[4.1%],
+        text(size: 16pt)[cuStreamSynchronize],        text(size: 16pt)[2.45 #sym.mu\s],   text(size: 16pt)[6.1%],
+        text(size: 16pt, weight: "bold")[Hot-path total], text(size: 16pt, weight: "bold")[4.1 #sym.mu\s], text(size: 16pt, weight: "bold")[launch+sync],
+        text(size: 16pt, fill: teal, weight: "bold")[Selection overhead], text(size: 16pt, fill: teal, weight: "bold")[3–6 ns], text(size: 16pt, fill: teal, weight: "bold")[< 0.01%],
       )
     ]
 
@@ -484,7 +484,7 @@
       #grid(
         columns: (1fr, 1fr),
         column-gutter: 8pt,
-        stat-box("5,100", "LOC — libkdl\n(dispatch library)", accent: navy),
+        stat-box("5,157", "LOC — libkdl\n(dispatch library)", accent: navy),
         stat-box("664", "LOC — PoC\n(MLIR integration)", accent: teal),
       )
 
@@ -531,6 +531,6 @@
   #grid(columns: (1fr, 1fr, 1fr),
     align(left)[#text(size: 14pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
     align(center)[#text(size: 14pt, fill: navy)[*EuroLLVM Developers' Meeting — Dublin 2026*]],
-    align(right)[#text(size: 14pt, fill: navy)[*5,100 + 664 LOC* · Apache 2.0 w/ LLVM Exception]],
+    align(right)[#text(size: 14pt, fill: navy)[*5,157 + 664 LOC* · Apache 2.0 w/ LLVM Exception]],
   )
 ]
