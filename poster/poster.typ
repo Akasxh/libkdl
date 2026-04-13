@@ -90,27 +90,41 @@
 
 #block(
   width: 100%,
-  inset: (x: 24pt, y: 22pt),
+  inset: (x: 24pt, y: 18pt),
   radius: 8pt,
   fill: gradient.linear(navy, llvm-blue, angle: 0deg),
   stroke: none,
 )[
-  #align(center)[
-    #text(font: "Liberation Sans", size: 48pt, weight: "bold", fill: white)[
-      Bridging Runtime Gaps in LLVM:\
-      Vendor-Agnostic Dispatch for ML Kernels
-    ]
-    #v(10pt)
-    #text(font: "Liberation Sans", size: 24pt, fill: rgb("#cce0f0"))[
-      S. Akash
-      #h(10pt) #text(fill: rgb("#88bbdd"))[|] #h(10pt)
-      IIT Patna  ·  CERN GSoC  ·  vLLM contributor
-    ]
-    #v(6pt)
-    #text(font: "Liberation Sans", size: 19pt, fill: rgb("#99c8e8"))[
-      EuroLLVM Developers' Meeting  ·  Dublin 2026
-    ]
-  ]
+  #grid(
+    columns: (auto, 1fr, auto),
+    column-gutter: 16pt,
+    align(left + horizon)[
+      #image("figures/llvm-logo.png", height: 70pt)
+    ],
+    align(center + horizon)[
+      #text(font: "Liberation Sans", size: 48pt, weight: "bold", fill: white)[
+        Bridging Runtime Gaps in LLVM:\
+        Vendor-Agnostic Dispatch for ML Kernels
+      ]
+      #v(6pt)
+      #text(font: "Liberation Sans", size: 22pt, fill: rgb("#cce0f0"))[
+        S. Akash
+        #h(10pt) #text(fill: rgb("#88bbdd"))[|] #h(10pt)
+        IIT Patna  ·  CERN GSoC  ·  vLLM contributor
+      ]
+      #v(4pt)
+      #text(font: "Liberation Sans", size: 17pt, fill: rgb("#99c8e8"))[
+        EuroLLVM Developers' Meeting  ·  Dublin 2026
+      ]
+    ],
+    align(right + horizon)[
+      #block(inset: 8pt, radius: 4pt, fill: rgb("#ffffff22"), stroke: 1pt + rgb("#ffffff33"))[
+        #text(font: "Liberation Sans", size: 16pt, weight: "bold", fill: white)[EuroLLVM\Dublin 2026]
+        #v(2pt)
+        #text(font: "Liberation Sans", size: 13pt, fill: rgb("#bbddee"))[Poster Session]
+      ]
+    ],
+  )
 ]
 
 #v(16pt)
@@ -454,127 +468,73 @@
   ],
 )
 
-#v(18pt)
+#v(8pt)
 
 // ═══════════════════════════════════════════════════════════════════
-//  BOTTOM SECTION — Related Work + Upstream Path
+//  BOTTOM — Related Work + Upstream Path (compact, side by side)
 // ═══════════════════════════════════════════════════════════════════
 
 #grid(
-  columns: (1.5fr, 1fr),
-  column-gutter: 12pt,
+  columns: (1.4fr, 1fr),
+  column-gutter: 10pt,
 
-  // Related Work Comparison
-  card(accent: navy)[
-    = #text(fill: navy)[Related Work Comparison]
-    #v(6pt)
-
+  // Related Work — compact table
+  block(width: 100%, inset: 8pt, radius: 4pt, fill: card-bg, stroke: (top: 3pt + navy, left: 0.5pt + luma(210), right: 0.5pt + luma(210), bottom: 0.5pt + luma(210)))[
+    #text(font: "Liberation Sans", size: 22pt, weight: "bold", fill: navy)[Related Work]
+    #v(4pt)
+    #set table(inset: 5pt, stroke: 0.4pt + luma(210))
     #table(
-      columns: (1.2fr, auto, auto, auto, auto, auto),
+      columns: (1fr, auto, auto, auto, auto, auto),
       fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
       table.header(
-        text(weight: "bold", size: 16pt)[*System*],
-        text(weight: "bold", size: 16pt)[*Multi-vendor*],
-        text(weight: "bold", size: 16pt)[*Metadata*],
-        text(weight: "bold", size: 16pt)[*Policy*],
-        text(weight: "bold", size: 16pt)[*Measured*],
-        text(weight: "bold", size: 16pt)[*Upstream*],
+        text(weight: "bold", size: 13pt)[*System*],
+        text(weight: "bold", size: 13pt)[*Vendor*],
+        text(weight: "bold", size: 13pt)[*Meta*],
+        text(weight: "bold", size: 13pt)[*Policy*],
+        text(weight: "bold", size: 13pt)[*Data*],
+        text(weight: "bold", size: 13pt)[*Upstr.*],
       ),
-      text(size: 16pt)[IREE HAL],      text(size: 18pt, fill: teal)[#sym.checkmark], text(size: 18pt, fill: teal)[#sym.checkmark], text(size: 18pt, fill: orange)[#sym.tilde],    text(size: 18pt, fill: orange)[#sym.times], text(size: 18pt, fill: orange)[#sym.times],
-      text(size: 16pt)[chipStar],       text(size: 18pt, fill: teal)[#sym.checkmark], text(size: 18pt, fill: orange)[#sym.times],    text(size: 18pt, fill: orange)[#sym.times],    text(size: 18pt, fill: orange)[#sym.times], text(size: 18pt, fill: orange)[#sym.times],
-      text(size: 16pt)[Proteus],        text(size: 18pt, fill: orange)[#sym.times],   text(size: 18pt, fill: orange)[#sym.times],    text(size: 18pt, fill: teal)[#sym.checkmark],  text(size: 18pt, fill: teal)[#sym.checkmark], text(size: 18pt, fill: orange)[#sym.times],
-      text(size: 16pt)[liboffload],     text(size: 18pt, fill: teal)[#sym.checkmark], text(size: 18pt, fill: orange)[#sym.tilde],    text(size: 18pt, fill: orange)[#sym.times],    text(size: 18pt, fill: orange)[#sym.times], text(size: 18pt, fill: teal)[#sym.checkmark],
-      text(size: 16pt)[CPU FMV],        text(size: 18pt, fill: orange)[#sym.times],   text(size: 18pt, fill: teal)[#sym.checkmark],  text(size: 18pt, fill: teal)[#sym.checkmark],  text(size: 18pt, fill: orange)[#sym.times], text(size: 18pt, fill: teal)[#sym.checkmark],
-      text(size: 16pt, weight: "bold", fill: llvm-blue)[This Work], text(size: 18pt, fill: teal, weight: "bold")[#sym.checkmark], text(size: 18pt, fill: teal, weight: "bold")[#sym.checkmark], text(size: 18pt, fill: teal, weight: "bold")[#sym.checkmark], text(size: 18pt, fill: teal, weight: "bold")[#sym.checkmark], text(size: 18pt, fill: teal, weight: "bold")[#sym.checkmark],
+      text(size: 13pt)[IREE],       text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
+      text(size: 13pt)[chipStar],    text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
+      text(size: 13pt)[Proteus],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗],
+      text(size: 13pt)[liboffload],  text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
+      text(size: 13pt)[CPU FMV],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
+      text(size: 13pt, weight: "bold", fill: llvm-blue)[*Ours*], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓],
     )
-
-    #v(6pt)
-    #text(size: 15pt, fill: rgb("#555"))[
-      This work is the first to combine all five properties: multi-vendor support, structured metadata, pluggable dispatch policy, empirical measurement, and an upstream-ready design.
-    ]
   ],
 
-  // Upstream Path
-  card(accent: teal)[
-    = #text(fill: teal)[Upstream Path]
-    #v(8pt)
-
-    #let step-box(num, title, desc, accent: teal) = {
-      block(width: 100%, inset: 8pt, radius: 4pt, fill: accent.lighten(90%), stroke: 1.5pt + accent.lighten(50%))[
-        #grid(
-          columns: (auto, 1fr),
-          column-gutter: 10pt,
-          align(center + horizon)[
-            #box(
-              width: 34pt, height: 34pt,
-              radius: 17pt,
-              fill: accent,
-              align(center + horizon)[
-                #text(size: 20pt, weight: "bold", fill: white)[#num]
-              ]
-            )
-          ],
-          [
-            #text(size: 20pt, weight: "bold", fill: navy)[#title]\
-            #text(size: 15pt, fill: rgb("#444"))[#desc]
-          ],
+  // Upstream Path — compact
+  block(width: 100%, inset: 8pt, radius: 4pt, fill: card-bg, stroke: (top: 3pt + teal, left: 0.5pt + luma(210), right: 0.5pt + luma(210), bottom: 0.5pt + luma(210)))[
+    #text(font: "Liberation Sans", size: 22pt, weight: "bold", fill: teal)[Upstream Path]
+    #v(4pt)
+    #let step(num, title, desc, accent: teal) = {
+      block(width: 100%, inset: 5pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
+        #grid(columns: (auto, 1fr), column-gutter: 6pt,
+          box(width: 22pt, height: 22pt, radius: 11pt, fill: accent, align(center + horizon)[#text(size: 13pt, weight: "bold", fill: white)[#num]]),
+          [#text(size: 16pt, weight: "bold", fill: navy)[#title] #text(size: 13pt, fill: rgb("#555"))[— #desc]],
         )
       ]
     }
-
-    #step-box("1", "Metadata RFC",
-      "Propose 5 keys for OffloadBinary. Low-risk, additive change.",
-      accent: teal)
-    #v(8pt)
-    #step-box("2", "liboffload Policy Slot",
-      "Add pluggable selection hook to liboffload's existing load path.",
-      accent: llvm-blue)
-    #v(8pt)
-    #step-box("3", "MLIR Attribute + Lowering",
-      "Wire #gpu.runtime_select through to the runtime via gpu.launch_func.",
-      accent: orange)
-
-    #v(8pt)
-
-    #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
-      #text(size: 18pt, fill: rgb("#1a5c4a"))[
-        Each step is independently useful. Step 1 unlocks dispatch for any downstream consumer of OffloadBinary.
-      ]
-    ]
+    #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
+    #v(4pt)
+    #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
+    #v(4pt)
+    #step("3", "MLIR Attribute", "~780 LOC, gpu.launch_func lowering", accent: orange)
+    #v(4pt)
+    #text(size: 13pt, fill: rgb("#666"), style: "italic")[Each step independently useful.]
   ],
 )
 
-#v(18pt)
+#v(6pt)
 
 // ═══════════════════════════════════════════════════════════════════
-//  FOOTER
+//  FOOTER (compact)
 // ═══════════════════════════════════════════════════════════════════
 
-#block(
-  width: 100%,
-  inset: (x: 20pt, y: 16pt),
-  radius: 6pt,
-  fill: navy.lighten(92%),
-  stroke: 1pt + navy.lighten(70%),
-)[
-  #grid(
-    columns: (1fr, 1fr, 1fr),
-    align(left)[
-      #text(size: 16pt, fill: navy)[
-        *Code:* github.com/AKASHAorg/libkdl\
-        *Contact:* sakash\@iitp.ac.in
-      ]
-    ],
-    align(center)[
-      #text(size: 16pt, fill: navy)[
-        *EuroLLVM Developers' Meeting — Dublin 2026*
-      ]
-    ],
-    align(right)[
-      #text(size: 16pt, fill: navy)[
-        *Prototype:* 5,100 + 664 LOC\
-        *License:* Apache 2.0 with LLVM Exception
-      ]
-    ],
+#block(width: 100%, inset: (x: 14pt, y: 8pt), radius: 4pt, fill: navy.lighten(92%), stroke: 1pt + navy.lighten(70%))[
+  #grid(columns: (1fr, 1fr, 1fr),
+    align(left)[#text(size: 14pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
+    align(center)[#text(size: 14pt, fill: navy)[*EuroLLVM Developers' Meeting — Dublin 2026*]],
+    align(right)[#text(size: 14pt, fill: navy)[*5,100 + 664 LOC* · Apache 2.0 w/ LLVM Exception]],
   )
 ]
