@@ -10,9 +10,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --gap: 3mm;
-  --pad: 10mm;
-  --font-scale: 3.5;
+  --gap: 5mm;
+  --pad: 14mm;
+  --font-scale: 5.5;
 
   --bg: #f0ece6;
   --card-bg: #fff;
@@ -27,11 +27,11 @@
 }
 
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-@page { size: 841mm 1189mm; margin: 0; }
+@page { size: 1000mm 2000mm; margin: 0; }
 
 body {
-  width: 841mm;
-  height: 1189mm;
+  width: 1000mm;
+  height: 2000mm;
   overflow: hidden;
   background: var(--bg);
   font-family: 'Nunito', sans-serif;
@@ -54,7 +54,7 @@ body {
 .header-left { flex: 1; }
 
 .header h1 {
-  font-size: 44pt;
+  font-size: 72pt;
   font-weight: 900;
   line-height: 1.08;
   letter-spacing: -0.3pt;
@@ -613,8 +613,8 @@ pre .op   { color: #38bdf8; }
     box-shadow: 0 4px 30px rgba(0,0,0,.3);
     border-radius: 4px;
     transform-origin: top center;
-    transform: scale(0.428);
-    margin-bottom: calc(-1189mm * (1 - 0.428) + 10mm);
+    transform: scale(0.3);
+    margin-bottom: calc(-2000mm * (1 - 0.3) + 10mm);
   }
 }
 @media print {
@@ -632,20 +632,7 @@ pre .op   { color: #38bdf8; }
     <div class="authors"><strong>S. Akash</strong> <span>&middot; IIT Patna &middot; CERN GSoC &middot; vLLM contributor &middot; EuroLLVM Dublin 2026</span></div>
   </div>
   <div class="header-right">
-    <div class="key-stats">
-      <div class="kstat">
-        <div class="kstat-val">3-6 ns</div>
-        <div class="kstat-lbl">Selection overhead</div>
-      </div>
-      <div class="kstat">
-        <div class="kstat-val">5</div>
-        <div class="kstat-lbl">New metadata keys</div>
-      </div>
-      <div class="kstat">
-        <div class="kstat-val">0%</div>
-        <div class="kstat-lbl">Hot-path penalty</div>
-      </div>
-    </div>
+    <!-- stat boxes removed -->
     <div class="venue-badge">
       EuroLLVM Developers' Meeting<br><strong>Dublin 2026</strong>
       <em>Poster Session</em>
@@ -729,7 +716,7 @@ pre .op   { color: #38bdf8; }
   <div class="col" style="flex:1.1">
 
     <!-- Architecture diagram - HERO -->
-    <div class="card teal grow" style="flex-grow:6;">
+    <div class="card teal grow" style="flex-grow:10;">
       <h2>System Architecture</h2>
       <div class="fig">
         <div class="fig-wrap">
