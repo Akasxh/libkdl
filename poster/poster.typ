@@ -325,7 +325,7 @@
 
     // Card 7: C3 — MLIR Attribute
     #card(accent: navy)[
-      = #text(fill: navy)[C3: MLIR Attribute Design]
+      = #text(fill: navy)[C3: MLIR Attribute Design] #text(size: 14pt, fill: rgb("#888"))[(proposed)]
       #v(6pt)
 
       #text(size: 18pt)[A new `#gpu.runtime_select` attribute that attaches dispatch policy directly to MLIR modules:]
@@ -372,9 +372,9 @@
       #grid(
         columns: (1fr, 1fr, 1fr),
         column-gutter: 8pt,
-        stat-box("36.0 " + sym.mu + "s", "cuModuleLoadData\n(90% of total)", accent: orange),
+        stat-box("36.0 " + sym.mu + "s", "cuModuleLoadData\n(90% of cold path)", accent: orange),
         stat-box("3 -- 6 ns", "Selection\noverhead", accent: teal),
-        stat-box("< 0.01%", "Dispatch cost\nvs. kernel load", accent: llvm-blue),
+        stat-box("< 0.02%", "Dispatch cost\nvs. kernel load", accent: llvm-blue),
       )
 
       #v(6pt)
@@ -407,7 +407,7 @@
         text(size: 16pt)[cuLaunchKernel],             text(size: 16pt)[1.65 #sym.mu\s],   text(size: 16pt)[4.1%],
         text(size: 16pt)[cuStreamSynchronize],        text(size: 16pt)[2.45 #sym.mu\s],   text(size: 16pt)[6.1%],
         text(size: 16pt, weight: "bold")[Hot-path total], text(size: 16pt, weight: "bold")[4.1 #sym.mu\s], text(size: 16pt, weight: "bold")[launch+sync],
-        text(size: 16pt, fill: teal, weight: "bold")[Selection overhead], text(size: 16pt, fill: teal, weight: "bold")[3–6 ns], text(size: 16pt, fill: teal, weight: "bold")[< 0.01%],
+        text(size: 16pt, fill: teal, weight: "bold")[Selection overhead], text(size: 16pt, fill: teal, weight: "bold")[3–6 ns], text(size: 16pt, fill: teal, weight: "bold")[< 0.02%],
       )
     ]
 
@@ -453,7 +453,7 @@
         row-gutter: 8pt,
         block(inset: 8pt, radius: 4pt, fill: light-blue, width: 100%)[
           #text(size: 18pt)[
-            *F1:* Module loading dominates dispatch latency at 90% — selection policy is essentially free.
+            *F1:* Module loading dominates cold dispatch at ~90% — selection policy is essentially free.
           ]
         ],
         block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
