@@ -284,18 +284,6 @@
       ]
     ]
 
-    #v(8pt)
-
-    // Context-Dependent Selection (moved from col 3)
-    #card(accent: teal)[
-      = #text(fill: teal)[Context-Dependent Selection]
-      #v(4pt)
-      #image("figures/mab-context.svg", width: 100%)
-      #v(4pt)
-      #text(size: 14pt, fill: rgb("#666"))[
-        Different shapes converge to different optimal variants — the context in contextual bandit matters.
-      ]
-    ]
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -512,6 +500,19 @@
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
         Profiled dispatch achieves 86% of oracle with 7.3x less regret than random.
+      ]
+    ]
+
+    #v(8pt)
+
+    // Context-Dependent Selection (back in col 3)
+    #card(accent: teal)[
+      = #text(fill: teal)[Context-Dependent Selection]
+      #v(4pt)
+      #image("figures/mab-context.svg", width: 100%)
+      #v(4pt)
+      #text(size: 14pt, fill: rgb("#666"))[
+        Different shapes converge to different optimal variants — context matters.
       ]
     ]
 
