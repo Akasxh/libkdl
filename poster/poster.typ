@@ -137,12 +137,12 @@
 // ═══════════════════════════════════════════════════════════════════
 
 #grid(
-  columns: (1fr, 1.3fr, 1fr),
+  columns: (1fr, 1.2fr, 1fr),
   column-gutter: 11pt,
   row-gutter: 10pt,
 
   // ─────────────────────────────────────────────────────────────────
-  //  COLUMN 1 — The Problem + Phase 1 Results (SETUP)
+  //  COLUMN 1 — Problem + Setup + Evidence from Col 3
   // ─────────────────────────────────────────────────────────────────
   [
     // Card: The Gap
@@ -270,6 +270,32 @@
         align(right)[#text(size: 13pt, fill: rgb("#666"))[First to combine all five.]],
       )
     ]
+
+    #v(8pt)
+
+    // Selection Scales Linearly (moved from col 3)
+    #card(accent: llvm-blue)[
+      = #text(fill: llvm-blue)[Selection Scales Linearly]
+      #v(4pt)
+      #image("figures/variant-scaling.svg", width: 100%)
+      #v(4pt)
+      #text(size: 14pt, fill: rgb("#666"))[
+        Even at 64 variants, selection stays under 400 ns — three orders of magnitude below driver overhead.
+      ]
+    ]
+
+    #v(8pt)
+
+    // Context-Dependent Selection (moved from col 3)
+    #card(accent: teal)[
+      = #text(fill: teal)[Context-Dependent Selection]
+      #v(4pt)
+      #image("figures/mab-context.svg", width: 100%)
+      #v(4pt)
+      #text(size: 14pt, fill: rgb("#666"))[
+        Different shapes converge to different optimal variants — the context in contextual bandit matters.
+      ]
+    ]
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -395,21 +421,20 @@
 
     #v(8pt)
 
-    // The Algorithm — 3-phase pseudocode
+    // The Algorithm — 3-phase pseudocode (trimmed)
     #card(accent: navy)[
       = #text(fill: navy)[The Algorithm]
       #v(4pt)
       ```
       fn dispatch(ctx, variants[N], warmup=3):
         key = (ctx.kernel, ctx.shape, ctx.device)
-        if key in cache:           // EXPLOIT
-          return cache[key]
-        if stats[key].count < N*warmup:  // EXPLORE
+        if key in cache: return cache[key]
+        if stats[key].count < N*warmup:
           arm = stats[key].count % N
           t = time(variants[arm])
           stats[key].update(arm, t)
           return variants[arm]
-        cache[key] = argmin(stats[key].mean)  // LOCK
+        cache[key] = argmin(stats[key].mean)
         return cache[key]
       ```
       #v(4pt)
@@ -452,7 +477,7 @@
   ],
 
   // ─────────────────────────────────────────────────────────────────
-  //  COLUMN 3 — Evidence + Results
+  //  COLUMN 3 — Compact Evidence + Results
   // ─────────────────────────────────────────────────────────────────
   [
     // Dispatch Latency Table
@@ -479,7 +504,7 @@
 
     #v(8pt)
 
-    // Regret Plot
+    // Scaling with Variants
     #card(accent: deep-purple)[
       = #text(fill: deep-purple)[Scaling with Variants]
       #v(4pt)
@@ -487,32 +512,6 @@
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
         Profiled dispatch achieves 86% of oracle with 7.3x less regret than random.
-      ]
-    ]
-
-    #v(8pt)
-
-    // Context-Dependent Selection
-    #card(accent: teal)[
-      = #text(fill: teal)[Context-Dependent Selection]
-      #v(4pt)
-      #image("figures/mab-context.svg", width: 100%)
-      #v(4pt)
-      #text(size: 14pt, fill: rgb("#666"))[
-        Different shapes converge to different optimal variants — the context in contextual bandit matters.
-      ]
-    ]
-
-    #v(8pt)
-
-    // Variant Scaling
-    #card(accent: llvm-blue)[
-      = #text(fill: llvm-blue)[Selection Scales Linearly]
-      #v(4pt)
-      #image("figures/variant-scaling.svg", width: 100%)
-      #v(4pt)
-      #text(size: 14pt, fill: rgb("#666"))[
-        Even at 64 variants, selection stays under 400 ns — three orders of magnitude below driver overhead.
       ]
     ]
 
