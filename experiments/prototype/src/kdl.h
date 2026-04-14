@@ -937,6 +937,90 @@ kdl_status kdl_context_reset(kdl_ctx ctx);
  */
 kdl_status kdl_self_test(int *out_tests_run, int *out_tests_failed);
 
+/* ---------- Profiled Dispatch (explore/exploit variant selection) ---------- */
+
+/**
+ * Adaptive profiled dispatch: measures actual execution time of kernel
+ * variants and converges to the fastest one via an explore/exploit strategy.
+ *
+ * Phase 1 (cold):    No profile data -- falls back to metadata-based selection.
+ * Phase 2 (explore): Cycles through compatible variants, gathering timing samples.
+ * Phase 3 (exploit): Returns the variant with lowest observed median time.
+ */
+
+#define KDL_PD_MAX_VARIANTS   16
+#define KDL_PD_WARMUP_SAMPLES  3
+
+typedef struct {
+    uint64_t dispatch_count;           /* total dispatches for this key       */
+    uint64_t explore_count;            /* dispatches spent exploring           */
+    int      best_variant_idx;         /* index of current best variant        */
+    double   best_time_ns;             /* median time of best variant          */
+    double   variant_times[KDL_PD_MAX_VARIANTS];   /* measured median times   */
+    int      variant_samples[KDL_PD_MAX_VARIANTS]; /* sample counts           */
+    int      n_variants;               /* number of compatible variants        */
+} kdl_pd_profile_entry;
+
+#define KDL_PD_MAP_SIZE 64
+
+/**
+ * Opaque handle to the profiled dispatch state.
+ * Created with kdl_pd_create(), destroyed with kdl_pd_destroy().
+ */
+typedef struct kdl_pd_state *kdl_pd_state_t;
+
+kdl_status kdl_pd_create(kdl_pd_state_t *out);
+void       kdl_pd_destroy(kdl_pd_state_t state);
+
+/**
+ * @brief Record a timing measurement for a specific (kernel, shape, device, variant).
+ *
+ * Call this after each kernel execution to feed the profiling system.
+ *
+ * @param state        Profiled dispatch state.
+ * @param kernel_name  Null-terminated kernel name.
+ * @param shape_hash   Hash of the input shape / problem size.
+ * @param device_id    Device index.
+ * @param variant_idx  Which variant was run (0-based index in the bundle).
+ * @param n_variants   Total number of compatible variants.
+ * @param elapsed_ns   Measured wall-clock time in nanoseconds.
+ */
+kdl_status kdl_pd_record(kdl_pd_state_t state, const char *kernel_name,
+                          uint64_t shape_hash, int device_id,
+                          int variant_idx, int n_variants, double elapsed_ns);
+
+/**
+ * @brief Select the next variant to run using explore/exploit strategy.
+ *
+ * Returns the variant index to execute next:
+ *   - If any variant has fewer than KDL_PD_WARMUP_SAMPLES, returns that variant (explore).
+ *   - Otherwise, returns the variant with lowest median time (exploit).
+ *   - If no profile entry exists yet, returns -1 (caller should use metadata-based selection).
+ *
+ * @param state        Profiled dispatch state.
+ * @param kernel_name  Null-terminated kernel name.
+ * @param shape_hash   Hash of the input shape / problem size.
+ * @param device_id    Device index.
+ * @param[out] out_variant  Receives the variant index to run, or -1 for cold start.
+ */
+kdl_status kdl_pd_select(kdl_pd_state_t state, const char *kernel_name,
+                          uint64_t shape_hash, int device_id,
+                          int *out_variant);
+
+/**
+ * @brief Retrieve the profile entry for a given (kernel, shape, device) key.
+ *
+ * @param state        Profiled dispatch state.
+ * @param kernel_name  Null-terminated kernel name.
+ * @param shape_hash   Hash of the input shape / problem size.
+ * @param device_id    Device index.
+ * @param[out] out     Receives a copy of the profile entry.
+ * @return KDL_SUCCESS if found, KDL_ERROR_NO_MATCHING_VARIANT if not.
+ */
+kdl_status kdl_pd_get_profile(kdl_pd_state_t state, const char *kernel_name,
+                               uint64_t shape_hash, int device_id,
+                               kdl_pd_profile_entry *out);
+
 #ifdef __cplusplus
 }
 #endif

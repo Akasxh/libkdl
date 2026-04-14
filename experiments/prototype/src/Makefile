@@ -15,7 +15,7 @@ BENCHDIR := ../benchmarks
 
 .PHONY: all clean
 
-all: libkdl.so bench_dispatch runtime_select_poc bench_layers
+all: libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled
 
 # -- Shared library (zero link-time GPU dependencies) --
 libkdl.so: $(SRCDIR)/kdl.c $(SRCDIR)/kdl.h
@@ -34,5 +34,10 @@ runtime_select_poc: $(SRCDIR)/runtime_select_poc.c
 bench_layers: $(SRCDIR)/bench_layers.c
 	$(CC) -O2 -Wall -Wextra -Wno-unused-parameter -std=c11 -o bench_layers $(SRCDIR)/bench_layers.c -ldl
 
+# -- Profiled dispatch benchmark (standalone, links profiled_dispatch.c directly) --
+bench_profiled: $(BENCHDIR)/bench_profiled.c $(SRCDIR)/profiled_dispatch.c $(SRCDIR)/kdl.h
+	$(CC) $(CFLAGS) -I$(SRCDIR) -o $@ $(BENCHDIR)/bench_profiled.c \
+		$(SRCDIR)/profiled_dispatch.c -lm
+
 clean:
-	rm -f libkdl.so bench_dispatch runtime_select_poc bench_layers
+	rm -f libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled
