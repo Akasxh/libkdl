@@ -245,29 +245,39 @@
     #v(10pt)
 
     // Related Work — moved into left column to fill space
+    #let yes = text(size: 22pt, fill: rgb("#16a34a"), weight: "bold")[●]
+    #let no = text(size: 22pt, fill: rgb("#dc2626"), weight: "bold")[●]
+    #let partial = text(size: 22pt, fill: rgb("#d97706"), weight: "bold")[●]
     #card(accent: navy)[
       = #text(fill: navy)[Related Work]
-      #v(4pt)
-      #set table(inset: 5pt, stroke: 0.4pt + luma(210))
+      #v(6pt)
+      #set table(inset: 7pt, stroke: 0.5pt + luma(200))
       #table(
-        columns: (1fr, auto, auto, auto, auto, auto),
-        fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
+        columns: (1.2fr, auto, auto, auto, auto, auto),
+        align: (left, center, center, center, center, center),
+        fill: (col, row) => if row == 0 { navy.lighten(85%) } else if row == 6 { teal.lighten(90%) } else if calc.odd(row) { luma(248) } else { white },
         table.header(
-          text(weight: "bold", size: 13pt)[*System*],
-          text(weight: "bold", size: 13pt)[*Vendor*],
-          text(weight: "bold", size: 13pt)[*Meta*],
-          text(weight: "bold", size: 13pt)[*Policy*],
-          text(weight: "bold", size: 13pt)[*Data*],
-          text(weight: "bold", size: 13pt)[*Upstr.*],
+          text(weight: "bold", size: 18pt)[*System*],
+          text(weight: "bold", size: 18pt)[*Vendor*],
+          text(weight: "bold", size: 18pt)[*Meta*],
+          text(weight: "bold", size: 18pt)[*Policy*],
+          text(weight: "bold", size: 18pt)[*Data*],
+          text(weight: "bold", size: 18pt)[*Upstr.*],
         ),
-        text(size: 13pt)[IREE],       text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
-        text(size: 13pt)[chipStar],    text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗],
-        text(size: 13pt)[Proteus],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗],
-        text(size: 13pt)[liboffload],  text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[~], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
-        text(size: 13pt)[CPU FMV],     text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: teal)[✓], text(size: 14pt, fill: orange)[✗], text(size: 14pt, fill: teal)[✓],
-        text(size: 13pt, weight: "bold", fill: llvm-blue)[*Ours*], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓], text(size: 14pt, fill: teal, weight: "bold")[✓],
+        text(size: 18pt)[IREE],       yes, yes, partial, no, no,
+        text(size: 18pt)[chipStar],    yes, no, no, no, no,
+        text(size: 18pt)[Proteus],     no, no, yes, yes, no,
+        text(size: 18pt)[liboffload],  yes, partial, no, no, yes,
+        text(size: 18pt)[CPU FMV],     no, yes, yes, no, yes,
+        text(size: 18pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, yes,
       )
-      #text(size: 12pt, fill: rgb("#666"))[First to combine all five: multi-vendor, metadata, policy, measurement, upstream-ready.]
+      #v(4pt)
+      #grid(columns: (auto, auto, auto, 1fr), column-gutter: 12pt,
+        [#text(size: 22pt, fill: rgb("#16a34a"))[●] #text(size: 15pt)[Yes]],
+        [#text(size: 22pt, fill: rgb("#d97706"))[●] #text(size: 15pt)[Partial]],
+        [#text(size: 22pt, fill: rgb("#dc2626"))[●] #text(size: 15pt)[No]],
+        align(right)[#text(size: 14pt, fill: rgb("#666"))[First to combine all five.]],
+      )
     ]
   ],
 
