@@ -453,7 +453,7 @@
       #grid(
         columns: (1fr, 1fr, 1fr),
         column-gutter: 8pt,
-        stat-box("86%", "Of oracle\nperformance", accent: deep-purple),
+        stat-box("83%", "Of oracle\nperformance", accent: deep-purple),
         stat-box[O(N#super[2])][Regret bound\ (constant)],
         stat-box("7.3x", "Less regret\nthan random", accent: teal),
       )
@@ -499,7 +499,7 @@
       #image("figures/mab-scaling.svg", width: 100%)
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Profiled dispatch achieves 86% of oracle with 7.3x less regret than random.
+        Profiled dispatch achieves 83% of oracle with 7.3x less regret than random.
       ]
     ]
 
