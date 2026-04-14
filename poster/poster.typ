@@ -337,24 +337,13 @@
         { gpu.runtime_select = #gpu.runtime_select<
             policy = "best_compatible",
             fallback = "first_valid"> }
-      {
-        gpu.func @matmul_sm80
-          { variant_tag = "ampere_tc",
-            min_sm = 80,
-            requires_features = ["tensor_cores"] }
-        { ... }
-
-        gpu.func @matmul_sm90
-          { variant_tag = "hopper_tma",
-            min_sm = 90,
-            requires_features = ["tma", "tensor_cores"] }
-        { ... }
-      }
+      {  gpu.func @matmul_sm80 { min_sm=80 } ...
+         gpu.func @matmul_sm90 { min_sm=90 } ... }
       ```
 
       #v(6pt)
       #text(size: 15pt, fill: rgb("#555"))[
-        The attribute is *declarative* — it expresses intent, not mechanism. The runtime implementation is free to evolve.
+        *Declarative* — expresses intent, not mechanism. Runtime is free to evolve.
       ]
     ]
 
@@ -438,6 +427,42 @@
       #v(6pt)
       #text(size: 14pt, fill: rgb("#666"))[
         Our dispatch adds negligible overhead compared to existing runtime costs — selection is noise-level relative to module loading.
+      ]
+    ]
+
+    #v(10pt)
+
+    // Card: Ongoing — Profiled Adaptive Dispatch
+    #card(accent: teal)[
+      = #text(fill: teal)[Ongoing: Profiled Adaptive Dispatch]
+      #v(4pt)
+
+      #text(size: 18pt)[
+        *Phase 2:* Instead of static metadata-based selection, we explore *runtime profiling* to learn which variant is fastest.
+      ]
+
+      #v(4pt)
+
+      #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
+        #text(size: 17pt, fill: rgb("#1a5c4a"))[
+          *Formulation:* Stochastic multi-armed bandit over kernel variants.\
+          *Key insight:* GPU dispatch is a _degenerate_ bandit — N#text(size: 14pt)[<]10 arms, #text(size: 14pt)[<]5% variance, cacheable contexts.
+        ]
+      ]
+
+      #v(4pt)
+
+      #grid(
+        columns: (1fr, 1fr),
+        column-gutter: 8pt,
+        stat-box("9", "Dispatches to\nconverge", accent: teal),
+        stat-box[O(N#super[2])][Regret bound\ (provably optimal)],
+      )
+
+      #v(4pt)
+      #text(size: 16pt, fill: rgb("#555"))[
+        *Warmup:* 3 samples #sym.times 3 variants = 9 dispatches #sym.arrow.r locks onto optimal.\
+        Exhaustive exploration #sym.arrow.r permanent exploitation.
       ]
     ]
 

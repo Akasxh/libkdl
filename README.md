@@ -1,6 +1,6 @@
 # libkdl — Kernel Dynamic Linker
 
-**Measuring and Improving Multi-Target Binary Selection in LLVM's GPU Offload Stack**
+**Bridging Runtime Gaps in LLVM: Vendor-Agnostic Dispatch for ML Kernels**
 
 *EuroLLVM Developers' Meeting, Dublin 2026 — Poster Session*
 

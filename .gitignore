@@ -44,11 +44,22 @@ experiments/prototype/src/bench_dispatch
 experiments/prototype/src/bench_layers
 experiments/prototype/src/bench_variant_scaling
 experiments/prototype/src/bench_ptx_vs_cubin
+experiments/prototype/src/bench_profiled
 experiments/prototype/src/runtime_select_poc
 experiments/prototype/src/offloadbinary_parse
+experiments/prototype/src/demo_dispatch
 experiments/prototype/src/libkdl.so
+experiments/prototype/benchmarks/bench_real
+experiments/prototype/benchmarks/demo
+
+# Poster iteration artifacts
 poster-*.png
 poster-*.jpeg
 iteration-*.png
 final-*.png
-poster/references/*.pdf
+poster.png
+*.pptx
+*.ppt
+
+# Reference materials (large, local only)
+poster/references/
