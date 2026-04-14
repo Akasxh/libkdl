@@ -1,0 +1,32 @@
+=== MAB Benchmark Suite ===
+KDL_PD_WARMUP_SAMPLES=3, KDL_PD_MAX_VARIANTS=16
+
+[Scenario 1] Near-identical variants (5 variants, 12% spread, sigma=8us)
+  Best variant: 0 (expected 0)
+  Median times: [0]=99938ns [1]=107979ns [2]=106134ns [3]=107638ns [4]=107328ns
+  Cumulative regret: 973606 ns
+
+[Scenario 2] Shape-dependent ranking (4 variants x 3 shapes)
+  Shape small: best=2 (expected 2), regret=533122 ns
+  Shape medium: best=1 (expected 1), regret=645363 ns
+  Shape large: best=0 (expected 0), regret=699983 ns
+
+[Scenario 3] Scaling: dispatches-to-converge vs N variants
+  N= 2: converged_at=6, best_variant=0 (102us)
+  N= 4: converged_at=-1, best_variant=3 (100us)
+  N= 8: converged_at=25, best_variant=5 (83us)
+  N=16: converged_at=48, best_variant=7 (82us)
+  N=32: converged_at=73, best_variant=9 (81us)
+  N=64: converged_at=85, best_variant=21 (80us)
+
+[Scenario 4] Non-stationary: thermal throttle at iter 500
+  static: final cumulative regret = 2298257 ns
+  adaptive: final cumulative regret = 3220411 ns
+
+[Scenario 5] Comparison vs baselines (5 variants)
+  random: final regret = 10021500 ns
+  roofline: final regret = 12598197 ns
+  oracle: final regret = 1140822 ns
+  profiled: final regret = 1371370 ns
+
+=== Total runtime: 1.5 seconds ===

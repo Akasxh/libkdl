@@ -15,7 +15,7 @@ BENCHDIR := ../benchmarks
 
 .PHONY: all clean
 
-all: libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled
+all: libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled bench_mab_suite
 
 # -- Shared library (zero link-time GPU dependencies) --
 libkdl.so: $(SRCDIR)/kdl.c $(SRCDIR)/kdl.h
@@ -39,5 +39,10 @@ bench_profiled: $(BENCHDIR)/bench_profiled.c $(SRCDIR)/profiled_dispatch.c $(SRC
 	$(CC) $(CFLAGS) -I$(SRCDIR) -o $@ $(BENCHDIR)/bench_profiled.c \
 		$(SRCDIR)/profiled_dispatch.c -lm
 
+# -- MAB comprehensive benchmark suite (standalone, links profiled_dispatch.c directly) --
+bench_mab_suite: $(BENCHDIR)/bench_mab_suite.c $(SRCDIR)/profiled_dispatch.c $(SRCDIR)/kdl.h
+	$(CC) $(CFLAGS) -I$(SRCDIR) -o $@ $(BENCHDIR)/bench_mab_suite.c \
+		$(SRCDIR)/profiled_dispatch.c -lm
+
 clean:
-	rm -f libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled
+	rm -f libkdl.so bench_dispatch runtime_select_poc bench_layers bench_profiled bench_mab_suite

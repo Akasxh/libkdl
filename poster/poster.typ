@@ -433,20 +433,20 @@
         bottom: 2pt + deep-purple.lighten(40%),
       ),
     )[
-      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[Convergence Dynamics]
+      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[Profiled vs. Baselines]
       #v(6pt)
-      #image("figures/convergence.svg", width: 100%)
+      #image("figures/mab-comparison.svg", width: 100%)
       #v(6pt)
       #grid(
         columns: (1fr, 1fr, 1fr),
         column-gutter: 8pt,
-        stat-box("9", "Dispatches to\nconverge", accent: deep-purple),
+        stat-box("86%", "Of oracle\nperformance", accent: deep-purple),
         stat-box[O(N#super[2])][Regret bound\ (constant)],
-        stat-box("0", "Marginal regret\nafter lock", accent: teal),
+        stat-box("7.3x", "Less regret\nthan random", accent: teal),
       )
       #v(4pt)
       #text(size: 15pt, fill: rgb("#555"), style: "italic")[
-        After 9 dispatches ($3 times 3$ round-robin), the profiler permanently locks onto the fastest variant. No further exploration is ever needed.
+        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance — 7.3x better than random, robust to noise.
       ]
     ]
   ],
@@ -481,25 +481,25 @@
 
     // Regret Plot
     #card(accent: deep-purple)[
-      = #text(fill: deep-purple)[Cumulative Regret]
+      = #text(fill: deep-purple)[Scaling with Variants]
       #v(4pt)
-      #image("figures/regret.svg", width: 100%)
+      #image("figures/mab-scaling.svg", width: 100%)
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Regret flattens after 9 iterations. Total regret is bounded by $O(N^2)$ — independent of horizon $T$.
+        Profiled dispatch achieves 86% of oracle with 7.3x less regret than random.
       ]
     ]
 
     #v(8pt)
 
-    // Selection Heatmap
+    // Context-Dependent Selection
     #card(accent: teal)[
-      = #text(fill: teal)[Selection Heatmap]
+      = #text(fill: teal)[Context-Dependent Selection]
       #v(4pt)
-      #image("figures/selection-heatmap.svg", width: 100%)
+      #image("figures/mab-context.svg", width: 100%)
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Visual of explore #sym.arrow exploit transition: round-robin warmup across all arms, then permanent lock onto the optimal variant.
+        Different shapes converge to different optimal variants — the context in contextual bandit matters.
       ]
     ]
 
