@@ -1,5 +1,6 @@
 // EuroLLVM Dublin 2026 — Conference Poster
 // Bridging Runtime Gaps in LLVM: Vendor-Agnostic Dispatch for ML Kernels
+// Structure: MAB Profiled Adaptive Dispatch as CENTERPIECE
 
 // ─── Page Setup ───────────────────────────────────────────────────
 #set page(
@@ -19,18 +20,20 @@
 #let light-blue = rgb("#e8f1fa")
 #let light-teal = rgb("#e6f6f1")
 #let light-orange = rgb("#fdf0e0")
+#let deep-purple = rgb("#6b21a8")
+#let light-purple = rgb("#f3e8ff")
 
 // ─── Typography ───────────────────────────────────────────────────
-#set text(font: "Libertinus Serif", size: 20pt, fill: rgb("#1a1a1a"))
-#show heading.where(level: 1): set text(font: "Liberation Sans", size: 30pt, weight: "bold", fill: navy)
-#show heading.where(level: 2): set text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: navy)
-#show heading.where(level: 3): set text(font: "Liberation Sans", size: 22pt, weight: "semibold", fill: rgb("#333"))
+#set text(font: "Libertinus Serif", size: 19pt, fill: rgb("#1a1a1a"))
+#show heading.where(level: 1): set text(font: "Liberation Sans", size: 28pt, weight: "bold", fill: navy)
+#show heading.where(level: 2): set text(font: "Liberation Sans", size: 24pt, weight: "bold", fill: navy)
+#show heading.where(level: 3): set text(font: "Liberation Sans", size: 20pt, weight: "semibold", fill: rgb("#333"))
 
 // ─── Card Helper ──────────────────────────────────────────────────
-#let card(accent: llvm-blue, body, grow: false) = {
+#let card(accent: llvm-blue, body) = {
   block(
     width: 100%,
-    inset: 12pt,
+    inset: 11pt,
     radius: 6pt,
     fill: card-bg,
     stroke: (
@@ -47,13 +50,13 @@
 #let stat-box(value, label, accent: llvm-blue) = {
   box(
     width: 100%,
-    inset: 6pt,
+    inset: 5pt,
     radius: 4pt,
     fill: accent.lighten(88%),
     stroke: 1pt + accent.lighten(60%),
     align(center)[
-      #text(size: 34pt, weight: "bold", fill: accent)[#value]\
-      #text(size: 14pt, fill: rgb("#555"))[#label]
+      #text(size: 30pt, weight: "bold", fill: accent)[#value]\
+      #text(size: 13pt, fill: rgb("#555"))[#label]
     ],
   )
 }
@@ -64,7 +67,7 @@
     inset: (x: 3pt, y: 2pt),
     radius: 3pt,
     fill: rgb("#f0f0f0"),
-    text(font: "DejaVu Sans Mono", size: 17pt, fill: rgb("#c7254e"), it),
+    text(font: "DejaVu Sans Mono", size: 16pt, fill: rgb("#c7254e"), it),
   )
 }
 
@@ -74,13 +77,13 @@
     inset: 8pt,
     radius: 4pt,
     fill: rgb("#282c34"),
-    text(font: "DejaVu Sans Mono", size: 15pt, fill: rgb("#abb2bf"), it),
+    text(font: "DejaVu Sans Mono", size: 14pt, fill: rgb("#abb2bf"), it),
   )
 }
 
 // ─── Table Styling ────────────────────────────────────────────────
 #set table(
-  inset: 6pt,
+  inset: 5pt,
   stroke: 0.5pt + luma(200),
 )
 
@@ -90,7 +93,7 @@
 
 #block(
   width: 100%,
-  inset: (x: 24pt, y: 18pt),
+  inset: (x: 24pt, y: 16pt),
   radius: 8pt,
   fill: gradient.linear(navy, llvm-blue, angle: 0deg),
   stroke: none,
@@ -99,20 +102,20 @@
     columns: (auto, 1fr, auto),
     column-gutter: 16pt,
     align(left + horizon)[
-      #image("figures/llvm-logo.png", height: 70pt)
+      #image("figures/llvm-logo.png", height: 65pt)
     ],
     align(center + horizon)[
       #text(font: "Liberation Sans", size: 48pt, weight: "bold", fill: white)[
         Bridging Runtime Gaps in LLVM:\
         Vendor-Agnostic Dispatch for ML Kernels
       ]
-      #v(6pt)
+      #v(5pt)
       #text(font: "Liberation Sans", size: 22pt, fill: rgb("#cce0f0"))[
         S. Akash
         #h(10pt) #text(fill: rgb("#88bbdd"))[|] #h(10pt)
         IIT Patna  ·  CERN GSoC  ·  vLLM contributor
       ]
-      #v(4pt)
+      #v(3pt)
       #text(font: "Liberation Sans", size: 17pt, fill: rgb("#99c8e8"))[
         EuroLLVM Developers' Meeting  ·  Dublin 2026
       ]
@@ -127,445 +130,466 @@
   )
 ]
 
-#v(16pt)
+#v(12pt)
 
 // ═══════════════════════════════════════════════════════════════════
 //  MAIN 3-COLUMN BODY
 // ═══════════════════════════════════════════════════════════════════
 
 #grid(
-  columns: (1fr, 1.2fr, 1fr),
-  column-gutter: 12pt,
-  row-gutter: 12pt,
+  columns: (1fr, 1.3fr, 1fr),
+  column-gutter: 11pt,
+  row-gutter: 10pt,
 
   // ─────────────────────────────────────────────────────────────────
-  //  LEFT COLUMN — The Problem
+  //  COLUMN 1 — The Problem + Phase 1 Results (SETUP)
   // ─────────────────────────────────────────────────────────────────
   [
-    // Card 1: Problem Statement
+    // Card: The Gap
     #card(accent: orange)[
-      = #text(fill: orange)[The Problem]
+      = #text(fill: orange)[The Gap]
+      #v(4pt)
+      #text(size: 20pt, weight: "bold", fill: navy)[
+        MLIR compiles one `gpu.module` to 3+ GPU vendors — but picks the *first compatible* binary at runtime.
+      ]
       #v(6pt)
-      #text(size: 22pt, weight: "bold", fill: navy)[
-        MLIR compiles one `gpu.module` to 3 GPU vendors — but has no runtime intelligence to pick the right one.
-      ]
-      #v(8pt)
-
-      #block(inset: 8pt, radius: 4pt, fill: light-orange, width: 100%)[
-        #text(size: 18pt, fill: rgb("#6b4c00"))[
-          *OffloadBinary* carries N device images. At runtime, the offload stack picks the *FIRST* compatible image. No metadata vocabulary. No measurement. No "best-compatible" mechanism.
+      #block(inset: 7pt, radius: 4pt, fill: light-orange, width: 100%)[
+        #text(size: 17pt, fill: rgb("#6b4c00"))[
+          *OffloadBinary* carries N device images. The runtime loads the first image that doesn't fail. No metadata vocabulary. No measurement. No "best-compatible" mechanism.
         ]
-      ]
-
-      #v(8pt)
-
-      *Runtime dispatch already exists everywhere:*
-      - cuBLAS / cuDNN — internal kernel selection
-      - PyTorch — `torch.compile` autotuning
-      - CPU world — Function Multi-Versioning (FMV)
-      - *MLIR is the exception*
-
-      #v(8pt)
-
-      #text(size: 18pt, fill: rgb("#555"), style: "italic")[
-        "The runtime just loads the first image that doesn't fail."
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 2: Upstream Evidence
+    // Card: Upstream Evidence
     #card(accent: navy)[
       = #text(fill: navy)[Upstream Evidence]
-      #v(6pt)
-
+      #v(4pt)
       #table(
         columns: (auto, 1fr),
         fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
         table.header(
-          text(weight: "bold", size: 16pt)[*PR / Issue*],
-          text(weight: "bold", size: 16pt)[*What it shows*],
+          text(weight: "bold", size: 15pt)[*PR / Issue*],
+          text(weight: "bold", size: 15pt)[*What it shows*],
         ),
-        text(size: 16pt)[`#148286`], text(size: 16pt)[XeVM — new vendor images arriving fast],
-        text(size: 16pt)[`#186088`], text(size: 16pt)[liboffload uses first-wins selection],
-        text(size: 16pt)[`#185663`], text(size: 16pt)[`isMetadataCompatible` — no policy],
-        text(size: 16pt)[`#75356`],  text(size: 16pt)[Chapel users need dispatch],
-        text(size: 16pt)[`#88170`],  text(size: 16pt)[RFC: policy slot explicitly empty],
+        text(size: 15pt)[`#148286`], text(size: 15pt)[XeVM — new vendor images arriving fast],
+        text(size: 15pt)[`#186088`], text(size: 15pt)[liboffload uses first-wins selection],
+        text(size: 15pt)[`#185663`], text(size: 15pt)[`isMetadataCompatible` — no policy],
+        text(size: 15pt)[`#75356`],  text(size: 15pt)[Chapel users need dispatch],
+        text(size: 15pt)[`#88170`],  text(size: 15pt)[RFC: policy slot explicitly empty],
       )
-
-      #v(6pt)
+      #v(3pt)
       #align(center)[
-        #text(size: 15pt, fill: rgb("#666"))[
-          5 independent signals pointing at the same gap.
-        ]
+        #text(size: 14pt, fill: rgb("#666"))[5 independent signals pointing at the same gap.]
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 3: Why It Matters
-    #card(accent: teal)[
-      = #text(fill: teal)[Why It Matters]
+    // Card: Phase 1 — Dispatch Measurement (SETUP for main story)
+    #card(accent: orange)[
+      = #text(fill: orange)[Phase 1: Dispatch Measurement]
+      #v(4pt)
+
+      #image("figures/latency-breakdown.svg", width: 100%)
+
       #v(6pt)
 
       #grid(
-        columns: (1fr, 1fr),
-        column-gutter: 8pt,
-        row-gutter: 8pt,
-        stat-box("3+", "GPU vendors\nin MLIR", accent: llvm-blue),
-        stat-box("0", "Lines of dispatch\npolicy upstream", accent: orange),
-        stat-box("5", "Independent PRs\nhitting this gap", accent: teal),
-        stat-box("1st", "Published dispatch\nflame graph", accent: navy),
+        columns: (1fr, 1fr, 1fr),
+        column-gutter: 6pt,
+        stat-box("36 " + sym.mu + "s", "cuModuleLoadData\n(90% of cold path)", accent: orange),
+        stat-box("3--6 ns", "Selection\noverhead", accent: teal),
+        stat-box("< 0.02%", "Dispatch cost\nvs. kernel load", accent: llvm-blue),
       )
 
-      #v(8pt)
-
-      #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
-        #text(size: 18pt, fill: rgb("#1a5c4a"))[
-          Without runtime dispatch, multi-vendor MLIR deployments are fragile — they silently load suboptimal kernels.
+      #v(4pt)
+      #block(inset: 7pt, radius: 4pt, fill: light-orange, width: 100%)[
+        #text(size: 18pt, weight: "bold", fill: rgb("#6b4c00"))[
+          Selection is *free* relative to driver costs. So: what information should *drive* it?
         ]
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 4: Dispatch Everywhere
-    #card(accent: llvm-blue)[
-      = #text(fill: llvm-blue)[Dispatch Is Everywhere — Except MLIR]
-      #v(6pt)
-
-      #image("figures/runtime-dispatch-everywhere.svg", width: 100%)
-
-      #v(6pt)
-      #text(size: 14pt, fill: rgb("#666"))[
-        Every major ML runtime implements kernel selection internally. MLIR's offload stack is the only one without a dispatch policy.
-      ]
+    // Card: Metadata Vocabulary
+    #card(accent: teal)[
+      = #text(fill: teal)[Metadata Vocabulary]
+      #v(4pt)
+      #table(
+        columns: (auto, 1fr),
+        fill: (col, row) => if row == 0 { teal.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
+        table.header(
+          text(weight: "bold", size: 15pt)[*Key*],
+          text(weight: "bold", size: 15pt)[*Purpose*],
+        ),
+        text(size: 15pt, font: "DejaVu Sans Mono")[min_sm],           text(size: 15pt)[Min CUDA compute capability],
+        text(size: 15pt, font: "DejaVu Sans Mono")[min_gfx],          text(size: 15pt)[Min AMD GFX version],
+        text(size: 15pt, font: "DejaVu Sans Mono")[requires_features], text(size: 15pt)[Tensor cores, matrix units, etc.],
+        text(size: 15pt, font: "DejaVu Sans Mono")[variant_priority],  text(size: 15pt)[Explicit ordering for tie-breaking],
+        text(size: 15pt, font: "DejaVu Sans Mono")[variant_tag],       text(size: 15pt)[Human-readable variant name],
+      )
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Related Work — moved into left column to fill space
-    #let yes = text(size: 22pt, fill: rgb("#16a34a"), weight: "bold")[●]
-    #let no = text(size: 22pt, fill: rgb("#dc2626"), weight: "bold")[●]
-    #let partial = text(size: 22pt, fill: rgb("#d97706"), weight: "bold")[●]
+    // Related Work
+    #let yes = text(size: 20pt, fill: rgb("#16a34a"), weight: "bold")[●]
+    #let no = text(size: 20pt, fill: rgb("#dc2626"), weight: "bold")[●]
+    #let partial = text(size: 20pt, fill: rgb("#d97706"), weight: "bold")[●]
     #card(accent: navy)[
       = #text(fill: navy)[Related Work]
-      #v(6pt)
-      #set table(inset: 7pt, stroke: 0.5pt + luma(200))
+      #v(4pt)
+      #set table(inset: 5pt, stroke: 0.5pt + luma(200))
       #table(
         columns: (1.2fr, auto, auto, auto, auto, auto),
         align: (left, center, center, center, center, center),
         fill: (col, row) => if row == 0 { navy.lighten(85%) } else if row == 6 { teal.lighten(90%) } else if calc.odd(row) { luma(248) } else { white },
         table.header(
-          text(weight: "bold", size: 18pt)[*System*],
-          text(weight: "bold", size: 18pt)[*Vendor*],
-          text(weight: "bold", size: 18pt)[*Meta*],
-          text(weight: "bold", size: 18pt)[*Policy*],
-          text(weight: "bold", size: 18pt)[*Data*],
-          text(weight: "bold", size: 18pt)[*Upstr.*],
+          text(weight: "bold", size: 16pt)[*System*],
+          text(weight: "bold", size: 16pt)[*Vend.*],
+          text(weight: "bold", size: 16pt)[*Meta*],
+          text(weight: "bold", size: 16pt)[*Pol.*],
+          text(weight: "bold", size: 16pt)[*Data*],
+          text(weight: "bold", size: 16pt)[*Ups.*],
         ),
-        text(size: 18pt)[IREE],       yes, yes, partial, no, no,
-        text(size: 18pt)[chipStar],    yes, no, no, no, no,
-        text(size: 18pt)[Proteus],     no, no, yes, yes, no,
-        text(size: 18pt)[liboffload],  yes, partial, no, no, yes,
-        text(size: 18pt)[CPU FMV],     no, yes, yes, no, yes,
-        text(size: 18pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, yes,
+        text(size: 16pt)[IREE],       yes, yes, partial, no, no,
+        text(size: 16pt)[chipStar],    yes, no, no, no, no,
+        text(size: 16pt)[Proteus],     no, no, yes, yes, no,
+        text(size: 16pt)[liboffload],  yes, partial, no, no, yes,
+        text(size: 16pt)[CPU FMV],     no, yes, yes, no, yes,
+        text(size: 16pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, yes,
       )
-      #v(4pt)
-      #grid(columns: (auto, auto, auto, 1fr), column-gutter: 12pt,
-        [#text(size: 22pt, fill: rgb("#16a34a"))[●] #text(size: 15pt)[Yes]],
-        [#text(size: 22pt, fill: rgb("#d97706"))[●] #text(size: 15pt)[Partial]],
-        [#text(size: 22pt, fill: rgb("#dc2626"))[●] #text(size: 15pt)[No]],
-        align(right)[#text(size: 14pt, fill: rgb("#666"))[First to combine all five.]],
+      #v(2pt)
+      #grid(columns: (auto, auto, auto, 1fr), column-gutter: 10pt,
+        [#text(size: 20pt, fill: rgb("#16a34a"))[●] #text(size: 14pt)[Yes]],
+        [#text(size: 20pt, fill: rgb("#d97706"))[●] #text(size: 14pt)[Partial]],
+        [#text(size: 20pt, fill: rgb("#dc2626"))[●] #text(size: 14pt)[No]],
+        align(right)[#text(size: 13pt, fill: rgb("#666"))[First to combine all five.]],
       )
     ]
   ],
 
   // ─────────────────────────────────────────────────────────────────
-  //  CENTER COLUMN — Our Contributions
+  //  COLUMN 2 — Phase 2: Profiled Adaptive Dispatch (THE MAIN STORY)
   // ─────────────────────────────────────────────────────────────────
   [
-    // Card 5: System Architecture (DOMINANT FIGURE)
+    // THE INSIGHT — Big callout
+    #block(
+      width: 100%,
+      inset: 14pt,
+      radius: 8pt,
+      fill: gradient.linear(deep-purple.lighten(85%), llvm-blue.lighten(85%), angle: 0deg),
+      stroke: (
+        top: 5pt + deep-purple,
+        left: 2pt + deep-purple.lighten(40%),
+        right: 2pt + deep-purple.lighten(40%),
+        bottom: 2pt + deep-purple.lighten(40%),
+      ),
+    )[
+      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[The Insight]
+      #v(6pt)
+      #text(size: 22pt, fill: navy)[
+        Since selection costs *3--6 ns*, the question is not _whether_ to dispatch, but *what information drives it*. We formalize kernel variant selection as a *multi-armed bandit* problem.
+      ]
+      #v(6pt)
+      #text(size: 18pt, fill: rgb("#555"))[
+        Phase 1 measured the dispatch. Phase 2 makes it *intelligent*.
+      ]
+    ]
+
+    #v(8pt)
+
+    // System Architecture
     #card(accent: llvm-blue)[
       = #text(fill: llvm-blue)[System Architecture]
-      #v(6pt)
-
+      #v(4pt)
       #image("figures/architecture.svg", width: 100%)
-
-      #v(6pt)
+      #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        End-to-end pipeline: MLIR compilation embeds metadata in OffloadBinary; at load time, libkdl scores each variant and dispatches the best match to the active GPU.
+        End-to-end: MLIR embeds metadata in OffloadBinary; at runtime, the MAB profiler scores each variant and dispatches the best match.
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 6: C1 — Metadata Keys
-    #card(accent: teal)[
-      = #text(fill: teal)[C1: Metadata Vocabulary]
+    // MAB Formulation — Highlighted mathematical box
+    #block(
+      width: 100%,
+      inset: 12pt,
+      radius: 6pt,
+      fill: white,
+      stroke: (
+        top: 4pt + deep-purple,
+        left: 2pt + deep-purple.lighten(50%),
+        right: 2pt + deep-purple.lighten(50%),
+        bottom: 2pt + deep-purple.lighten(50%),
+      ),
+    )[
+      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[The MAB Formulation]
       #v(6pt)
 
-      #text(size: 18pt)[Five new keys that let the runtime reason about variant compatibility:]
-
-      #v(6pt)
-
-      #table(
+      #grid(
         columns: (auto, 1fr),
-        fill: (col, row) => if row == 0 { teal.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
-        table.header(
-          text(weight: "bold", size: 18pt)[*Key*],
-          text(weight: "bold", size: 18pt)[*Purpose*],
-        ),
-        text(size: 18pt, font: "DejaVu Sans Mono")[min_sm],           text(size: 18pt)[Minimum CUDA compute capability],
-        text(size: 18pt, font: "DejaVu Sans Mono")[min_gfx],          text(size: 18pt)[Minimum AMD GFX version],
-        text(size: 18pt, font: "DejaVu Sans Mono")[requires_features], text(size: 18pt)[Tensor cores, matrix units, etc.],
-        text(size: 18pt, font: "DejaVu Sans Mono")[variant_priority],  text(size: 18pt)[Explicit ordering for tie-breaking],
-        text(size: 18pt, font: "DejaVu Sans Mono")[variant_tag],       text(size: 18pt)[Human-readable variant name],
+        column-gutter: 10pt,
+        row-gutter: 8pt,
+        text(size: 19pt, weight: "bold", fill: navy)[Arms:],
+        text(size: 19pt)[$N$ pre-compiled kernel variants (typically $N < 10$)],
+        text(size: 19pt, weight: "bold", fill: navy)[Reward:],
+        text(size: 19pt)[Negative execution time: $r_i = -t_"exec"(v_i)$],
+        text(size: 19pt, weight: "bold", fill: navy)[Context:],
+        text(size: 19pt)[$(italic("kernel_name"), italic("shape"), italic("device_id"))$ #sym.arrow.r cacheable key],
+        text(size: 19pt, weight: "bold", fill: navy)[Objective:],
+        text(size: 19pt)[Minimize cumulative regret $R_T = sum_(t=1)^T (mu^* - mu_(a_t))$],
       )
 
+      #v(8pt)
+      #block(inset: 8pt, radius: 4pt, fill: light-purple, width: 100%)[
+        #text(size: 18pt, weight: "bold", fill: deep-purple)[Structural Properties:]
+        #v(4pt)
+        #grid(
+          columns: (1fr, 1fr, 1fr),
+          column-gutter: 8pt,
+          align(center)[#text(size: 17pt)[*$N < 10$*\ arms (few variants)]],
+          align(center)[#text(size: 17pt)[*$sigma^2 < 5%$*\ low noise]],
+          align(center)[#text(size: 17pt)[*Cacheable*\ contexts reuse]],
+        )
+      ]
+    ]
+
+    #v(8pt)
+
+    // Why This Is a DEGENERATE Bandit — Key theoretical insight
+    #block(
+      width: 100%,
+      inset: 12pt,
+      radius: 6pt,
+      fill: white,
+      stroke: (
+        top: 4pt + teal,
+        left: 2pt + teal.lighten(50%),
+        right: 2pt + teal.lighten(50%),
+        bottom: 2pt + teal.lighten(50%),
+      ),
+    )[
+      #text(font: "Liberation Sans", size: 24pt, weight: "bold", fill: teal)[Why This Is a Degenerate Bandit]
+      #v(6pt)
+      #text(size: 19pt)[
+        Standard MAB algorithms (UCB1, Thompson Sampling) are designed for $N #sym.arrow infinity$ or non-stationary rewards. GPU kernel dispatch has *none* of these complexities:
+      ]
       #v(6pt)
       #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
-        #text(size: 18pt, fill: rgb("#1a5c4a"))[
-          These keys are *composable* — a single OffloadBinary can carry variants tagged for different vendors and feature sets. The dispatcher scores each against the live GPU context.
+        #text(size: 19pt, fill: rgb("#1a5c4a"))[
+          *Exhaustive exploration* ($N times w$ warmup samples) followed by *permanent exploitation*.\
+          *Regret:* $O(N^2)$ constant — provably optimal for this problem class.\
+          *UCB1 and Thompson Sampling are unnecessary.*
         ]
       ]
-    ]
-
-    #v(10pt)
-
-    // Card 7: C3 — MLIR Attribute
-    #card(accent: navy)[
-      = #text(fill: navy)[C3: MLIR Attribute Design] #text(size: 14pt, fill: rgb("#888"))[(proposed)]
       #v(6pt)
-
-      #text(size: 18pt)[A new `#gpu.runtime_select` attribute that attaches dispatch policy directly to MLIR modules:]
-
-      #v(6pt)
-
-      ```
-      gpu.module @matmul_variants
-        { gpu.runtime_select = #gpu.runtime_select<
-            policy = "best_compatible",
-            fallback = "first_valid"> }
-      {  gpu.func @matmul_sm80 { min_sm=80 } ...
-         gpu.func @matmul_sm90 { min_sm=90 } ... }
-      ```
-
-      #v(6pt)
-      #text(size: 15pt, fill: rgb("#555"))[
-        *Declarative* — expresses intent, not mechanism. Runtime is free to evolve.
+      #text(size: 17pt, fill: rgb("#555"))[
+        With $N=3$ variants and $w=3$ warmup rounds, convergence is guaranteed in *9 dispatches*. After that, every dispatch is optimal with zero marginal regret.
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 8: Latency Breakdown
-    #card(accent: orange)[
-      = #text(fill: orange)[C2: First Published Dispatch Flame Graph]
+    // The Algorithm — 3-phase pseudocode
+    #card(accent: navy)[
+      = #text(fill: navy)[The Algorithm]
+      #v(4pt)
+      ```
+      fn dispatch(ctx, variants[N], warmup=3):
+        key = (ctx.kernel, ctx.shape, ctx.device)
+        if key in cache:           // EXPLOIT
+          return cache[key]
+        if stats[key].count < N*warmup:  // EXPLORE
+          arm = stats[key].count % N
+          t = time(variants[arm])
+          stats[key].update(arm, t)
+          return variants[arm]
+        cache[key] = argmin(stats[key].mean)  // LOCK
+        return cache[key]
+      ```
+      #v(4pt)
+      #text(size: 15pt, fill: rgb("#555"))[
+        Three phases: *Cold* (no data) #sym.arrow *Explore* (round-robin warmup) #sym.arrow *Exploit* (permanent lock).
+      ]
+    ]
+
+    #v(8pt)
+
+    // CONVERGENCE FIGURE — THE HERO FIGURE (BIG)
+    #block(
+      width: 100%,
+      inset: 12pt,
+      radius: 8pt,
+      fill: white,
+      stroke: (
+        top: 5pt + deep-purple,
+        left: 2pt + deep-purple.lighten(40%),
+        right: 2pt + deep-purple.lighten(40%),
+        bottom: 2pt + deep-purple.lighten(40%),
+      ),
+    )[
+      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[Convergence Dynamics]
       #v(6pt)
-
-      #image("figures/latency-breakdown.svg", width: 100%)
-
-      #v(8pt)
-
+      #image("figures/convergence.svg", width: 100%)
+      #v(6pt)
       #grid(
         columns: (1fr, 1fr, 1fr),
         column-gutter: 8pt,
-        stat-box("36.0 " + sym.mu + "s", "cuModuleLoadData\n(90% of cold path)", accent: orange),
-        stat-box("3 -- 6 ns", "Selection\noverhead", accent: teal),
-        stat-box("< 0.02%", "Dispatch cost\nvs. kernel load", accent: llvm-blue),
+        stat-box("9", "Dispatches to\nconverge", accent: deep-purple),
+        stat-box[O(N#super[2])][Regret bound\ (constant)],
+        stat-box("0", "Marginal regret\nafter lock", accent: teal),
       )
-
-      #v(6pt)
-      #text(size: 15pt, fill: rgb("#555"))[
-        Selection is *free* relative to the driver costs it rides alongside.
+      #v(4pt)
+      #text(size: 15pt, fill: rgb("#555"), style: "italic")[
+        After 9 dispatches ($3 times 3$ round-robin), the profiler permanently locks onto the fastest variant. No further exploration is ever needed.
       ]
     ]
   ],
 
   // ─────────────────────────────────────────────────────────────────
-  //  RIGHT COLUMN — Evidence
+  //  COLUMN 3 — Evidence + Results
   // ─────────────────────────────────────────────────────────────────
   [
-    // Card 9: Dispatch Latency Table
+    // Dispatch Latency Table
     #card(accent: navy)[
       = #text(fill: navy)[Dispatch Latency Breakdown]
-      #v(6pt)
-
+      #v(4pt)
       #table(
         columns: (1fr, auto, auto),
         fill: (col, row) => if row == 0 { navy.lighten(85%) } else if calc.odd(row) { luma(248) } else { white },
         table.header(
-          text(weight: "bold", size: 16pt)[*Operation*],
-          text(weight: "bold", size: 16pt)[*Latency*],
-          text(weight: "bold", size: 16pt)[*Share*],
+          text(weight: "bold", size: 15pt)[*Operation*],
+          text(weight: "bold", size: 15pt)[*Latency*],
+          text(weight: "bold", size: 15pt)[*Share*],
         ),
-        text(size: 16pt)[cuModuleLoadData (cold)],  text(size: 16pt, weight: "bold", fill: orange)[36.0 #sym.mu\s],  text(size: 16pt)[89.6%],
-        text(size: 16pt)[cuModuleLoadData (warm)],   text(size: 16pt)[9.6 #sym.mu\s],   text(size: 16pt)[—],
-        text(size: 16pt)[cuModuleGetFunction],        text(size: 16pt)[63 ns],            text(size: 16pt)[0.2%],
-        text(size: 16pt)[cuLaunchKernel],             text(size: 16pt)[1.65 #sym.mu\s],   text(size: 16pt)[4.1%],
-        text(size: 16pt)[cuStreamSynchronize],        text(size: 16pt)[2.45 #sym.mu\s],   text(size: 16pt)[6.1%],
-        text(size: 16pt, weight: "bold")[Hot-path total], text(size: 16pt, weight: "bold")[4.1 #sym.mu\s], text(size: 16pt, weight: "bold")[launch+sync],
-        text(size: 16pt, fill: teal, weight: "bold")[Selection overhead], text(size: 16pt, fill: teal, weight: "bold")[3–6 ns], text(size: 16pt, fill: teal, weight: "bold")[< 0.02%],
+        text(size: 15pt)[cuModuleLoadData (cold)],  text(size: 15pt, weight: "bold", fill: orange)[36.0 #sym.mu\s],  text(size: 15pt)[89.6%],
+        text(size: 15pt)[cuModuleLoadData (warm)],   text(size: 15pt)[9.6 #sym.mu\s],   text(size: 15pt)[--],
+        text(size: 15pt)[cuModuleGetFunction],        text(size: 15pt)[63 ns],            text(size: 15pt)[0.2%],
+        text(size: 15pt)[cuLaunchKernel],             text(size: 15pt)[1.65 #sym.mu\s],   text(size: 15pt)[4.1%],
+        text(size: 15pt)[cuStreamSynchronize],        text(size: 15pt)[2.45 #sym.mu\s],   text(size: 15pt)[6.1%],
+        text(size: 15pt, weight: "bold")[Hot-path total], text(size: 15pt, weight: "bold")[4.1 #sym.mu\s], text(size: 15pt, weight: "bold")[launch+sync],
+        text(size: 15pt, fill: teal, weight: "bold")[Selection overhead], text(size: 15pt, fill: teal, weight: "bold")[3--6 ns], text(size: 15pt, fill: teal, weight: "bold")[< 0.02%],
       )
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 10: Variant Scaling
-    #card(accent: teal)[
-      = #text(fill: teal)[Selection Scales Linearly]
-      #v(6pt)
-
-      #image("figures/variant-scaling.svg", width: 100%)
-
-      #v(6pt)
+    // Regret Plot
+    #card(accent: deep-purple)[
+      = #text(fill: deep-purple)[Cumulative Regret]
+      #v(4pt)
+      #image("figures/regret.svg", width: 100%)
+      #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Even at 64 variants, selection stays under 400ns — three orders of magnitude below driver overhead.
+        Regret flattens after 9 iterations. Total regret is bounded by $O(N^2)$ — independent of horizon $T$.
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 11: Overhead Comparison
-    #card(accent: orange)[
-      = #text(fill: orange)[Overhead Comparison]
-      #v(6pt)
-
-      #image("figures/overhead-comparison.svg", width: 100%)
-
-      #v(6pt)
-      #text(size: 14pt, fill: rgb("#666"))[
-        Our dispatch adds negligible overhead compared to existing runtime costs — selection is noise-level relative to module loading.
-      ]
-    ]
-
-    #v(10pt)
-
-    // Card: Ongoing — Profiled Adaptive Dispatch
+    // Selection Heatmap
     #card(accent: teal)[
-      = #text(fill: teal)[Ongoing: Profiled Adaptive Dispatch]
+      = #text(fill: teal)[Selection Heatmap]
       #v(4pt)
-
-      #text(size: 18pt)[
-        *Phase 2:* Instead of static metadata-based selection, we explore *runtime profiling* to learn which variant is fastest.
-      ]
-
+      #image("figures/selection-heatmap.svg", width: 100%)
       #v(4pt)
-
-      #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
-        #text(size: 17pt, fill: rgb("#1a5c4a"))[
-          *Formulation:* Stochastic multi-armed bandit over kernel variants.\
-          *Key insight:* GPU dispatch is a _degenerate_ bandit — N#text(size: 14pt)[<]10 arms, #text(size: 14pt)[<]5% variance, cacheable contexts.
-        ]
-      ]
-
-      #v(4pt)
-
-      #grid(
-        columns: (1fr, 1fr),
-        column-gutter: 8pt,
-        stat-box("9", "Dispatches to\nconverge", accent: teal),
-        stat-box[O(N#super[2])][Regret bound\ (provably optimal)],
-      )
-
-      #v(4pt)
-      #text(size: 16pt, fill: rgb("#555"))[
-        *Warmup:* 3 samples #sym.times 3 variants = 9 dispatches #sym.arrow.r locks onto optimal.\
-        Exhaustive exploration #sym.arrow.r permanent exploitation.
+      #text(size: 14pt, fill: rgb("#666"))[
+        Visual of explore #sym.arrow exploit transition: round-robin warmup across all arms, then permanent lock onto the optimal variant.
       ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 12: Key Findings
+    // Variant Scaling
     #card(accent: llvm-blue)[
-      = #text(fill: llvm-blue)[Key Findings]
-      #v(6pt)
-
-      #grid(
-        columns: (1fr,),
-        row-gutter: 8pt,
-        block(inset: 8pt, radius: 4pt, fill: light-blue, width: 100%)[
-          #text(size: 18pt)[
-            *F1:* Module loading dominates cold dispatch at ~90% — selection policy is essentially free.
-          ]
-        ],
-        block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
-          #text(size: 18pt)[
-            *F2:* Five metadata keys suffice to express all observed vendor-selection patterns in the wild.
-          ]
-        ],
-        block(inset: 8pt, radius: 4pt, fill: light-orange, width: 100%)[
-          #text(size: 18pt)[
-            *F3:* Linear variant scaling means the approach works from 2 to 64+ variants without architectural changes.
-          ]
-        ],
-        block(inset: 8pt, radius: 4pt, fill: rgb("#f0e8f5"), width: 100%)[
-          #text(size: 18pt)[
-            *F4:* A declarative MLIR attribute (`#gpu.runtime_select`) cleanly separates policy from mechanism.
-          ]
-        ],
-      )
+      = #text(fill: llvm-blue)[Selection Scales Linearly]
+      #v(4pt)
+      #image("figures/variant-scaling.svg", width: 100%)
+      #v(4pt)
+      #text(size: 14pt, fill: rgb("#666"))[
+        Even at 64 variants, selection stays under 400 ns — three orders of magnitude below driver overhead.
+      ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Card 13: Prototype
+    // Prototype Stats
     #card(accent: navy)[
       = #text(fill: navy)[Prototype Implementation]
-      #v(6pt)
-
+      #v(4pt)
       #grid(
-        columns: (1fr, 1fr),
-        column-gutter: 8pt,
-        stat-box("5,157", "LOC — libkdl\n(dispatch library)", accent: navy),
-        stat-box("664", "LOC — PoC\n(MLIR integration)", accent: teal),
+        columns: (1fr, 1fr, 1fr),
+        column-gutter: 6pt,
+        stat-box("5,157", "LOC — libkdl\n(dispatch lib)", accent: navy),
+        stat-box("664", "LOC — PoC\n(MLIR integ.)", accent: teal),
+        stat-box("238", "LOC — MAB\nprofiler", accent: deep-purple),
       )
-
-      #v(8pt)
-      #text(size: 18pt)[
-        *libkdl* (Kernel Dynamic Linker) is a standalone C library that implements the dispatch algorithm. The PoC wires it into the MLIR GPU runtime via `gpu.launch_func` lowering.
-      ]
     ]
 
-    #v(10pt)
+    #v(8pt)
 
-    // Upstream Path — moved into right column
+    // Key Findings
+    #card(accent: llvm-blue)[
+      = #text(fill: llvm-blue)[Key Findings]
+      #v(4pt)
+      #grid(
+        columns: (1fr,),
+        row-gutter: 5pt,
+        block(inset: 6pt, radius: 4pt, fill: light-blue, width: 100%)[
+          #text(size: 17pt)[*F1:* Module loading dominates cold dispatch at ~90% — selection is essentially free.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-purple, width: 100%)[
+          #text(size: 17pt)[*F2:* GPU dispatch is a _degenerate_ bandit — exhaustive exploration provably optimal.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-teal, width: 100%)[
+          #text(size: 17pt)[*F3:* Convergence in 9 dispatches; zero marginal regret after lock-in.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-orange, width: 100%)[
+          #text(size: 17pt)[*F4:* Linear variant scaling works from 2 to 64+ variants without changes.]
+        ],
+      )
+    ]
+
+    #v(8pt)
+
+    // Upstream Path
     #card(accent: teal)[
       = #text(fill: teal)[Upstream Path]
-      #v(4pt)
+      #v(3pt)
       #let step(num, title, desc, accent: teal) = {
-        block(width: 100%, inset: 5pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
-          #grid(columns: (auto, 1fr), column-gutter: 6pt,
-            box(width: 22pt, height: 22pt, radius: 11pt, fill: accent, align(center + horizon)[#text(size: 13pt, weight: "bold", fill: white)[#num]]),
-            [#text(size: 16pt, weight: "bold", fill: navy)[#title] #text(size: 13pt, fill: rgb("#555"))[— #desc]],
+        block(width: 100%, inset: 4pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
+          #grid(columns: (auto, 1fr), column-gutter: 5pt,
+            box(width: 20pt, height: 20pt, radius: 10pt, fill: accent, align(center + horizon)[#text(size: 12pt, weight: "bold", fill: white)[#num]]),
+            [#text(size: 15pt, weight: "bold", fill: navy)[#title] #text(size: 12pt, fill: rgb("#555"))[— #desc]],
           )
         ]
       }
       #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
-      #v(3pt)
+      #v(2pt)
       #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
-      #v(3pt)
-      #step("3", "MLIR Attribute", "~780 LOC lowering", accent: orange)
-      #v(3pt)
+      #v(2pt)
+      #step("3", "MAB Profiler", "Drop-in profiled dispatch", accent: deep-purple)
+      #v(2pt)
       #text(size: 12pt, fill: rgb("#666"), style: "italic")[Each step independently useful.]
     ]
   ],
 )
 
-// Related Work + Upstream Path moved into columns above
-
-#v(6pt)
+#v(4pt)
 
 // ═══════════════════════════════════════════════════════════════════
-//  FOOTER (compact)
+//  FOOTER
 // ═══════════════════════════════════════════════════════════════════
 
-#block(width: 100%, inset: (x: 14pt, y: 8pt), radius: 4pt, fill: navy.lighten(92%), stroke: 1pt + navy.lighten(70%))[
+#block(width: 100%, inset: (x: 14pt, y: 7pt), radius: 4pt, fill: navy.lighten(92%), stroke: 1pt + navy.lighten(70%))[
   #grid(columns: (1fr, 1fr, 1fr),
-    align(left)[#text(size: 14pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
-    align(center)[#text(size: 14pt, fill: navy)[*EuroLLVM Developers' Meeting — Dublin 2026*]],
-    align(right)[#text(size: 14pt, fill: navy)[*5,157 + 664 LOC* · Apache 2.0 w/ LLVM Exception]],
+    align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
+    align(center)[#text(size: 13pt, fill: navy)[*Refs:* Auer et al. (2002) UCB1 · SparseX, CGO 2026 · *EuroLLVM Dublin 2026*]],
+    align(right)[#text(size: 13pt, fill: navy)[*5,157 + 664 + 238 LOC* · Apache 2.0 w/ LLVM Exception]],
   )
 ]

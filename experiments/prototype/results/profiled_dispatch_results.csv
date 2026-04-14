@@ -1,0 +1,126 @@
+=== Profiled Dispatch Benchmark ===
+Variants:
+  [0] sm_50_slow       simulated_time=500 us
+  [1] sm_80_fast       simulated_time=100 us
+  [2] sm_70_med        simulated_time=300 us
+
+Warmup samples per variant: 3
+Explore budget: 9 iterations (worst case)
+
+iter    variant   measured_ns     phase       cumul_regret_ns       variant_name
+------  --------  --------------  ----------  --------------------  ---------------
+0       0         604657          cold        504657                sm_50_slow
+1       0         597323          explore     1001980               sm_50_slow
+2       0         593691          explore     1495671               sm_50_slow
+3       1         195848          explore     1591519               sm_80_fast
+4       1         207652          explore     1699171               sm_80_fast
+5       1         206884          explore     1806055               sm_80_fast
+6       2         409647          explore     2115702               sm_70_med
+7       2         393513          explore     2409215               sm_70_med
+8       2         386878          explore     2696093               sm_70_med
+9       1         197874          exploit     2793967               sm_80_fast
+10      1         193194          exploit     2887161               sm_80_fast
+11      1         215196          exploit     3002357               sm_80_fast
+12      1         188305          exploit     3090662               sm_80_fast
+13      1         150308          exploit     3140970               sm_80_fast
+14      1         193264          exploit     3234234               sm_80_fast
+15      1         188514          exploit     3322748               sm_80_fast
+16      1         192356          exploit     3415104               sm_80_fast
+17      1         192775          exploit     3507879               sm_80_fast
+18      1         268907          exploit     3676786               sm_80_fast
+19      1         192775          exploit     3769561               sm_80_fast
+20      1         196127          exploit     3865688               sm_80_fast
+21      1         196687          exploit     3962375               sm_80_fast
+22      1         192146          exploit     4054521               sm_80_fast
+23      1         180342          exploit     4134863               sm_80_fast
+24      1         192425          exploit     4227288               sm_80_fast
+25      1         193264          exploit     4320552               sm_80_fast
+26      1         195779          exploit     4416331               sm_80_fast
+27      1         193124          exploit     4509455               sm_80_fast
+28      1         188654          exploit     4598109               sm_80_fast
+29      1         192845          exploit     4690954               sm_80_fast
+30      1         188165          exploit     4779119               sm_80_fast
+31      1         195987          exploit     4875106               sm_80_fast
+32      1         193683          exploit     4968789               sm_80_fast
+33      1         172450          exploit     5041239               sm_80_fast
+34      1         192985          exploit     5134224               sm_80_fast
+35      1         192495          exploit     5226719               sm_80_fast
+36      1         196617          exploit     5323336               sm_80_fast
+37      1         193264          exploit     5416600               sm_80_fast
+38      1         168678          exploit     5485278               sm_80_fast
+39      1         170703          exploit     5555981               sm_80_fast
+40      1         192286          exploit     5648267               sm_80_fast
+41      1         196686          exploit     5744953               sm_80_fast
+42      1         193264          exploit     5838217               sm_80_fast
+43      1         127399          exploit     5865616               sm_80_fast
+44      1         192495          exploit     5958111               sm_80_fast
+45      1         193194          exploit     6051305               sm_80_fast
+46      1         192775          exploit     6144080               sm_80_fast
+47      1         197594          exploit     6241674               sm_80_fast
+48      1         166932          exploit     6308606               sm_80_fast
+49      1         192985          exploit     6401591               sm_80_fast
+50      1         194730          exploit     6496321               sm_80_fast
+51      1         193263          exploit     6589584               sm_80_fast
+52      1         192775          exploit     6682359               sm_80_fast
+53      1         168468          exploit     6750827               sm_80_fast
+54      1         192775          exploit     6843602               sm_80_fast
+55      1         192985          exploit     6936587               sm_80_fast
+56      1         192776          exploit     7029363               sm_80_fast
+57      1         192286          exploit     7121649               sm_80_fast
+58      1         168678          exploit     7190327               sm_80_fast
+59      1         193473          exploit     7283800               sm_80_fast
+60      1         193055          exploit     7376855               sm_80_fast
+61      1         192775          exploit     7469630               sm_80_fast
+62      1         192845          exploit     7562475               sm_80_fast
+63      1         161693          exploit     7624168               sm_80_fast
+64      1         195080          exploit     7719248               sm_80_fast
+65      1         192496          exploit     7811744               sm_80_fast
+66      1         192915          exploit     7904659               sm_80_fast
+67      1         192565          exploit     7997224               sm_80_fast
+68      1         168887          exploit     8066111               sm_80_fast
+69      1         193264          exploit     8159375               sm_80_fast
+70      1         193404          exploit     8252779               sm_80_fast
+71      1         193124          exploit     8345903               sm_80_fast
+72      1         192775          exploit     8438678               sm_80_fast
+73      1         160436          exploit     8499114               sm_80_fast
+74      1         193264          exploit     8592378               sm_80_fast
+75      1         192635          exploit     8685013               sm_80_fast
+76      1         193473          exploit     8778486               sm_80_fast
+77      1         246068          exploit     8924554               sm_80_fast
+78      1         188096          exploit     9012650               sm_80_fast
+79      1         193264          exploit     9105914               sm_80_fast
+80      1         192705          exploit     9198619               sm_80_fast
+81      1         169237          exploit     9267856               sm_80_fast
+82      1         196616          exploit     9364472               sm_80_fast
+83      1         197455          exploit     9461927               sm_80_fast
+84      1         193404          exploit     9555331               sm_80_fast
+85      1         187886          exploit     9643217               sm_80_fast
+86      1         196337          exploit     9739554               sm_80_fast
+87      1         194242          exploit     9833796               sm_80_fast
+88      1         200458          exploit     9934254               sm_80_fast
+89      1         193543          exploit     10027797              sm_80_fast
+90      1         192984          exploit     10120781              sm_80_fast
+91      1         196337          exploit     10217118              sm_80_fast
+92      1         205068          exploit     10322186              sm_80_fast
+93      1         192775          exploit     10414961              sm_80_fast
+94      1         193473          exploit     10508434              sm_80_fast
+95      1         192915          exploit     10601349              sm_80_fast
+96      1         192496          exploit     10693845              sm_80_fast
+97      1         184324          exploit     10778169              sm_80_fast
+98      1         192565          exploit     10870734              sm_80_fast
+99      1         187886          exploit     10958620              sm_80_fast
+
+=== Summary ===
+Total dispatches:  100
+Explore dispatches: 8
+Best variant:      [1] sm_80_fast
+Best median time:  192915 ns (192.9 us)
+
+Per-variant statistics:
+  idx   name             samples     median_ns     
+  0     sm_50_slow       3           597323        
+  1     sm_80_fast       94          192915        
+  2     sm_70_med        3           393513        
+
+Converged to optimal at iteration: 9
+Cumulative regret:  10958620 ns (10958.6 us)
