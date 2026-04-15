@@ -284,6 +284,23 @@
       ]
     ]
 
+    #v(8pt)
+
+    // Prototype Stats — at end of col 1
+    #card(accent: navy)[
+      = #text(fill: navy)[Prototype]
+      #v(4pt)
+      #grid(
+        columns: (1fr, 1fr, 1fr),
+        column-gutter: 6pt,
+        stat-box("5,157", "LOC — libkdl", accent: navy),
+        stat-box("664", "LOC — PoC", accent: teal),
+        stat-box("238", "LOC — MAB", accent: deep-purple),
+      )
+      #v(4pt)
+      #text(size: 14pt, fill: rgb("#666"))[github.com/Akasxh/libkdl — Apache 2.0 w/ LLVM Exception]
+    ]
+
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -453,6 +470,27 @@
           #text(size: 17pt)[*F4:* Linear variant scaling works from 2 to 64+ variants without changes.]
         ],
       )
+    ]
+
+    #v(8pt)
+
+    // Upstream Path — at end of col 2
+    #card(accent: teal)[
+      = #text(fill: teal)[Upstream Path]
+      #v(3pt)
+      #let step(num, title, desc, accent: teal) = {
+        block(width: 100%, inset: 4pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
+          #grid(columns: (auto, 1fr), column-gutter: 5pt,
+            box(width: 20pt, height: 20pt, radius: 10pt, fill: accent, align(center + horizon)[#text(size: 12pt, weight: "bold", fill: white)[#num]]),
+            [#text(size: 15pt, weight: "bold", fill: navy)[#title] #text(size: 12pt, fill: rgb("#555"))[— #desc]],
+          )
+        ]
+      }
+      #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
+      #v(2pt)
+      #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
+      #v(2pt)
+      #step("3", "MAB Profiler", "Drop-in profiled dispatch", accent: deep-purple)
     ]
   ],
 
