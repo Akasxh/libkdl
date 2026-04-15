@@ -253,7 +253,7 @@
         text(size: 16pt)[Proteus],     no, no, yes, yes, no,
         text(size: 16pt)[liboffload],  yes, partial, no, no, yes,
         text(size: 16pt)[CPU FMV],     no, yes, yes, no, yes,
-        text(size: 16pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, partial,
+        text(size: 16pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, no,
       )
       #v(2pt)
       #grid(columns: (auto, auto, auto, 1fr), column-gutter: 10pt,
