@@ -253,7 +253,7 @@
         text(size: 16pt)[Proteus],     no, no, yes, yes, no,
         text(size: 16pt)[liboffload],  yes, partial, no, no, yes,
         text(size: 16pt)[CPU FMV],     no, yes, yes, no, yes,
-        text(size: 16pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, yes,
+        text(size: 16pt, weight: "bold", fill: llvm-blue)[*Ours*], yes, yes, yes, yes, partial,
       )
       #v(2pt)
       #grid(columns: (auto, auto, auto, 1fr), column-gutter: 10pt,
@@ -390,7 +390,7 @@
       #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
         #text(size: 19pt, fill: rgb("#1a5c4a"))[
           *Exhaustive exploration* ($N times w$ warmup samples) followed by *permanent exploitation*.\
-          *Regret:* $O(N^2)$ constant, provably optimal for this problem class.\
+          *Regret:* $O(N)$ constant, provably optimal for this problem class.\
           *UCB1 and Thompson Sampling are unnecessary.*
         ]
       ]
@@ -415,7 +415,7 @@
           t = time(variants[arm])
           stats[key].update(arm, t)
           return variants[arm]
-        cache[key] = argmin(stats[key].mean)
+        cache[key] = argmin(stats[key].median)
         return cache[key]
       ```
       #v(4pt)
@@ -524,12 +524,12 @@
         columns: (1fr, 1fr, 1fr),
         column-gutter: 8pt,
         stat-box("83%", "Of oracle\nperformance", accent: deep-purple),
-        stat-box[O(N#super[2])][Regret bound\ (constant)],
+        stat-box[O(N)][Regret bound\ (constant)],
         stat-box("7.3x", "Less regret\nthan random", accent: teal),
       )
       #v(4pt)
       #text(size: 15pt, fill: rgb("#555"), style: "italic")[
-        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance, 7.3x better than random, robust to noise.
+        With 5 near-identical variants (53% spread, 6% noise), profiled dispatch converges and achieves near-oracle performance, 7.3x better than random, robust to noise.
       ]
     ]
 
