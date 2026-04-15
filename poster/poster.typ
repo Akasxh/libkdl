@@ -1,4 +1,4 @@
-// EuroLLVM Dublin 2026 — Conference Poster
+// EuroLLVM Dublin 2026: Conference Poster
 // Bridging Runtime Gaps in LLVM: Vendor-Agnostic Dispatch for ML Kernels
 // Structure: MAB Profiled Adaptive Dispatch as CENTERPIECE
 
@@ -102,7 +102,7 @@
     columns: (auto, 1fr, auto),
     column-gutter: 16pt,
     align(left + horizon)[
-      #image("figures/llvm-logo.png", height: 100pt)
+      #image("figures/llvm-logo.png", height: 140pt)
     ],
     align(center + horizon)[
       #text(font: "Liberation Sans", size: 48pt, weight: "bold", fill: white)[
@@ -120,13 +120,6 @@
         EuroLLVM Developers' Meeting  ·  Dublin 2026
       ]
     ],
-    align(right + horizon)[
-      #block(inset: 8pt, radius: 4pt, fill: rgb("#ffffff22"), stroke: 1pt + rgb("#ffffff33"))[
-        #text(font: "Liberation Sans", size: 16pt, weight: "bold", fill: white)[EuroLLVM\Dublin 2026]
-        #v(2pt)
-        #text(font: "Liberation Sans", size: 13pt, fill: rgb("#bbddee"))[Poster Session]
-      ]
-    ],
   )
 ]
 
@@ -142,7 +135,7 @@
   row-gutter: 10pt,
 
   // ─────────────────────────────────────────────────────────────────
-  //  COLUMN 1 — Problem + Setup + Evidence from Col 3
+  //  COLUMN 1: Problem + Setup + Evidence from Col 3
   // ─────────────────────────────────────────────────────────────────
   [
     // Card: The Gap
@@ -150,7 +143,7 @@
       = #text(fill: orange)[The Gap]
       #v(4pt)
       #text(size: 20pt, weight: "bold", fill: navy)[
-        MLIR compiles one `gpu.module` to 3+ GPU vendors — but picks the *first compatible* binary at runtime.
+        MLIR compiles one `gpu.module` to 3+ GPU vendors, but picks the *first compatible* binary at runtime.
       ]
       #v(6pt)
       #block(inset: 7pt, radius: 4pt, fill: light-orange, width: 100%)[
@@ -173,9 +166,9 @@
           text(weight: "bold", size: 15pt)[*PR / Issue*],
           text(weight: "bold", size: 15pt)[*What it shows*],
         ),
-        text(size: 15pt)[`#148286`], text(size: 15pt)[XeVM — new vendor images arriving fast],
+        text(size: 15pt)[`#148286`], text(size: 15pt)[XeVM: new vendor images arriving fast],
         text(size: 15pt)[`#186088`], text(size: 15pt)[liboffload uses first-wins selection],
-        text(size: 15pt)[`#185663`], text(size: 15pt)[`isMetadataCompatible` — no policy],
+        text(size: 15pt)[`#185663`], text(size: 15pt)[`isMetadataCompatible`: no policy],
         text(size: 15pt)[`#75356`],  text(size: 15pt)[Chapel users need dispatch],
         text(size: 15pt)[`#88170`],  text(size: 15pt)[RFC: policy slot explicitly empty],
       )
@@ -187,7 +180,7 @@
 
     #v(8pt)
 
-    // Card: Phase 1 — Dispatch Measurement (SETUP for main story)
+    // Card: Phase 1: Dispatch Measurement (SETUP for main story)
     #card(accent: orange)[
       = #text(fill: orange)[Phase 1: Dispatch Measurement]
       #v(4pt)
@@ -280,17 +273,17 @@
       #image("figures/variant-scaling.svg", width: 100%)
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Even at 64 variants, selection stays under 400 ns — three orders of magnitude below driver overhead.
+        Even at 64 variants, selection stays under 400 ns. Three orders of magnitude below driver overhead.
       ]
     ]
 
   ],
 
   // ─────────────────────────────────────────────────────────────────
-  //  COLUMN 2 — Phase 2: Profiled Adaptive Dispatch (THE MAIN STORY)
+  //  COLUMN 2: Phase 2: Profiled Adaptive Dispatch (THE MAIN STORY)
   // ─────────────────────────────────────────────────────────────────
   [
-    // THE INSIGHT — Big callout
+    // THE INSIGHT: Big callout
     #block(
       width: 100%,
       inset: 14pt,
@@ -329,7 +322,7 @@
 
     #v(8pt)
 
-    // MAB Formulation — Highlighted mathematical box
+    // MAB Formulation: Highlighted mathematical box
     #block(
       width: 100%,
       inset: 12pt,
@@ -375,7 +368,7 @@
 
     #v(8pt)
 
-    // Why This Is a DEGENERATE Bandit — Key theoretical insight
+    // Why This Is a DEGENERATE Bandit: Key theoretical insight
     #block(
       width: 100%,
       inset: 12pt,
@@ -397,7 +390,7 @@
       #block(inset: 8pt, radius: 4pt, fill: light-teal, width: 100%)[
         #text(size: 19pt, fill: rgb("#1a5c4a"))[
           *Exhaustive exploration* ($N times w$ warmup samples) followed by *permanent exploitation*.\
-          *Regret:* $O(N^2)$ constant — provably optimal for this problem class.\
+          *Regret:* $O(N^2)$ constant, provably optimal for this problem class.\
           *UCB1 and Thompson Sampling are unnecessary.*
         ]
       ]
@@ -409,7 +402,7 @@
 
     #v(8pt)
 
-    // The Algorithm — 3-phase pseudocode (trimmed)
+    // The Algorithm: 3-phase pseudocode (trimmed)
     #card(accent: navy)[
       = #text(fill: navy)[The Algorithm]
       #v(4pt)
@@ -441,10 +434,10 @@
         columns: (1fr,),
         row-gutter: 5pt,
         block(inset: 6pt, radius: 4pt, fill: light-blue, width: 100%)[
-          #text(size: 17pt)[*F1:* Module loading dominates cold dispatch at ~90% — selection is essentially free.]
+          #text(size: 17pt)[*F1:* Module loading dominates cold dispatch at ~90%; selection is essentially free.]
         ],
         block(inset: 6pt, radius: 4pt, fill: light-purple, width: 100%)[
-          #text(size: 17pt)[*F2:* GPU dispatch is a _degenerate_ bandit — exhaustive exploration provably optimal.]
+          #text(size: 17pt)[*F2:* GPU dispatch is a _degenerate_ bandit; exhaustive exploration provably optimal.]
         ],
         block(inset: 6pt, radius: 4pt, fill: light-teal, width: 100%)[
           #text(size: 17pt)[*F3:* Convergence in 9 dispatches; zero marginal regret after lock-in.]
@@ -457,7 +450,7 @@
   ],
 
   // ─────────────────────────────────────────────────────────────────
-  //  COLUMN 3 — Compact Evidence + Results
+  //  COLUMN 3: Compact Evidence + Results
   // ─────────────────────────────────────────────────────────────────
   [
     // Dispatch Latency Table
@@ -504,13 +497,13 @@
       #image("figures/mab-context.svg", width: 100%)
       #v(4pt)
       #text(size: 14pt, fill: rgb("#666"))[
-        Different shapes converge to different optimal variants — context matters.
+        Different shapes converge to different optimal variants; context matters.
       ]
     ]
 
     #v(8pt)
 
-    // CONVERGENCE FIGURE — THE HERO FIGURE (moved from col 2)
+    // CONVERGENCE FIGURE: THE HERO FIGURE (moved from col 2)
     #block(
       width: 100%,
       inset: 12pt,
@@ -536,7 +529,7 @@
       )
       #v(4pt)
       #text(size: 15pt, fill: rgb("#555"), style: "italic")[
-        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance — 7.3x better than random, robust to noise.
+        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance, 7.3x better than random, robust to noise.
       ]
     ]
 
@@ -552,8 +545,8 @@
 
 #block(width: 100%, inset: (x: 14pt, y: 7pt), radius: 4pt, fill: navy.lighten(92%), stroke: 1pt + navy.lighten(70%))[
   #grid(columns: (1fr, 1fr, 1fr),
-    align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
-    align(center)[#text(size: 13pt, fill: navy)[*Refs:* Auer et al. (2002) UCB1 · SparseX, CGO 2026 · *EuroLLVM Dublin 2026*]],
-    align(right)[#text(size: 13pt, fill: navy)[*Prototype:* 5,157 + 664 + 238 LOC · Apache 2.0 w/ LLVM Exception]],
+    align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Prototype:* 6,059 LOC (C, no external deps)]],
+    align(center)[#text(size: 13pt, fill: navy)[*Contact:* 2201ee54\_sakash\@iitp.ac.in · drakathakash\@gmail.com]],
+    align(right)[#text(size: 13pt, fill: navy)[*EuroLLVM Developers' Meeting · Dublin 2026*]],
   )
 ]
