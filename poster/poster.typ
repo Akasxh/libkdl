@@ -5,7 +5,7 @@
 // ─── Page Setup ───────────────────────────────────────────────────
 #set page(
   width: 841mm,
-  height: 1189mm,
+  height: auto,
   margin: 14mm,
   fill: rgb("#f0ece6"),
 )
