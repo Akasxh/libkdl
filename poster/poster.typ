@@ -545,7 +545,7 @@
 
 #block(width: 100%, inset: (x: 14pt, y: 7pt), radius: 4pt, fill: navy.lighten(92%), stroke: 1pt + navy.lighten(70%))[
   #grid(columns: (1fr, 1fr, 1fr),
-    align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Prototype:* 6,059 LOC (C, no external deps)]],
+    align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl]],
     align(center)[#text(size: 13pt, fill: navy)[*Contact:* 2201ee54\_sakash\@iitp.ac.in · drakathakash\@gmail.com]],
     align(right)[#text(size: 13pt, fill: navy)[*EuroLLVM Developers' Meeting · Dublin 2026*]],
   )
