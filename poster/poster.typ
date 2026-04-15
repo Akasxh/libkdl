@@ -102,7 +102,7 @@
     columns: (auto, 1fr, auto),
     column-gutter: 16pt,
     align(left + horizon)[
-      #image("figures/llvm-logo.png", height: 65pt)
+      #image("figures/llvm-logo.png", height: 100pt)
     ],
     align(center + horizon)[
       #text(font: "Liberation Sans", size: 48pt, weight: "bold", fill: white)[
@@ -540,43 +540,7 @@
       ]
     ]
 
-    #v(8pt)
-
-    // Prototype Stats
-    #card(accent: navy)[
-      = #text(fill: navy)[Prototype Implementation]
-      #v(4pt)
-      #grid(
-        columns: (1fr, 1fr, 1fr),
-        column-gutter: 6pt,
-        stat-box("5,157", "LOC — libkdl\n(dispatch lib)", accent: navy),
-        stat-box("664", "LOC — PoC\n(MLIR integ.)", accent: teal),
-        stat-box("238", "LOC — MAB\nprofiler", accent: deep-purple),
-      )
-    ]
-
-    #v(8pt)
-
-    // Upstream Path
-    #card(accent: teal)[
-      = #text(fill: teal)[Upstream Path]
-      #v(3pt)
-      #let step(num, title, desc, accent: teal) = {
-        block(width: 100%, inset: 4pt, radius: 3pt, fill: accent.lighten(92%), stroke: 1pt + accent.lighten(60%))[
-          #grid(columns: (auto, 1fr), column-gutter: 5pt,
-            box(width: 20pt, height: 20pt, radius: 10pt, fill: accent, align(center + horizon)[#text(size: 12pt, weight: "bold", fill: white)[#num]]),
-            [#text(size: 15pt, weight: "bold", fill: navy)[#title] #text(size: 12pt, fill: rgb("#555"))[— #desc]],
-          )
-        ]
-      }
-      #step("1", "Metadata RFC", "5 keys, ~30 LOC patch", accent: teal)
-      #v(2pt)
-      #step("2", "Policy Slot", "Pluggable hook in liboffload", accent: llvm-blue)
-      #v(2pt)
-      #step("3", "MAB Profiler", "Drop-in profiled dispatch", accent: deep-purple)
-      #v(2pt)
-      #text(size: 12pt, fill: rgb("#666"), style: "italic")[Each step independently useful.]
-    ]
+    // Prototype + Upstream removed for cleaner alignment
   ],
 )
 
@@ -590,6 +554,6 @@
   #grid(columns: (1fr, 1fr, 1fr),
     align(left)[#text(size: 13pt, fill: navy)[*Code:* github.com/Akasxh/libkdl · *Contact:* sakash\@iitp.ac.in]],
     align(center)[#text(size: 13pt, fill: navy)[*Refs:* Auer et al. (2002) UCB1 · SparseX, CGO 2026 · *EuroLLVM Dublin 2026*]],
-    align(right)[#text(size: 13pt, fill: navy)[*5,157 + 664 + 238 LOC* · Apache 2.0 w/ LLVM Exception]],
+    align(right)[#text(size: 13pt, fill: navy)[*Prototype:* 5,157 + 664 + 238 LOC · Apache 2.0 w/ LLVM Exception]],
   )
 ]
