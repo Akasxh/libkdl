@@ -433,34 +433,26 @@
 
     #v(8pt)
 
-    // CONVERGENCE FIGURE — THE HERO FIGURE (BIG)
-    #block(
-      width: 100%,
-      inset: 12pt,
-      radius: 8pt,
-      fill: white,
-      stroke: (
-        top: 5pt + deep-purple,
-        left: 2pt + deep-purple.lighten(40%),
-        right: 2pt + deep-purple.lighten(40%),
-        bottom: 2pt + deep-purple.lighten(40%),
-      ),
-    )[
-      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[Profiled vs. Baselines]
-      #v(6pt)
-      #image("figures/mab-comparison.svg", width: 100%)
-      #v(6pt)
-      #grid(
-        columns: (1fr, 1fr, 1fr),
-        column-gutter: 8pt,
-        stat-box("83%", "Of oracle\nperformance", accent: deep-purple),
-        stat-box[O(N#super[2])][Regret bound\ (constant)],
-        stat-box("7.3x", "Less regret\nthan random", accent: teal),
-      )
+    // Key Findings (moved from col 3)
+    #card(accent: llvm-blue)[
+      = #text(fill: llvm-blue)[Key Findings]
       #v(4pt)
-      #text(size: 15pt, fill: rgb("#555"), style: "italic")[
-        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance — 7.3x better than random, robust to noise.
-      ]
+      #grid(
+        columns: (1fr,),
+        row-gutter: 5pt,
+        block(inset: 6pt, radius: 4pt, fill: light-blue, width: 100%)[
+          #text(size: 17pt)[*F1:* Module loading dominates cold dispatch at ~90% — selection is essentially free.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-purple, width: 100%)[
+          #text(size: 17pt)[*F2:* GPU dispatch is a _degenerate_ bandit — exhaustive exploration provably optimal.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-teal, width: 100%)[
+          #text(size: 17pt)[*F3:* Convergence in 9 dispatches; zero marginal regret after lock-in.]
+        ],
+        block(inset: 6pt, radius: 4pt, fill: light-orange, width: 100%)[
+          #text(size: 17pt)[*F4:* Linear variant scaling works from 2 to 64+ variants without changes.]
+        ],
+      )
     ]
   ],
 
@@ -518,6 +510,38 @@
 
     #v(8pt)
 
+    // CONVERGENCE FIGURE — THE HERO FIGURE (moved from col 2)
+    #block(
+      width: 100%,
+      inset: 12pt,
+      radius: 8pt,
+      fill: white,
+      stroke: (
+        top: 5pt + deep-purple,
+        left: 2pt + deep-purple.lighten(40%),
+        right: 2pt + deep-purple.lighten(40%),
+        bottom: 2pt + deep-purple.lighten(40%),
+      ),
+    )[
+      #text(font: "Liberation Sans", size: 26pt, weight: "bold", fill: deep-purple)[Profiled vs. Baselines]
+      #v(6pt)
+      #image("figures/mab-comparison.svg", width: 100%)
+      #v(6pt)
+      #grid(
+        columns: (1fr, 1fr, 1fr),
+        column-gutter: 8pt,
+        stat-box("83%", "Of oracle\nperformance", accent: deep-purple),
+        stat-box[O(N#super[2])][Regret bound\ (constant)],
+        stat-box("7.3x", "Less regret\nthan random", accent: teal),
+      )
+      #v(4pt)
+      #text(size: 15pt, fill: rgb("#555"), style: "italic")[
+        With 5 near-identical variants (12% spread, 8% noise), profiled dispatch converges and achieves near-oracle performance — 7.3x better than random, robust to noise.
+      ]
+    ]
+
+    #v(8pt)
+
     // Prototype Stats
     #card(accent: navy)[
       = #text(fill: navy)[Prototype Implementation]
@@ -528,30 +552,6 @@
         stat-box("5,157", "LOC — libkdl\n(dispatch lib)", accent: navy),
         stat-box("664", "LOC — PoC\n(MLIR integ.)", accent: teal),
         stat-box("238", "LOC — MAB\nprofiler", accent: deep-purple),
-      )
-    ]
-
-    #v(8pt)
-
-    // Key Findings
-    #card(accent: llvm-blue)[
-      = #text(fill: llvm-blue)[Key Findings]
-      #v(4pt)
-      #grid(
-        columns: (1fr,),
-        row-gutter: 5pt,
-        block(inset: 6pt, radius: 4pt, fill: light-blue, width: 100%)[
-          #text(size: 17pt)[*F1:* Module loading dominates cold dispatch at ~90% — selection is essentially free.]
-        ],
-        block(inset: 6pt, radius: 4pt, fill: light-purple, width: 100%)[
-          #text(size: 17pt)[*F2:* GPU dispatch is a _degenerate_ bandit — exhaustive exploration provably optimal.]
-        ],
-        block(inset: 6pt, radius: 4pt, fill: light-teal, width: 100%)[
-          #text(size: 17pt)[*F3:* Convergence in 9 dispatches; zero marginal regret after lock-in.]
-        ],
-        block(inset: 6pt, radius: 4pt, fill: light-orange, width: 100%)[
-          #text(size: 17pt)[*F4:* Linear variant scaling works from 2 to 64+ variants without changes.]
-        ],
       )
     ]
 
